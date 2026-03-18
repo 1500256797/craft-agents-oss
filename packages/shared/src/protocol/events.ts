@@ -4,6 +4,7 @@
  */
 
 import type { ThemeOverrides } from '../config/index'
+import type { UiLanguage } from '../config/types'
 import type { LoadedSource } from '../sources/types'
 import type { LoadedSkill } from '../skills/types'
 import { RPC_CHANNELS } from './channels'
@@ -35,6 +36,7 @@ export interface BroadcastEventMap {
   [RPC_CHANNELS.theme.SYSTEM_CHANGED]: [isDark: boolean]
   [RPC_CHANNELS.theme.PREFERENCES_CHANGED]: [preferences: { mode: string; colorTheme: string; font: string }]
   [RPC_CHANNELS.theme.WORKSPACE_THEME_CHANGED]: [data: { workspaceId: string; themeId: string | null }]
+  [RPC_CHANNELS.locale.CHANGED]: [language: UiLanguage]
 
   // Update broadcasts (global)
   [RPC_CHANNELS.update.AVAILABLE]: [info: UpdateInfo]
@@ -46,6 +48,7 @@ export interface BroadcastEventMap {
 
   // Window events (per-window)
   [RPC_CHANNELS.window.FOCUS_STATE]: [isFocused: boolean]
+  [RPC_CHANNELS.window.FULLSCREEN_STATE]: [isFullscreen: boolean]
   [RPC_CHANNELS.window.CLOSE_REQUESTED]: []
 
   // Browser pane events (global)

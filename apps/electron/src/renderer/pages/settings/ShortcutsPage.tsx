@@ -11,6 +11,7 @@ import { SettingsSection, SettingsCard, SettingsRow } from '@/components/setting
 import type { DetailsPageMeta } from '@/lib/navigation-registry'
 import { isMac } from '@/lib/platform'
 import { actionsByCategory, useActionLabel, type ActionId } from '@/actions'
+import { useI18n } from '@/context/I18nContext'
 
 export const meta: DetailsPageMeta = {
   navigator: 'settings',
@@ -26,34 +27,6 @@ interface ShortcutSection {
   title: string
   shortcuts: ShortcutItem[]
 }
-
-// Component-specific shortcuts that aren't in the centralized registry
-const componentSpecificSections: ShortcutSection[] = [
-  {
-    title: 'List Navigation',
-    shortcuts: [
-      { keys: ['↑', '↓'], description: 'Navigate items in list' },
-      { keys: ['Home'], description: 'Go to first item' },
-      { keys: ['End'], description: 'Go to last item' },
-    ],
-  },
-  {
-    title: 'Session List',
-    shortcuts: [
-      { keys: ['Enter'], description: 'Focus chat input' },
-      { keys: ['Right-click'], description: 'Open context menu' },
-      { keys: [isMac ? '⌥' : 'Alt', 'Click'], description: 'Add filter as excluded' },
-    ],
-  },
-  {
-    title: 'Chat Input',
-    shortcuts: [
-      { keys: ['Enter'], description: 'Send message' },
-      { keys: ['Shift', 'Enter'], description: 'New line' },
-      { keys: ['Esc'], description: 'Close dialog / blur input' },
-    ],
-  },
-]
 
 function Kbd({ children }: { children: React.ReactNode }) {
   return (
@@ -90,9 +63,37 @@ function ActionShortcutRow({ actionId }: { actionId: ActionId }) {
 }
 
 export default function ShortcutsPage() {
+  const { t } = useI18n()
+  const localizedSections: ShortcutSection[] = [
+    {
+      title: t('settings.shortcuts.listNavigation'),
+      shortcuts: [
+        { keys: ['↑', '↓'], description: t('settings.shortcuts.items.navigateList') },
+        { keys: ['Home'], description: t('settings.shortcuts.items.firstItem') },
+        { keys: ['End'], description: t('settings.shortcuts.items.lastItem') },
+      ],
+    },
+    {
+      title: t('settings.shortcuts.sessionList'),
+      shortcuts: [
+        { keys: ['Enter'], description: t('settings.shortcuts.items.focusChatInput') },
+        { keys: ['Right-click'], description: t('settings.shortcuts.items.openContextMenu') },
+        { keys: [isMac ? '⌥' : 'Alt', 'Click'], description: t('settings.shortcuts.items.addExcludedFilter') },
+      ],
+    },
+    {
+      title: t('settings.shortcuts.chatInput'),
+      shortcuts: [
+        { keys: ['Enter'], description: t('settings.shortcuts.items.sendMessage') },
+        { keys: ['Shift', 'Enter'], description: t('settings.shortcuts.items.newLine') },
+        { keys: ['Esc'], description: t('settings.shortcuts.items.closeDialog') },
+      ],
+    },
+  ]
+
   return (
     <div className="h-full flex flex-col">
-      <PanelHeader title="Shortcuts" />
+      <PanelHeader title={t('settings.pages.shortcuts.title')} />
       <div className="flex-1 min-h-0 mask-fade-y">
         <ScrollArea className="h-full">
           <div className="px-5 py-7 max-w-3xl mx-auto space-y-8">
@@ -108,7 +109,7 @@ export default function ShortcutsPage() {
             ))}
 
             {/* Component-specific sections */}
-            {componentSpecificSections.map((section) => (
+            {localizedSections.map((section) => (
               <SettingsSection key={section.title} title={section.title}>
                 <SettingsCard>
                   {section.shortcuts.map((shortcut, index) => (

@@ -63,6 +63,7 @@ import { SourceAvatar } from '@/components/ui/source-avatar'
 import { SourceSelectorPopover } from '@/components/ui/SourceSelectorPopover'
 import { ConnectionIcon } from '@/components/icons/ConnectionIcon'
 import { FreeFormInputContextBadge } from './FreeFormInputContextBadge'
+import { useI18n } from '@/context/I18nContext'
 import type { FileAttachment, LoadedSource, LoadedSkill } from '../../../../shared/types'
 import type { PermissionMode } from '@craft-agent/shared/agent/modes'
 import { type ThinkingLevel, THINKING_LEVELS, getThinkingLevelName } from '@craft-agent/shared/agent/thinking-levels'
@@ -108,16 +109,18 @@ function formatFollowUpChipText(text: string, fallback: string, maxLength = 50):
 /** Platform-specific modifier key for keyboard shortcuts */
 const cmdKey = isMac ? '⌘' : 'Ctrl'
 
-/** Default rotating placeholders for onboarding/empty state */
-const DEFAULT_PLACEHOLDERS = [
-  'What would you like to work on?',
-  'Use Shift + Tab to switch between Explore and Execute',
-  'Type @ to mention files, folders, or skills',
-  'Type # to apply labels to this conversation',
-  'Press Shift + Return to add a new line',
-  `Press ${cmdKey} + B to toggle the sidebar`,
-  `Press ${cmdKey} + . for focus mode`,
-]
+/** Get default rotating placeholders for onboarding/empty state */
+function getDefaultPlaceholders(t: (key: string, params?: Record<string, any>) => string): string[] {
+  return [
+    t('common.freeFormInput.placeholders.0'),
+    t('common.freeFormInput.placeholders.1'),
+    t('common.freeFormInput.placeholders.2'),
+    t('common.freeFormInput.placeholders.3'),
+    t('common.freeFormInput.placeholders.4'),
+    t('common.freeFormInput.placeholders.5', { cmdKey }),
+    t('common.freeFormInput.placeholders.6', { cmdKey }),
+  ]
+}
 
 /** Fisher-Yates shuffle — returns a new array in random order */
 function shuffleArray<T>(array: T[]): T[] {
@@ -247,7 +250,7 @@ export interface FreeFormInputProps {
  * - Active option badges
  */
 export function FreeFormInput({
-  placeholder = DEFAULT_PLACEHOLDERS,
+  placeholder,
   disabled = false,
   isProcessing = false,
   onSubmit,
@@ -289,6 +292,12 @@ export function FreeFormInput({
   onConnectionChange,
   connectionUnavailable = false,
 }: FreeFormInputProps) {
+  const { t } = useI18n()
+
+  // Default placeholder if not provided
+  const defaultPlaceholders = React.useMemo(() => getDefaultPlaceholders(t), [t])
+  const effectivePlaceholderProp = placeholder ?? defaultPlaceholders
+
   // Read connection default model, connections, and workspace info from context.
   // Uses optional variant so playground (no provider) doesn't crash.
   const appShellCtx = useOptionalAppShellContext()
@@ -350,21 +359,21 @@ export function FreeFormInput({
   // Each provider (Anthropic, Pi) can have multiple connections (API Key, OAuth, etc.)
   const connectionsByProvider = React.useMemo(() => {
     const groups: Record<string, typeof llmConnections> = {
-      'Anthropic': [],
-      'Craft Agents Backend': [],
+      [t('common.freeFormInput.providerGroups.anthropic')]: [],
+      [t('common.freeFormInput.providerGroups.craftAgentsBackend')]: [],
     }
     for (const conn of llmConnections) {
       const provider = conn.providerType || 'anthropic'
       // Group by SDK: anthropic/anthropic_compat/bedrock/vertex use Anthropic SDK
       if (provider === 'anthropic' || provider === 'anthropic_compat' || provider === 'bedrock' || provider === 'vertex') {
-        groups['Anthropic'].push(conn)
+        groups[t('common.freeFormInput.providerGroups.anthropic')].push(conn)
       } else if (provider === 'pi' || provider === 'pi_compat') {
-        groups['Craft Agents Backend'].push(conn)
+        groups[t('common.freeFormInput.providerGroups.craftAgentsBackend')].push(conn)
       }
     }
     // Return only non-empty groups
     return Object.entries(groups).filter(([, conns]) => conns.length > 0)
-  }, [llmConnections])
+  }, [llmConnections, t])
 
   // Find current connection details for display
   const currentConnectionDetails = React.useMemo(() => {
@@ -407,7 +416,7 @@ export function FreeFormInput({
   // Shuffle placeholder order once per mount so each session feels fresh
   // Hide placeholder entirely when panel is unfocused in multi-panel layout
   const shuffledPlaceholder = React.useMemo(
-    () => Array.isArray(placeholder) ? shuffleArray(placeholder) : placeholder,
+    () => Array.isArray(effectivePlaceholderProp) ? shuffleArray(effectivePlaceholderProp) : effectivePlaceholderProp,
     [] // eslint-disable-line react-hooks/exhaustive-deps -- intentionally shuffle only on mount
   )
   const effectivePlaceholder = isFocusedPanel ? shuffledPlaceholder : ''
@@ -925,7 +934,7 @@ export function FreeFormInput({
   // Memoize the add-label config so the EditPopover doesn't recreate on every render
   const addLabelEditConfig = React.useMemo(() => {
     if (!workspaceRootPath) return null
-    return getEditConfig('add-label', workspaceRootPath)
+    return getEditConfig('add-label', workspaceRootPath, t)
   }, [workspaceRootPath])
 
   // Report height changes to parent (for external animation sync)
@@ -1637,15 +1646,15 @@ export function FreeFormInput({
             // Show count ("1 file" / "X files") instead of filename for cleaner UI
             label={attachments.length > 0
               ? attachments.length === 1
-                ? "1 file"
-                : `${attachments.length} files`
-              : "Attach Files"
+                ? t('common.freeFormInput.fileCount', { count: 1 })
+                : t('common.freeFormInput.fileCountPlural', { count: attachments.length })
+              : t('common.freeFormInput.attachFiles')
             }
             isExpanded={isEmptySession}
             hasSelection={attachments.length > 0}
             showChevron={false}
             onClick={handleAttachClick}
-            tooltip="Attach files"
+            tooltip={t('common.freeFormInput.attachFilesTooltip')}
             disabled={disabled}
           />
 
@@ -1690,7 +1699,7 @@ export function FreeFormInput({
                 }
                 label={
                   optimisticSourceSlugs.length === 0
-                    ? "Choose Sources"
+                    ? t('common.freeFormInput.chooseSources')
                     : (() => {
                         const enabledSources = sources.filter(s => optimisticSourceSlugs.includes(s.config.slug))
                         if (enabledSources.length === 1) return enabledSources[0].config.name
@@ -1705,7 +1714,7 @@ export function FreeFormInput({
                 disabled={disabled}
                 data-tutorial="source-selector-button"
                 onClick={() => setSourceDropdownOpen(prev => !prev)}
-                tooltip="Sources"
+                tooltip={t('common.freeFormInput.sourcesTooltip')}
               />
 
               <SourceSelectorPopover
@@ -2073,6 +2082,7 @@ function WorkingDirectoryBadge({
   sessionFolderPath?: string
   isEmptySession?: boolean
 }) {
+  const { t } = useI18n()
   const [recentDirs, setRecentDirs] = React.useState<string[]>([])
   const [popoverOpen, setPopoverOpen] = React.useState(false)
   const [homeDir, setHomeDir] = React.useState<string>('')
@@ -2153,7 +2163,7 @@ function WorkingDirectoryBadge({
 
   // Determine label - "Work in Folder" if not set or at session root, otherwise folder name
   const hasFolder = !!workingDirectory && workingDirectory !== sessionFolderPath
-  const folderName = hasFolder ? (getPathBasename(workingDirectory) || 'Folder') : 'Work in Folder'
+  const folderName = hasFolder ? (getPathBasename(workingDirectory) || 'Folder') : t('common.freeFormInput.workInFolder')
 
   // Show reset option when a folder is selected and it differs from session folder
   const showReset = hasFolder && sessionFolderPath && sessionFolderPath !== workingDirectory
@@ -2177,11 +2187,11 @@ function WorkingDirectoryBadge({
             tooltip={
               hasFolder ? (
                 <span className="flex flex-col gap-0.5">
-                  <span className="font-medium">Working directory</span>
+                  <span className="font-medium">{t('common.freeFormInput.workInFolder')}</span>
                   <span className="text-xs opacity-70">{formatPathForDisplay(workingDirectory, homeDir)}</span>
                   {gitBranch && <span className="text-xs opacity-70">on {gitBranch}</span>}
                 </span>
-              ) : "Choose working directory"
+              ) : t('common.freeFormInput.chooseWorkingDirectory')
             }
           />
         </span>
@@ -2195,7 +2205,7 @@ function WorkingDirectoryBadge({
                 ref={inputRef}
                 value={filter}
                 onValueChange={setFilter}
-                placeholder="Filter folders..."
+                placeholder={t('common.freeFormInput.filterFolders')}
                 className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/50 placeholder:select-none"
               />
             </div>

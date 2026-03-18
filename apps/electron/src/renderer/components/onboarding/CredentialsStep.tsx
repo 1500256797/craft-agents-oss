@@ -17,6 +17,7 @@ import {
   type OAuthStatus,
 } from "../apisetup"
 import type { CustomEndpointApi } from '@config/llm-connections'
+import { useI18n } from "@/context/I18nContext"
 
 export type CredentialStatus = ApiKeyStatus | OAuthStatus
 
@@ -57,6 +58,7 @@ export function CredentialsStep({
   copilotDeviceCode,
   editInitialValues,
 }: CredentialsStepProps) {
+  const { t } = useI18n()
   const isClaudeOAuth = apiSetupMethod === 'claude_oauth'
   const isChatGptOAuth = apiSetupMethod === 'pi_chatgpt_oauth'
   const isCopilotOAuth = apiSetupMethod === 'pi_copilot_oauth'
@@ -92,8 +94,8 @@ export function CredentialsStep({
   if (isChatGptOAuth) {
     return (
       <StepFormLayout
-        title="Connect ChatGPT"
-        description="Use your ChatGPT subscription to power Craft Agents."
+        title={t('onboarding.credentials.chatgptTitle')}
+        description={t('onboarding.credentials.chatgptDescription')}
         actions={
           <>
             <BackButton onClick={onBack} disabled={status === 'validating'} />
@@ -101,17 +103,17 @@ export function CredentialsStep({
               onClick={() => onStartOAuth?.()}
               className="gap-2"
               loading={status === 'validating'}
-              loadingText="Connecting..."
+              loadingText={t('onboarding.credentials.connecting')}
             >
               <ExternalLink className="size-4" />
-              Sign in with ChatGPT
+              {t('onboarding.credentials.signInWithChatgpt')}
             </ContinueButton>
           </>
         }
       >
         <div className="space-y-4">
           <div className="rounded-xl bg-foreground-2 p-4 text-sm text-muted-foreground">
-            <p>Click the button above to sign in with your OpenAI account. A browser window will open for authentication.</p>
+            <p>{t('onboarding.credentials.chatgptBody')}</p>
           </div>
           {status === 'error' && errorMessage && (
             <div className="rounded-lg bg-destructive/10 text-destructive text-sm p-3">
@@ -120,7 +122,7 @@ export function CredentialsStep({
           )}
           {status === 'success' && (
             <div className="rounded-lg bg-success/10 text-success text-sm p-3">
-              Connected! Your ChatGPT subscription is ready.
+              {t('onboarding.credentials.chatgptConnected')}
             </div>
           )}
         </div>
@@ -132,8 +134,8 @@ export function CredentialsStep({
   if (isCopilotOAuth) {
     return (
       <StepFormLayout
-        title="Connect GitHub Copilot"
-        description="Use your GitHub Copilot subscription to power Craft Agents."
+        title={t('onboarding.credentials.copilotTitle')}
+        description={t('onboarding.credentials.copilotDescription')}
         actions={
           <>
             <BackButton onClick={onBack} disabled={status === 'validating'} />
@@ -141,10 +143,10 @@ export function CredentialsStep({
               onClick={() => onStartOAuth?.()}
               className="gap-2"
               loading={status === 'validating'}
-              loadingText="Waiting for authorization..."
+              loadingText={t('onboarding.credentials.waitingAuth')}
             >
               <ExternalLink className="size-4" />
-              Sign in with GitHub
+              {t('onboarding.credentials.signInWithGithub')}
             </ContinueButton>
           </>
         }
@@ -153,7 +155,7 @@ export function CredentialsStep({
           {copilotDeviceCode ? (
             <div className="rounded-xl bg-foreground-2 p-4 text-sm space-y-3">
               <p className="text-muted-foreground text-center">
-                Enter this code on GitHub to authorize:
+                {t('onboarding.credentials.copilotEnterCode')}
               </p>
               <div className="flex flex-col items-center justify-center gap-2">
                 <button
@@ -165,16 +167,16 @@ export function CredentialsStep({
                 </button>
                 <span className={`text-xs text-muted-foreground flex items-center gap-1 transition-opacity ${copiedCode ? 'opacity-100' : 'opacity-0'}`}>
                   <Check className="size-3" />
-                  Copied to clipboard
+                  {t('onboarding.credentials.copiedToClipboard')}
                 </span>
               </div>
               <p className="text-muted-foreground text-xs text-center">
-                A browser window should have opened to github.com/login/device
+                {t('onboarding.credentials.browserOpened')}
               </p>
             </div>
           ) : (
             <div className="rounded-xl bg-foreground-2 p-4 text-sm text-muted-foreground text-center">
-              <p>Click the button above to sign in with your GitHub account.</p>
+              <p>{t('onboarding.credentials.clickSignInGithub')}</p>
             </div>
           )}
           {status === 'error' && errorMessage && (
@@ -184,7 +186,7 @@ export function CredentialsStep({
           )}
           {status === 'success' && (
             <div className="rounded-lg bg-success/10 text-success text-sm p-3 text-center">
-              Connected! Your GitHub Copilot subscription is ready.
+              {t('onboarding.credentials.copilotConnected')}
             </div>
           )}
         </div>
@@ -198,17 +200,17 @@ export function CredentialsStep({
     if (isWaitingForCode) {
       return (
         <StepFormLayout
-          title="Enter Authorization Code"
-          description="Copy the code from the browser page and paste it below."
+          title={t('onboarding.credentials.authCodeTitle')}
+          description={t('onboarding.credentials.authCodeDescription')}
           actions={
             <>
-              <BackButton onClick={onCancelOAuth} disabled={status === 'validating'}>Cancel</BackButton>
+              <BackButton onClick={onCancelOAuth} disabled={status === 'validating'}>{t('onboarding.common.cancel')}</BackButton>
               <ContinueButton
                 type="submit"
                 form="auth-code-form"
                 disabled={false}
                 loading={status === 'validating'}
-                loadingText="Connecting..."
+                loadingText={t('onboarding.credentials.connecting')}
               />
             </>
           }
@@ -227,8 +229,8 @@ export function CredentialsStep({
 
     return (
       <StepFormLayout
-        title="Connect Claude Account"
-        description="Use your Claude subscription to power multi-agent workflows."
+        title={t('onboarding.credentials.claudeTitle')}
+        description={t('onboarding.credentials.claudeDescription')}
         actions={
           <>
             <BackButton onClick={onBack} disabled={status === 'validating'} />
@@ -236,10 +238,10 @@ export function CredentialsStep({
               onClick={() => onStartOAuth?.()}
               className="gap-2"
               loading={status === 'validating'}
-              loadingText="Connecting..."
+              loadingText={t('onboarding.credentials.connecting')}
             >
               <ExternalLink className="size-4" />
-              Sign in with Claude
+              {t('onboarding.credentials.signInWithClaude')}
             </ContinueButton>
           </>
         }
@@ -260,8 +262,8 @@ export function CredentialsStep({
   // Determine provider type and description based on selected method
   const providerType = isPiApiKey ? 'pi_api_key' : 'anthropic'
   const apiKeyDescription = isPiApiKey
-    ? "Select a provider preset and enter the API key. For arbitrary Anthropic-compatible endpoints, use Anthropic API Key mode."
-    : "Enter your API key. Optionally configure a custom endpoint for OpenRouter, Ollama, or compatible APIs."
+    ? t('onboarding.credentials.apiDescriptionPi')
+    : t('onboarding.credentials.apiDescriptionAnthropic')
 
   const apiKeyInputKey = [
     apiSetupMethod,
@@ -274,7 +276,7 @@ export function CredentialsStep({
 
   return (
     <StepFormLayout
-      title="API Configuration"
+      title={t('onboarding.credentials.apiTitle')}
       description={apiKeyDescription}
       actions={
         <>
@@ -284,7 +286,7 @@ export function CredentialsStep({
             form="api-key-form"
             disabled={false}
             loading={status === 'validating'}
-            loadingText="Validating..."
+            loadingText={t('onboarding.credentials.validating')}
           />
         </>
       }

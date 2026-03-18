@@ -11,6 +11,7 @@ import type { AgentEvent, Effect } from './event-processor'
 import { AppShell } from '@/components/app-shell/AppShell'
 import type { AppShellContextType } from '@/context/AppShellContext'
 import { OnboardingWizard, ReauthScreen } from '@/components/onboarding'
+import { LoginScreen } from '@/components/auth/LoginScreen'
 import { ResetConfirmationDialog } from '@/components/ResetConfirmationDialog'
 import { SplashScreen } from '@/components/SplashScreen'
 import { TooltipProvider } from '@craft-agent/ui'
@@ -60,7 +61,7 @@ import { getFileManagerName } from '@/lib/platform'
 import { ActionRegistryProvider } from '@/actions'
 import { toast } from 'sonner'
 
-type AppState = 'loading' | 'onboarding' | 'reauth' | 'ready'
+type AppState = 'loading' | 'login' | 'onboarding' | 'reauth' | 'ready'
 
 /** Type for the Jotai store returned by useStore() */
 type JotaiStore = ReturnType<typeof getDefaultStore>
@@ -343,6 +344,12 @@ export default function App() {
     }
   }, [resolveDefaultConnectionSlug, windowWorkspaceId])
 
+  const resolvePostLoginState = useCallback(async () => {
+    const needs = await window.electronAPI.getSetupNeeds()
+    setSetupNeeds(needs)
+    setAppState(needs.isFullyConfigured ? 'ready' : 'onboarding')
+  }, [])
+
   // Handle onboarding completion
   const handleOnboardingComplete = useCallback(async () => {
     // Reload workspaces after onboarding
@@ -370,14 +377,7 @@ export default function App() {
 
   // Reauth login handler - placeholder (reauth is not currently used)
   const handleReauthLogin = useCallback(async () => {
-    // Re-check setup needs
-    const needs = await window.electronAPI.getSetupNeeds()
-    if (needs.isFullyConfigured) {
-      setAppState('ready')
-    } else {
-      setSetupNeeds(needs)
-      setAppState('onboarding')
-    }
+    setAppState('login')
   }, [])
 
   // Reauth reset handler - open reset confirmation dialog
@@ -402,24 +402,31 @@ export default function App() {
         const wsId = await window.electronAPI.getWindowWorkspace()
         setWindowWorkspaceId(wsId)
 
-        const needs = await window.electronAPI.getSetupNeeds()
-        setSetupNeeds(needs)
-
-        if (needs.isFullyConfigured) {
-          setAppState('ready')
-        } else {
-          // New user or needs setup - show onboarding
-          setAppState('onboarding')
+        const sessionState = await window.electronAPI.getAccountSessionState()
+        if (!sessionState.authenticated) {
+          setAppState('login')
+          return
         }
+
+        const currentUser = await window.electronAPI.getCurrentUser()
+        if (!currentUser) {
+          setAppState('login')
+          return
+        }
+
+        await resolvePostLoginState()
       } catch (error) {
         console.error('Failed to check auth state:', error)
-        // If check fails, show onboarding to be safe
-        setAppState('onboarding')
+        setAppState('login')
       }
     }
 
-    initialize()
-  }, [])
+    void initialize()
+  }, [resolvePostLoginState])
+
+  const handleLoginSuccess = useCallback(async () => {
+    await resolvePostLoginState()
+  }, [resolvePostLoginState])
 
   // Session selection state
   const [sessionSelection, setSession] = useSession()
@@ -1305,15 +1312,10 @@ export default function App() {
       initializeSessions([])
       setWorkspaces([])
       setWindowWorkspaceId(null)
-      // Reset setupNeeds to force fresh onboarding start
-      setSetupNeeds({
-        needsBillingConfig: true,
-        needsCredentials: true,
-        isFullyConfigured: false,
-      })
+      setSetupNeeds(null)
       // Reset onboarding hook state
       onboarding.reset()
-      setAppState('onboarding')
+      setAppState('login')
     } catch (error) {
       console.error('Reset failed:', error)
     } finally {
@@ -1514,6 +1516,25 @@ export default function App() {
     return <SplashScreen isExiting={false} />
   }
 
+  if (appState === 'login') {
+    return (
+      <DismissibleLayerProvider>
+        <ModalProvider>
+          <WindowCloseHandler />
+          <LoginScreen
+            onLoginSuccess={handleLoginSuccess}
+            onReset={handleReset}
+          />
+          <ResetConfirmationDialog
+            open={showResetDialog}
+            onConfirm={executeReset}
+            onCancel={() => setShowResetDialog(false)}
+          />
+        </ModalProvider>
+      </DismissibleLayerProvider>
+    )
+  }
+
   // Reauth state - session expired, need to re-login
   // ModalProvider + WindowCloseHandler ensures X button works on Windows
   if (appState === 'reauth') {
@@ -1602,7 +1623,7 @@ export default function App() {
           )}
 
           {/* Main UI - always rendered, splash fades away to reveal it */}
-          <div className="h-full flex flex-col pt-[48px] text-foreground">
+          <div className="h-full flex flex-col pt-[40px] text-foreground">
             {showTransportConnectionBanner && transportConnectionState && (
               <TransportConnectionBanner
                 state={transportConnectionState}

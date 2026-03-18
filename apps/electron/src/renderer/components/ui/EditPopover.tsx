@@ -19,13 +19,16 @@ import type { ContentBadge, Session, CreateSessionOptions } from '../../../share
 import { useActiveWorkspace, useAppShellContext, useSession } from '@/context/AppShellContext'
 import { useEscapeInterrupt } from '@/context/EscapeInterruptContext'
 import { ChatDisplay } from '../app-shell/ChatDisplay'
+import { useI18n } from '@/context/I18nContext'
 
 /** Rotating placeholders for compact mode input - short, action-oriented */
-const COMPACT_PLACEHOLDERS = [
-  'Just tell me what to change',
-  'Describe the update',
-  'What should I modify?',
-]
+function getCompactPlaceholders(t: (key: string) => string): string[] {
+  return [
+    t('common.editPopover.compactPlaceholders.0'),
+    t('common.editPopover.compactPlaceholders.1'),
+    t('common.editPopover.compactPlaceholders.2'),
+  ]
+}
 
 /**
  * Context passed to the new chat session so the agent knows exactly
@@ -109,10 +112,11 @@ export interface EditConfig {
  * Registry of all edit configurations.
  * Each entry contains all strings needed for the edit popover and agent context.
  */
-const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
+function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (location: string) => EditConfig> {
+  return {
   'workspace-permissions': (location) => ({
     context: {
-      label: 'Permission Settings',
+      label: t('common.editPopover.configs.workspacePermissions.label'),
       filePath: `${location}/permissions.json`,
       context:
         'The user is on the Settings Screen and pressed the edit button on Workspace Permission settings. ' +
@@ -122,7 +126,7 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'After editing, call config_validate with target "permissions" to verify the changes. ' +
         'Confirm clearly when done.',
     },
-    example: "Allow running 'make build' in Explore mode",
+    example: t('common.editPopover.configs.workspacePermissions.example'),
     model: 'sonnet',
     systemPromptPreset: 'mini',
     inlineExecution: true,
@@ -130,8 +134,8 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
 
   'default-permissions': (location) => ({
     context: {
-      label: 'Default Permissions',
-      filePath: location, // location is the full path for default permissions
+      label: t('common.editPopover.configs.defaultPermissions.label'),
+      filePath: location,
       context:
         'The user is editing app-level default permissions (~/.craft-agent/permissions/default.json). ' +
         'This file configures Explore mode rules that apply to ALL workspaces. ' +
@@ -141,16 +145,15 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'After editing, call config_validate with target "permissions" to verify the changes. ' +
         'Confirm clearly when done.',
     },
-    example: 'Allow git fetch command',
+    example: t('common.editPopover.configs.defaultPermissions.example'),
     model: 'sonnet',
     systemPromptPreset: 'mini',
     inlineExecution: true,
   }),
 
-  // Skill editing contexts
   'skill-instructions': (location) => ({
     context: {
-      label: 'Skill Instructions',
+      label: t('common.editPopover.configs.skillInstructions.label'),
       filePath: `${location}/SKILL.md`,
       context:
         'The user is editing skill instructions in SKILL.md. ' +
@@ -160,7 +163,7 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'After editing, call skill_validate with the skill slug to verify the changes. ' +
         'Confirm clearly when done.',
     },
-    example: 'Add error handling guidelines',
+    example: t('common.editPopover.configs.skillInstructions.example'),
     model: 'haiku',
     systemPromptPreset: 'mini',
     inlineExecution: true,
@@ -168,7 +171,7 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
 
   'skill-metadata': (location) => ({
     context: {
-      label: 'Skill Metadata',
+      label: t('common.editPopover.configs.skillMetadata.label'),
       filePath: `${location}/SKILL.md`,
       context:
         'The user is editing skill metadata in the YAML frontmatter of SKILL.md. ' +
@@ -177,16 +180,15 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'After editing, call skill_validate with the skill slug to verify the changes. ' +
         'Confirm clearly when done.',
     },
-    example: 'Update the skill description',
+    example: t('common.editPopover.configs.skillMetadata.example'),
     model: 'haiku',
     systemPromptPreset: 'mini',
     inlineExecution: true,
   }),
 
-  // Source editing contexts
   'source-guide': (location) => ({
     context: {
-      label: 'Source Documentation',
+      label: t('common.editPopover.configs.sourceGuide.label'),
       filePath: `${location}/guide.md`,
       context:
         'The user is editing source documentation (guide.md). ' +
@@ -194,7 +196,7 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'Keep content clear and actionable. ' +
         'Confirm clearly when done.',
     },
-    example: 'Add rate limit documentation',
+    example: t('common.editPopover.configs.sourceGuide.example'),
     model: 'haiku',
     systemPromptPreset: 'mini',
     inlineExecution: true,
@@ -202,7 +204,7 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
 
   'source-config': (location) => ({
     context: {
-      label: 'Source Configuration',
+      label: t('common.editPopover.configs.sourceConfig.label'),
       filePath: `${location}/config.json`,
       context:
         'The user is editing source configuration (config.json). ' +
@@ -211,7 +213,7 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'After editing, call source_test with the source slug to verify the configuration. ' +
         'Confirm clearly when done.',
     },
-    example: 'Update the display name',
+    example: t('common.editPopover.configs.sourceConfig.example'),
     model: 'sonnet',
     systemPromptPreset: 'mini',
     inlineExecution: true,
@@ -219,7 +221,7 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
 
   'source-permissions': (location) => ({
     context: {
-      label: 'Source Permissions',
+      label: t('common.editPopover.configs.sourcePermissions.label'),
       filePath: `${location}/permissions.json`,
       context:
         'The user is editing source-level permissions (permissions.json). ' +
@@ -228,7 +230,7 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'After editing, call config_validate with target "permissions" and the source slug to verify the changes. ' +
         'Confirm clearly when done.',
     },
-    example: 'Allow list operations in Explore mode',
+    example: t('common.editPopover.configs.sourcePermissions.example'),
     model: 'sonnet',
     systemPromptPreset: 'mini',
     inlineExecution: true,
@@ -236,7 +238,7 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
 
   'source-tool-permissions': (location) => ({
     context: {
-      label: 'Tool Permissions',
+      label: t('common.editPopover.configs.sourceToolPermissions.label'),
       filePath: `${location}/permissions.json`,
       context:
         'The user is viewing the Tools list for an MCP source and wants to modify tool permissions. ' +
@@ -247,17 +249,16 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'After editing, call config_validate with target "permissions" and the source slug to verify the changes. ' +
         'Confirm clearly when done.',
     },
-    example: 'Only allow read operations (list, get, search)',
+    example: t('common.editPopover.configs.sourceToolPermissions.example'),
     model: 'sonnet',
     systemPromptPreset: 'mini',
     inlineExecution: true,
   }),
 
-  // Preferences editing context
   'preferences-notes': (location) => ({
     context: {
-      label: 'Preferences Notes',
-      filePath: location, // location is the full path for preferences
+      label: t('common.editPopover.configs.preferencesNotes.label'),
+      filePath: location,
       context:
         'The user is editing the notes field in their preferences (~/.craft-agent/preferences.json). ' +
         'This is a JSON file. Only modify the "notes" field unless explicitly asked otherwise. ' +
@@ -265,17 +266,16 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'After editing, call config_validate with target "preferences" to verify the changes. ' +
         'Confirm clearly when done.',
     },
-    example: 'Add coding style preferences',
+    example: t('common.editPopover.configs.preferencesNotes.example'),
     model: 'haiku',
     systemPromptPreset: 'mini',
     inlineExecution: true,
   }),
 
-  // Add new source/skill contexts - use overridePlaceholder for inspiring, contextual prompts
   'add-source': (location) => ({
     context: {
-      label: 'Add Source',
-      filePath: `${location}/sources/`, // location is the workspace root path
+      label: t('common.editPopover.configs.addSource.label'),
+      filePath: `${location}/sources/`,
       context:
         'The user wants to add a new source to their workspace. ' +
         'Sources can be MCP servers (HTTP/SSE or stdio), REST APIs, or local filesystems. ' +
@@ -284,14 +284,13 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'Follow the patterns in ~/.craft-agent/docs/sources.md. ' +
         'After creating the source, call source_test with the source slug to verify the configuration.',
     },
-    example: 'Connect to my Craft space',
-    overridePlaceholder: 'What would you like to connect?',
+    example: t('common.editPopover.configs.addSource.example'),
+    overridePlaceholder: t('common.editPopover.configs.addSource.placeholder'),
   }),
 
-  // Filter-specific add-source contexts: user is viewing a filtered list and wants to add that type
   'add-source-api': (location) => ({
     context: {
-      label: 'Add API',
+      label: t('common.editPopover.configs.addSourceApi.label'),
       filePath: `${location}/sources/`,
       context:
         'The user is viewing API sources and wants to add a new REST API. ' +
@@ -302,13 +301,13 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'Follow the patterns in ~/.craft-agent/docs/sources.md. ' +
         'After creating the source, call source_test with the source slug to verify the configuration.',
     },
-    example: 'Connect to the OpenAI API',
-    overridePlaceholder: 'What API would you like to connect?',
+    example: t('common.editPopover.configs.addSourceApi.example'),
+    overridePlaceholder: t('common.editPopover.configs.addSourceApi.placeholder'),
   }),
 
   'add-source-mcp': (location) => ({
     context: {
-      label: 'Add MCP Server',
+      label: t('common.editPopover.configs.addSourceMcp.label'),
       filePath: `${location}/sources/`,
       context:
         'The user is viewing MCP sources and wants to add a new MCP server. ' +
@@ -319,13 +318,13 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'Follow the patterns in ~/.craft-agent/docs/sources.md. ' +
         'After creating the source, call source_test with the source slug to verify the configuration.',
     },
-    example: 'Connect to Linear',
-    overridePlaceholder: 'What MCP server would you like to connect?',
+    example: t('common.editPopover.configs.addSourceMcp.example'),
+    overridePlaceholder: t('common.editPopover.configs.addSourceMcp.placeholder'),
   }),
 
   'add-source-local': (location) => ({
     context: {
-      label: 'Add Local Folder',
+      label: t('common.editPopover.configs.addSourceLocal.label'),
       filePath: `${location}/sources/`,
       context:
         'The user wants to add a local folder source. ' +
@@ -337,14 +336,14 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'Follow the patterns in ~/.craft-agent/docs/sources.md. ' +
         'After creating the source, call source_test with the source slug to verify the configuration.',
     },
-    example: 'Connect to my Obsidian vault',
-    overridePlaceholder: 'What folder would you like to connect?',
+    example: t('common.editPopover.configs.addSourceLocal.example'),
+    overridePlaceholder: t('common.editPopover.configs.addSourceLocal.placeholder'),
   }),
 
   'add-skill': (location) => ({
     context: {
-      label: 'Add Skill',
-      filePath: `${location}/skills/`, // location is the workspace root path
+      label: t('common.editPopover.configs.addSkill.label'),
+      filePath: `${location}/skills/`,
       context:
         'The user wants to add a new skill to their workspace. ' +
         'Skills are specialized instructions with a SKILL.md file containing YAML frontmatter (name, description) and markdown instructions. ' +
@@ -353,8 +352,8 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'Follow the patterns in ~/.craft-agent/docs/skills.md. ' +
         'After creating the skill, call skill_validate with the skill slug to verify the SKILL.md file.',
     },
-    example: 'Review PRs following our code standards',
-    overridePlaceholder: 'What should I learn to do?',
+    example: t('common.editPopover.configs.addSkill.example'),
+    overridePlaceholder: t('common.editPopover.configs.addSkill.placeholder'),
   }),
 
   // Status configuration context
@@ -401,7 +400,7 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
   // Auto-label rules context (focused on regex patterns within labels)
   'edit-auto-rules': (location) => ({
     context: {
-      label: 'Auto-Apply Rules',
+      label: t('common.editPopover.configs.editAutoRules.label'),
       filePath: `${location}/labels/config.json`,
       context:
         'The user wants to edit auto-apply rules (regex patterns that auto-tag sessions). ' +
@@ -412,16 +411,16 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'Read ~/.craft-agent/docs/labels.md for full format reference. ' +
         'Confirm clearly when done.',
     },
-    example: 'Add a rule to detect GitHub issue URLs',
-    model: 'haiku',               // Use fast model for quick config edits
-    systemPromptPreset: 'mini',   // Use focused mini prompt
-    inlineExecution: true,        // Execute inline in popover
+    example: t('common.editPopover.configs.editAutoRules.example'),
+    model: 'haiku',
+    systemPromptPreset: 'mini',
+    inlineExecution: true,
   }),
 
   // Add new label context (triggered from the # menu when no labels match)
   'add-label': (location) => ({
     context: {
-      label: 'Add Label',
+      label: t('common.editPopover.configs.addLabel.label'),
       filePath: `${location}/labels/config.json`,
       context:
         'The user wants to create a new label from the # inline menu. ' +
@@ -432,17 +431,17 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'Read ~/.craft-agent/docs/labels.md for full format reference. ' +
         'Confirm clearly when done.',
     },
-    example: 'A red "Bug" label',
-    overridePlaceholder: 'What label would you like to create?',
-    model: 'haiku',               // Use fast model for quick config edits
-    systemPromptPreset: 'mini',   // Use focused mini prompt
-    inlineExecution: true,        // Execute inline in popover
+    example: t('common.editPopover.configs.addLabel.example'),
+    overridePlaceholder: t('common.editPopover.configs.addLabel.placeholder'),
+    model: 'haiku',
+    systemPromptPreset: 'mini',
+    inlineExecution: true,
   }),
 
   // Views configuration context
   'edit-views': (location) => ({
     context: {
-      label: 'Views Configuration',
+      label: t('common.editPopover.configs.editViews.label'),
       filePath: `${location}/views.json`,
       context:
         'The user wants to edit views (dynamic, expression-based filters). ' +
@@ -454,17 +453,17 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'Colors use EntityColor format: string shorthand (e.g. "orange") or { light, dark } object. ' +
         'Confirm clearly when done.',
     },
-    example: 'Add a "Stale" view for sessions inactive > 7 days',
-    model: 'haiku',               // Use fast model for quick config edits
-    systemPromptPreset: 'mini',   // Use focused mini prompt
-    inlineExecution: true,        // Execute inline in popover
+    example: t('common.editPopover.configs.editViews.example'),
+    model: 'haiku',
+    systemPromptPreset: 'mini',
+    inlineExecution: true,
   }),
 
   // Tool icons configuration context
   'edit-tool-icons': (location) => ({
     context: {
-      label: 'Tool Icons',
-      filePath: location, // location is the full path to tool-icons.json
+      label: t('common.editPopover.configs.editToolIcons.label'),
+      filePath: location,
       context:
         'The user wants to edit CLI tool icon mappings. ' +
         'The file is tool-icons.json in ~/.craft-agent/tool-icons/. Icon image files live in the same directory. ' +
@@ -475,15 +474,15 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'After editing, call config_validate with target "tool-icons" to verify the changes are valid. ' +
         'Confirm clearly when done.',
     },
-    example: 'Add an icon for my custom CLI tool "deploy"',
-    model: 'haiku',               // Use fast model for quick config edits
-    systemPromptPreset: 'mini',   // Use focused mini prompt
-    inlineExecution: true,        // Execute inline in popover
+    example: t('common.editPopover.configs.editToolIcons.example'),
+    model: 'haiku',
+    systemPromptPreset: 'mini',
+    inlineExecution: true,
   }),
 
   'automation-config': (location) => ({
     context: {
-      label: 'Automation Configuration',
+      label: t('common.editPopover.configs.automationConfig.label'),
       filePath: `${location}/automations.json`,
       context:
         'The user is editing automations.json which configures automations. ' +
@@ -492,11 +491,12 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
         'Read ~/.craft-agent/docs/automations.md for full format reference. ' +
         'After editing, confirm clearly what changed.',
     },
-    example: 'Change the cron schedule to every 30 minutes',
+    example: t('common.editPopover.configs.automationConfig.example'),
     model: 'sonnet',
     systemPromptPreset: 'mini',
     inlineExecution: true,
   }),
+}
 }
 
 /**
@@ -504,14 +504,17 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
  *
  * @param key - The edit context key
  * @param location - Base path (e.g., workspace root path)
+ * @param t - Translation function from useI18n hook
  *
  * @example
- * const { context, example } = getEditConfig('workspace-permissions', workspace.rootPath)
+ * const { t } = useI18n()
+ * const { context, example } = getEditConfig('workspace-permissions', workspace.rootPath, t)
  */
-export function getEditConfig(key: EditContextKey, location: string): EditConfig {
-  const factory = EDIT_CONFIGS[key]
+export function getEditConfig(key: EditContextKey, location: string, t: (key: string, params?: Record<string, any>) => string): EditConfig {
+  const configs = getEditConfigs(t)
+  const factory = configs[key]
   if (!factory) {
-    throw new Error(`Unknown edit context key: ${key}. Add it to EDIT_CONFIGS in EditPopover.tsx`)
+    throw new Error(`Unknown edit context key: ${key}. Add it to getEditConfigs in EditPopover.tsx`)
   }
   return factory(location)
 }
@@ -661,15 +664,17 @@ export function EditPopover({
   defaultValue = '',
   inlineExecution = false,
 }: EditPopoverProps) {
+  const { t } = useI18n()
   const { onOpenFile, onOpenUrl } = usePlatform()
   const workspace = useActiveWorkspace()
 
   // Build placeholder: for inline execution use rotating array, otherwise build descriptive string
   // overridePlaceholder allows contexts like add-source/add-skill to say "add" instead of "change"
+  const compactPlaceholders = useMemo(() => getCompactPlaceholders(t), [t])
   const placeholder = inlineExecution
-    ? COMPACT_PLACEHOLDERS
+    ? compactPlaceholders
     : (() => {
-        const basePlaceholder = overridePlaceholder ?? "Describe what you'd like to change..."
+        const basePlaceholder = overridePlaceholder ?? t('common.editPopover.defaultPlaceholder')
         return example
           ? `${basePlaceholder.replace(/\.{3}$/, '')}, e.g., "${example}"`
           : basePlaceholder

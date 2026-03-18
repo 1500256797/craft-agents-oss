@@ -48,6 +48,48 @@ export type {
 import type { AuthState, SetupNeeds } from '@craft-agent/shared/auth/types';
 import type { AuthType } from '@craft-agent/shared/config/types';
 export type { AuthState, SetupNeeds, AuthType };
+import type { AccountLoginInput, AccountSessionState, AccountUser } from '@craft-agent/shared/account-auth';
+export type { AccountLoginInput, AccountSessionState, AccountUser };
+import type {
+  AccountStatusSummary,
+  ChannelAccount,
+  ChannelTypeConfig,
+  ChannelsStatusSnapshot,
+  CreateModelProviderForm,
+  DocumentIndexItem,
+  KnowledgeBaseCreateForm,
+  KnowledgeBaseItem,
+  KnowledgeBaseQueryParams,
+  KnowledgeBaseStatus,
+  KnowledgeBaseUpdateForm,
+  KnowledgeTaskStatus,
+  ModelProviderItem,
+  ModelProviderListQueryParams,
+  ProviderModelItem,
+  ProviderStatus,
+  UserChannelConfig,
+  UpdateModelProviderForm,
+} from '@craft-agent/shared/account-api'
+export type {
+  AccountStatusSummary,
+  ChannelAccount,
+  ChannelTypeConfig,
+  ChannelsStatusSnapshot,
+  CreateModelProviderForm,
+  DocumentIndexItem,
+  KnowledgeBaseCreateForm,
+  KnowledgeBaseItem,
+  KnowledgeBaseQueryParams,
+  KnowledgeBaseStatus,
+  KnowledgeBaseUpdateForm,
+  KnowledgeTaskStatus,
+  ModelProviderItem,
+  ModelProviderListQueryParams,
+  ProviderModelItem,
+  ProviderStatus,
+  UserChannelConfig,
+  UpdateModelProviderForm,
+}
 
 // Credential health types
 import type { CredentialHealthStatus, CredentialHealthIssue, CredentialHealthIssueType } from '@craft-agent/shared/credentials/types';
@@ -62,8 +104,8 @@ import type { LoadedSkill, SkillMetadata } from '@craft-agent/shared/skills/type
 export type { LoadedSkill, SkillMetadata };
 
 // LLM connection types
-import type { LlmConnection, LlmConnectionWithStatus, LlmAuthType, LlmProviderType, NetworkProxySettings } from '@craft-agent/shared/config';
-export type { LlmConnection, LlmConnectionWithStatus, LlmAuthType, LlmProviderType, NetworkProxySettings };
+import type { LlmConnection, LlmConnectionWithStatus, LlmAuthType, LlmProviderType, NetworkProxySettings, UiLanguage } from '@craft-agent/shared/config';
+export type { LlmConnection, LlmConnectionWithStatus, LlmAuthType, LlmProviderType, NetworkProxySettings, UiLanguage };
 
 // =============================================================================
 // GUI-only types (not used by server/handler code)
@@ -313,9 +355,31 @@ export interface ElectronAPI {
   onDeepLinkNavigate(callback: (nav: DeepLinkNavigation) => void): () => void
 
   // Auth
+  login(input: AccountLoginInput): Promise<{ success: boolean; user?: AccountUser; error?: string }>
+  getCurrentUser(): Promise<AccountUser | null>
+  getAccountSessionState(): Promise<AccountSessionState>
+  getCaptchaId(): Promise<string>
+  getCaptchaImage(captchaId: string, reload?: boolean): Promise<string>
   showLogoutConfirmation(): Promise<boolean>
   showDeleteSessionConfirmation(name: string): Promise<boolean>
   logout(): Promise<void>
+  getChannelTypes(): Promise<ChannelTypeConfig[]>
+  getUserChannels(): Promise<UserChannelConfig[]>
+  getChannelAccounts(channelType: string): Promise<ChannelAccount[]>
+  getChannelsSnapshot(): Promise<ChannelsStatusSnapshot>
+  listModelProviders(params?: ModelProviderListQueryParams): Promise<{ data: ModelProviderItem[]; total: number }>
+  createModelProvider(input: CreateModelProviderForm): Promise<ModelProviderItem>
+  updateModelProvider(id: number, input: UpdateModelProviderForm): Promise<ModelProviderItem>
+  deleteModelProvider(id: number): Promise<void>
+  updateModelProviderStatus(id: number, status: ProviderStatus): Promise<void>
+  listKnowledgeBases(params?: KnowledgeBaseQueryParams): Promise<{ data: KnowledgeBaseItem[]; total: number }>
+  createKnowledgeBase(input: KnowledgeBaseCreateForm): Promise<{ id: number }>
+  updateKnowledgeBase(id: number, input: KnowledgeBaseUpdateForm): Promise<void>
+  deleteKnowledgeBase(id: number): Promise<void>
+  listKnowledgeDocuments(knowledgeBaseName: string): Promise<{ data: DocumentIndexItem[]; total: number }>
+  uploadKnowledgeDocument(knowledgeBaseName: string, filePath: string): Promise<{ task_id: string; message: string }>
+  deleteKnowledgeDocument(documentId: number): Promise<void>
+  getKnowledgeTaskStatus(taskId: string): Promise<KnowledgeTaskStatus>
 
   // Credential health check (startup validation)
   getCredentialHealth(): Promise<CredentialHealthStatus>
@@ -446,12 +510,15 @@ export interface ElectronAPI {
   loadPresetTheme(themeId: string): Promise<import('@config/theme').PresetTheme | null>
   getColorTheme(): Promise<string>
   setColorTheme(themeId: string): Promise<void>
+  getUiLanguage(): Promise<UiLanguage>
+  setUiLanguage(language: UiLanguage): Promise<void>
   getWorkspaceColorTheme(workspaceId: string): Promise<string | null>
   setWorkspaceColorTheme(workspaceId: string, themeId: string | null): Promise<void>
   getAllWorkspaceThemes(): Promise<Record<string, string | undefined>>
 
   // Theme change listeners
   onAppThemeChange(callback: (theme: import('@config/theme').ThemeOverrides | null) => void): () => void
+  onUiLanguageChange(callback: (language: UiLanguage) => void): () => void
 
   // Logo URL resolution
   getLogoUrl(serviceUrl: string, provider?: string): Promise<string | null>
@@ -487,6 +554,8 @@ export interface ElectronAPI {
   onBadgeDrawWindows(callback: (data: { count: number }) => void): () => void
   getWindowFocusState(): Promise<boolean>
   onWindowFocusChange(callback: (isFocused: boolean) => void): () => void
+  getWindowFullscreenState(): Promise<boolean>
+  onWindowFullscreenChange(callback: (isFullscreen: boolean) => void): () => void
   onNotificationNavigate(callback: (data: { workspaceId: string; sessionId: string }) => void): () => void
 
   // Theme preferences sync across windows
@@ -594,6 +663,8 @@ export type SessionFilter =
  */
 export type { SettingsSubpage } from './settings-registry'
 import { isValidSettingsSubpage, type SettingsSubpage } from './settings-registry'
+export type { ModuleSubpage } from './module-registry'
+import { isValidModuleSubpage, type ModuleSubpage } from './module-registry'
 
 /**
  * Sessions navigation state
@@ -641,6 +712,15 @@ export interface SettingsNavigationState {
 }
 
 /**
+ * Business module navigation state
+ */
+export interface ModuleNavigationState {
+  navigator: 'module'
+  subpage: ModuleSubpage
+  rightSidebar?: RightSidebarPanel
+}
+
+/**
  * Skills navigation state
  */
 export interface SkillsNavigationState {
@@ -666,6 +746,7 @@ export type NavigationState =
   | SessionsNavigationState
   | SourcesNavigationState
   | SettingsNavigationState
+  | ModuleNavigationState
   | SkillsNavigationState
   | AutomationsNavigationState
 
@@ -680,6 +761,10 @@ export const isSourcesNavigation = (
 export const isSettingsNavigation = (
   state: NavigationState
 ): state is SettingsNavigationState => state.navigator === 'settings'
+
+export const isModuleNavigation = (
+  state: NavigationState
+): state is ModuleNavigationState => state.navigator === 'module'
 
 export const isSkillsNavigation = (
   state: NavigationState
@@ -716,6 +801,9 @@ export const getNavigationStateKey = (state: NavigationState): string => {
   }
   if (state.navigator === 'settings') {
     return `settings:${state.subpage}`
+  }
+  if (state.navigator === 'module') {
+    return `module:${state.subpage}`
   }
   // Chats
   const f = state.filter
@@ -767,6 +855,14 @@ export const parseNavigationStateKey = (key: string): NavigationState | null => 
     const subpage = key.slice(9)
     if (isValidSettingsSubpage(subpage)) {
       return { navigator: 'settings', subpage }
+    }
+  }
+
+  // Handle business modules
+  if (key.startsWith('module:')) {
+    const subpage = key.slice(7)
+    if (isValidModuleSubpage(subpage)) {
+      return { navigator: 'module', subpage }
     }
   }
 

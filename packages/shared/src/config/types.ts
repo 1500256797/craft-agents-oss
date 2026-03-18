@@ -13,6 +13,9 @@ export type {
   OAuthCredentials,
 } from '@craft-agent/core/types';
 
+export type UiLanguage = 'system' | 'en' | 'zh-CN';
+export type ResolvedUiLanguage = Exclude<UiLanguage, 'system'>;
+
 /** App-level network proxy configuration. */
 export interface NetworkProxySettings {
   enabled: boolean;

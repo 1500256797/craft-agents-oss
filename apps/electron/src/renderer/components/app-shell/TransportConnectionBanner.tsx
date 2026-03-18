@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { useI18n } from '@/context/I18nContext'
 import type { TransportConnectionState } from '../../../shared/types'
 
 export function shouldShowTransportConnectionBanner(state: TransportConnectionState | null): boolean {
@@ -14,21 +15,21 @@ export interface TransportBannerCopy {
   tone: 'warning' | 'error' | 'info'
 }
 
-export function getTransportBannerCopy(state: TransportConnectionState): TransportBannerCopy {
+export function getTransportBannerCopy(state: TransportConnectionState, t: (key: string, params?: any) => string): TransportBannerCopy {
   switch (state.status) {
     case 'connecting':
       return {
-        title: 'Connecting to remote server',
-        description: `Connecting to ${state.url}...`,
+        title: t('common.banners.connectingToRemote'),
+        description: t('common.banners.connectingToUrl', { url: state.url }),
         showRetry: false,
         tone: 'info',
       }
 
     case 'reconnecting': {
-      const retry = state.nextRetryInMs != null ? `retry in ${state.nextRetryInMs}ms` : 'retrying'
+      const retry = state.nextRetryInMs != null ? t('common.banners.retryIn', { ms: state.nextRetryInMs }) : 'retrying'
       return {
-        title: 'Reconnecting to remote server',
-        description: `${getFailureReason(state)} (${retry}, attempt ${state.attempt})`,
+        title: t('common.banners.reconnectingToRemote'),
+        description: `${getFailureReason(state, t)} (${retry}, ${t('common.banners.attempt', { count: state.attempt })})`,
         showRetry: true,
         tone: 'warning',
       }
@@ -36,46 +37,46 @@ export function getTransportBannerCopy(state: TransportConnectionState): Transpo
 
     case 'failed':
       return {
-        title: 'Cannot connect to remote server',
-        description: getFailureReason(state),
+        title: t('common.banners.cannotConnectToRemote'),
+        description: getFailureReason(state, t),
         showRetry: true,
         tone: 'error',
       }
 
     case 'disconnected':
       return {
-        title: 'Connection to remote server lost',
-        description: getFailureReason(state),
+        title: t('common.banners.connectionLost'),
+        description: getFailureReason(state, t),
         showRetry: true,
         tone: 'warning',
       }
 
     default:
       return {
-        title: 'Remote server connection status',
-        description: getFailureReason(state),
+        title: t('common.banners.remoteServerStatus'),
+        description: getFailureReason(state, t),
         showRetry: true,
         tone: 'info',
       }
   }
 }
 
-function getFailureReason(state: TransportConnectionState): string {
+function getFailureReason(state: TransportConnectionState, t: (key: string, params?: any) => string): string {
   const err = state.lastError
   if (err) {
-    if (err.kind === 'auth') return 'Authentication failed. Verify CRAFT_SERVER_TOKEN.'
-    if (err.kind === 'protocol') return 'Protocol mismatch between client and server versions.'
-    if (err.kind === 'timeout') return `Connection to ${state.url} timed out. Server may be unreachable.`
-    if (err.kind === 'network') return `Could not connect to ${state.url}. Is the remote server running?`
+    if (err.kind === 'auth') return t('common.banners.authFailed')
+    if (err.kind === 'protocol') return t('common.banners.protocolMismatch')
+    if (err.kind === 'timeout') return t('common.banners.connectionTimeout', { url: state.url })
+    if (err.kind === 'network') return t('common.banners.networkError', { url: state.url })
     return err.message
   }
 
   if (state.lastClose?.code != null) {
     const reason = state.lastClose.reason ? ` (${state.lastClose.reason})` : ''
-    return `WebSocket closed with code ${state.lastClose.code}${reason}.`
+    return t('common.banners.websocketClosed', { code: state.lastClose.code, reason })
   }
 
-  return 'Waiting for remote server connection.'
+  return t('common.banners.waitingForConnection')
 }
 
 export function TransportConnectionBanner({
@@ -85,7 +86,8 @@ export function TransportConnectionBanner({
   state: TransportConnectionState
   onRetry: () => void
 }) {
-  const copy = getTransportBannerCopy(state)
+  const { t } = useI18n()
+  const copy = getTransportBannerCopy(state, t)
 
   const toneClasses = copy.tone === 'error'
     ? 'border-destructive/30 bg-destructive/10 text-destructive'
@@ -102,7 +104,7 @@ export function TransportConnectionBanner({
         </div>
         {copy.showRetry && (
           <Button size="sm" variant="outline" onClick={onRetry} className="shrink-0 h-7">
-            Retry
+            {t('common.actions.retry')}
           </Button>
         )}
       </div>

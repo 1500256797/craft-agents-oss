@@ -1,0 +1,1319 @@
+{
+  "common": {
+    "actions": {
+      "openInNewWindow": "Open in New Window",
+      "refresh": "Refresh",
+      "save": "Save",
+      "saving": "Saving...",
+      "reset": "Reset",
+      "checkNow": "Check Now",
+      "checking": "Checking...",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "learnMore": "Learn more",
+      "showIn": "Show in {{name}}",
+      "deleteSource": "Delete Source",
+      "deleteSkill": "Delete Skill",
+      "viewOutput": "View Output",
+      "stopTask": "Stop Task",
+      "retry": "Retry",
+      "connect": "Connect",
+      "addCredentials": "Add Credentials"
+    },
+    "account": {
+      "menuAria": "Open account menu",
+      "guest": "User",
+      "logout": "Log Out"
+    },
+    "errors": {
+      "failedToSave": "Failed to save",
+      "failedToSaveItem": "Failed to save {{item}}",
+      "terminalOverlayNotAvailable": "Terminal overlay not available",
+      "failedToLoadTaskOutput": "Failed to load task output"
+    },
+    "tasks": {
+      "task": "Task",
+      "shell": "Shell",
+      "clickForActions": "Click for task actions"
+    },
+    "banners": {
+      "connectionRequired": "Connection required",
+      "apiCredentialsRequired": "API credentials required",
+      "somethingWentWrong": "Something went wrong",
+      "connectToServices": "Connect to required services to continue.",
+      "enterApiCredentials": "Enter API credentials to continue.",
+      "tapToRetry": "Something went wrong. Tap to retry.",
+      "connectingToRemote": "Connecting to remote server",
+      "connectingToUrl": "Connecting to {{url}}...",
+      "reconnectingToRemote": "Reconnecting to remote server",
+      "cannotConnectToRemote": "Cannot connect to remote server",
+      "connectionLost": "Connection to remote server lost",
+      "remoteServerStatus": "Remote server connection status",
+      "authFailed": "Authentication failed. Verify CRAFT_SERVER_TOKEN.",
+      "protocolMismatch": "Protocol mismatch between client and server versions.",
+      "connectionTimeout": "Connection to {{url}} timed out. Server may be unreachable.",
+      "networkError": "Could not connect to {{url}}. Is the remote server running?",
+      "websocketClosed": "WebSocket closed with code {{code}}{{reason}}.",
+      "waitingForConnection": "Waiting for remote server connection.",
+      "retryIn": "retry in {{ms}}ms",
+      "attempt": "attempt {{count}}"
+    },
+    "apiSetup": {
+      "authorizationCode": "Authorization Code",
+      "authCodePlaceholder": "Paste your authorization code here",
+      "apiKey": "API Key",
+      "apiKeyPlaceholder": "Paste your API key here",
+      "baseUrl": "Base URL",
+      "models": "Models",
+      "searchModels": "Search models...",
+      "selectProvider": "Select provider...",
+      "customEndpoint": "Custom Endpoint",
+      "providers": {
+        "anthropic": "Anthropic",
+        "openai": "OpenAI",
+        "openaiEu": "OpenAI EU",
+        "openaiUs": "OpenAI US",
+        "google": "Google AI Studio",
+        "openrouter": "OpenRouter",
+        "azureOpenai": "Azure OpenAI",
+        "amazonBedrock": "Amazon Bedrock",
+        "groq": "Groq",
+        "mistral": "Mistral",
+        "xai": "xAI (Grok)",
+        "cerebras": "Cerebras",
+        "zai": "z.ai (GLM)",
+        "huggingface": "Hugging Face",
+        "minimaxGlobal": "Minimax Global",
+        "minimaxCn": "Minimax CN",
+        "kimiCoding": "Kimi (Coding)"
+      }
+    },
+    "keyboardShortcuts": {
+      "title": "Keyboard Shortcuts",
+      "listNavigation": "List Navigation",
+      "sessionList": "Session List",
+      "agentTree": "Agent Tree",
+      "chatInput": "Chat Input",
+      "navigateItems": "Navigate items in list",
+      "goToFirst": "Go to first item",
+      "goToLast": "Go to last item",
+      "focusChatInput": "Focus chat input",
+      "deleteSession": "Delete session",
+      "renameSession": "Rename session",
+      "openContextMenu": "Open context menu",
+      "addFilterExcluded": "Add filter as excluded",
+      "collapseFolder": "Collapse folder",
+      "expandFolder": "Expand folder",
+      "sendMessage": "Send message",
+      "newLine": "New line",
+      "closeDialogBlur": "Close dialog / blur input"
+    },
+    "cronBuilder": {
+      "commonSchedules": "Common Schedules",
+      "customSchedule": "Custom Schedule",
+      "rawExpression": "Raw Expression",
+      "summary": "Summary",
+      "nextRuns": "Next Runs",
+      "presets": {
+        "everyMinute": "Every minute",
+        "every15Min": "Every 15 min",
+        "everyHour": "Every hour",
+        "dailyMidnight": "Daily at midnight",
+        "daily9am": "Daily at 9am",
+        "weekdays9am": "Weekdays at 9am",
+        "monthlyFirst": "Monthly on 1st"
+      },
+      "descriptions": {
+        "everyMinute": "Runs every minute",
+        "every15Min": "Runs every 15 minutes",
+        "everyHour": "At the top of every hour",
+        "dailyMidnight": "Once a day at 00:00",
+        "daily9am": "Once a day at 09:00",
+        "weekdays9am": "Monday–Friday at 09:00",
+        "monthlyFirst": "First day of each month at 00:00"
+      },
+      "fields": {
+        "minute": "Minute",
+        "hour": "Hour",
+        "day": "Day",
+        "month": "Month",
+        "weekday": "Weekday"
+      },
+      "months": {
+        "jan": "Jan",
+        "feb": "Feb",
+        "mar": "Mar",
+        "apr": "Apr",
+        "may": "May",
+        "jun": "Jun",
+        "jul": "Jul",
+        "aug": "Aug",
+        "sep": "Sep",
+        "oct": "Oct",
+        "nov": "Nov",
+        "dec": "Dec"
+      },
+      "weekdays": {
+        "sun": "Sun",
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat"
+      },
+      "errors": {
+        "needs5Parts": "Schedule needs 5 parts: minute, hour, day, month, and weekday",
+        "invalidValue": "Invalid value in {{field}}: \"{{value}}\""
+      }
+    },
+    "labels": {
+      "loading": "Loading...",
+      "select": "Select...",
+      "search": "Search...",
+      "noResultsFound": "No results found",
+      "enabled": "Enabled",
+      "off": "Off",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "language": {
+      "selectorLabel": "Language",
+      "selectorDescription": "Choose the language used across the desktop UI.",
+      "system": "System Default",
+      "systemDescription": "Follow your operating system language.",
+      "en": "English",
+      "enDescription": "Use English throughout the desktop UI.",
+      "zhCN": "Simplified Chinese",
+      "zhCNDescription": "Use Simplified Chinese throughout the desktop UI."
+    },
+    "sidebar": {
+      "listTitle": {
+        "sources": "Sources",
+        "allSkills": "All Skills",
+        "allAutomations": "All Automations",
+        "scheduled": "Scheduled",
+        "eventBased": "Event-based",
+        "agentic": "Agentic",
+        "settings": "Settings",
+        "allSessions": "All Sessions",
+        "flagged": "Flagged",
+        "labels": "Labels",
+        "views": "Views",
+        "recentSessions": "Recent Sessions"
+      },
+      "nav": {
+        "startChat": "Start Chat",
+        "recentSessions": "Recent Sessions",
+        "scheduledTasks": "Scheduled Tasks",
+        "agents": "Agents",
+        "knowledgeBase": "Knowledge Base",
+        "sources": "Sources",
+        "apis": "APIs",
+        "mcps": "MCPs",
+        "localFolders": "Local Folders",
+        "skills": "Skills",
+        "settings": "Settings",
+        "whatsNew": "What's New"
+      },
+      "menu": {
+        "markAllRead": "Mark All Read",
+        "configureStatuses": "Configure Statuses",
+        "addNewLabel": "Add New Label",
+        "editLabels": "Edit Labels",
+        "deleteLabel": "Delete Label",
+        "editViews": "Edit Views",
+        "deleteView": "Delete View",
+        "addSource": "Add Source",
+        "addSkill": "Add Skill",
+        "addAutomation": "Add Automation",
+        "learnMoreApis": "Learn More about APIs",
+        "learnMoreMcp": "Learn More about MCP",
+        "learnMoreLocalFolders": "Learn More about Local Folders",
+        "learnMoreSources": "Learn More about Sources",
+        "learnMoreAutomations": "Learn More about Automations"
+      },
+      "filters": {
+        "filterChats": "Filter Chats",
+        "clear": "Clear",
+        "include": "Include",
+        "exclude": "Exclude",
+        "flagged": "Flagged",
+        "statuses": "Statuses",
+        "labels": "Labels",
+        "group": "Group",
+        "date": "Date",
+        "status": "Status",
+        "search": "Search",
+        "searchPlaceholder": "Search statuses & labels...",
+        "noLabelsConfigured": "No labels configured",
+        "noMatchingStatusesOrLabels": "No matching statuses or labels",
+        "addSourceTooltip": "Add Source",
+        "addSkillTooltip": "Add Skill",
+        "addAutomationTooltip": "Add Automation"
+      },
+      "empty": {
+        "noSourcesConfigured": "No sources configured",
+        "noSkillsConfigured": "No skills configured",
+        "noAutomationsConfigured": "No automations configured"
+      }
+    },
+    "freeFormInput": {
+      "placeholders": {
+        "0": "What would you like to work on?",
+        "1": "Use Shift + Tab to switch between Explore and Execute",
+        "2": "Type @ to mention files, folders, or skills",
+        "3": "Type # to apply labels to this conversation",
+        "4": "Press Shift + Return to add a new line",
+        "5": "Press {{cmdKey}} + B to toggle the sidebar",
+        "6": "Press {{cmdKey}} + . for focus mode"
+      },
+      "attachFiles": "Attach Files",
+      "attachFilesTooltip": "Attach files",
+      "fileCount": "{{count}} file",
+      "fileCountPlural": "{{count}} files",
+      "chooseSources": "Choose Sources",
+      "sourcesTooltip": "Sources",
+      "workInFolder": "Work in Folder",
+      "chooseWorkingDirectory": "Choose working directory",
+      "filterFolders": "Filter folders...",
+      "sessionRoot": "Session Root",
+      "resetToSessionRoot": "Reset to Session Root",
+      "recentFolders": "Recent Folders",
+      "browseFolders": "Browse Folders...",
+      "noRecentFolders": "No recent folders",
+      "removeFromRecent": "Remove from recent",
+      "connectionUnavailable": "Connection Unavailable",
+      "connectionUnavailableDesc": "The selected connection is not available. Please choose another connection or check your settings.",
+      "selectConnection": "Select Connection",
+      "modelUnavailable": "Model Unavailable",
+      "modelUnavailableDesc": "The selected model is not available for this connection.",
+      "selectModel": "Select Model",
+      "thinkingLevel": "Thinking Level",
+      "permissionMode": "Permission Mode",
+      "permissionSafe": "Safe",
+      "permissionAsk": "Ask",
+      "permissionAllowAll": "Allow All",
+      "sendMessage": "Send message",
+      "stopGeneration": "Stop generation",
+      "providerGroups": {
+        "anthropic": "Anthropic",
+        "craftAgentsBackend": "Craft Agents Backend"
+      }
+    }
+  },
+  "menu": {
+    "sections": {
+      "edit": "Edit",
+      "view": "View",
+      "window": "Window"
+    },
+    "items": {
+      "role": {
+        "undo": "Undo",
+        "redo": "Redo",
+        "cut": "Cut",
+        "copy": "Copy",
+        "paste": "Paste",
+        "selectAll": "Select All",
+        "zoomIn": "Zoom In",
+        "zoomOut": "Zoom Out",
+        "resetZoom": "Reset Zoom",
+        "minimize": "Minimize",
+        "zoom": "Maximize"
+      },
+      "action": {
+        "toggleFocusMode": "Toggle Focus Mode",
+        "toggleSidebar": "Toggle Sidebar"
+      }
+    },
+    "appMenu": {
+      "craftMenuAria": "Craft menu",
+      "newChat": "New Chat",
+      "newWindow": "New Window",
+      "settings": "Settings",
+      "settingsEllipsis": "Settings...",
+      "help": "Help",
+      "helpAndDocs": "Help & Documentation",
+      "automations": "Automations",
+      "keyboardShortcuts": "Keyboard Shortcuts",
+      "debug": "Debug",
+      "checkForUpdates": "Check for Updates",
+      "installUpdate": "Install Update",
+      "toggleDevTools": "Toggle DevTools",
+      "quitCraftAgents": "Quit Craft Agents",
+      "back": "Back",
+      "forward": "Forward",
+      "goBackAria": "Go back",
+      "goForwardAria": "Go forward"
+    },
+    "topBar": {
+      "toggleSidebarAria": "Toggle sidebar",
+      "toggleSidebar": "Toggle Sidebar",
+      "addPanelMenuAria": "Add panel menu",
+      "newSessionPanel": "New Session in Panel",
+      "newBrowserWindow": "New Browser Window",
+      "helpDocsAria": "Help & Documentation",
+      "sources": "Sources",
+      "skills": "Skills",
+      "statuses": "Statuses",
+      "permissions": "Permissions",
+      "automations": "Automations",
+      "allDocumentation": "All Documentation"
+    },
+    "mainMenu": {
+      "appName": "Craft Agents",
+      "about": "About Craft Agents",
+      "checkForUpdatesEllipsis": "Check for Updates…",
+      "installUpdateEllipsis": "Install Update…【{{version}}】",
+      "settingsEllipsis": "Settings...",
+      "hideApp": "Hide Craft Agents",
+      "quitApp": "Quit Craft Agents",
+      "file": "File",
+      "newChat": "New Chat",
+      "newWindow": "New Window",
+      "view": "View",
+      "window": "Window",
+      "help": "Help",
+      "helpAndDocs": "Help & Documentation",
+      "keyboardShortcuts": "Keyboard Shortcuts",
+      "debug": "Debug",
+      "reload": "Reload",
+      "forceReload": "Force Reload",
+      "resetToDefaultsEllipsis": "Reset to Defaults..."
+    }
+  },
+  "settings": {
+    "pages": {
+      "app": {
+        "label": "App",
+        "description": "Notifications and updates",
+        "title": "App"
+      },
+      "ai": {
+        "label": "AI",
+        "description": "Model, thinking, connections",
+        "title": "AI"
+      },
+      "models": {
+        "label": "Models",
+        "description": "Provider catalog and model availability",
+        "title": "Models"
+      },
+      "channels": {
+        "label": "Channels",
+        "description": "Channel connections and account status",
+        "title": "Channels"
+      },
+      "appearance": {
+        "label": "Appearance",
+        "description": "Theme, font, language",
+        "title": "Appearance"
+      },
+      "input": {
+        "label": "Input",
+        "description": "Send key, spell check",
+        "title": "Input"
+      },
+      "workspace": {
+        "label": "Agent",
+        "description": "Name, icon, working directory",
+        "title": "Agent Settings"
+      },
+      "permissions": {
+        "label": "Permissions",
+        "description": "Explore mode rules",
+        "title": "Permissions"
+      },
+      "shortcuts": {
+        "label": "Shortcuts",
+        "description": "Keyboard shortcuts",
+        "title": "Shortcuts"
+      },
+      "preferences": {
+        "label": "Preferences",
+        "description": "User preferences",
+        "title": "Preferences"
+      }
+    },
+    "navigator": {
+      "openInNewWindow": "Open in New Window"
+    },
+    "appearance": {
+      "sections": {
+        "defaultTheme": "Default Theme",
+        "workspaceThemes": "Workspace Themes",
+        "interface": "Interface",
+        "toolIcons": "Tool Icons"
+      },
+      "descriptions": {
+        "workspaceThemes": "Override theme settings per workspace",
+        "toolIcons": "Icons shown next to CLI commands in chat activity. Stored in ~/.craft-agent/tool-icons/.",
+        "connectionIcons": "Show provider icons in the session list and model selector",
+        "richToolDescriptions": "Add action names and intent descriptions to all tool calls. Provides richer activity context in sessions."
+      },
+      "rows": {
+        "mode": "Mode",
+        "colorTheme": "Color theme",
+        "font": "Font",
+        "connectionIcons": "Connection icons",
+        "richToolDescriptions": "Rich tool descriptions",
+        "editFile": "Edit File",
+        "searchTools": "Search tools...",
+        "emptyToolIcons": "No tool icon mappings found",
+        "themeWarning": "Theme warning: {{message}} ({{fallback}})",
+        "fallbackBundled": "using bundled fallback",
+        "fallbackDefault": "using default theme"
+      },
+      "table": {
+        "icon": "Icon",
+        "tool": "Tool",
+        "commands": "Commands"
+      },
+      "options": {
+        "modeSystem": "System",
+        "modeLight": "Light",
+        "modeDark": "Dark",
+        "fontInter": "Inter",
+        "fontSystem": "System",
+        "useDefault": "Use Default",
+        "useDefaultWithName": "Use Default ({{name}})"
+      }
+    },
+    "app": {
+      "sections": {
+        "notifications": "Notifications",
+        "power": "Power",
+        "network": "Network",
+        "about": "About"
+      },
+      "rows": {
+        "desktopNotifications": "Desktop notifications",
+        "desktopNotificationsDescription": "Get notified when AI finishes working in a chat.",
+        "keepScreenAwake": "Keep screen awake",
+        "keepScreenAwakeDescription": "Prevent the screen from turning off while sessions are running.",
+        "httpProxyEnabled": "HTTP proxy",
+        "httpProxyEnabledDescription": "Route network traffic through a proxy server.",
+        "httpProxy": "HTTP Proxy",
+        "httpsProxy": "HTTPS Proxy",
+        "bypassRules": "Bypass Rules",
+        "version": "Version",
+        "loadingVersion": "Loading...",
+        "downloadingVersion": "Downloading v{{version}} ({{progress}}%)",
+        "checkForUpdates": "Check for updates",
+        "updateReady": "Update ready",
+        "restartToUpdate": "Restart to Update to v{{version}}"
+      },
+      "placeholders": {
+        "proxyUrl": "http://proxy.example.com:8080",
+        "bypassRules": "localhost, 127.0.0.1, .example.com"
+      }
+    },
+    "input": {
+      "sections": {
+        "typing": "Typing",
+        "typingDescription": "Control how text is entered in the chat input.",
+        "sending": "Sending",
+        "sendingDescription": "Choose how to send messages."
+      },
+      "rows": {
+        "autoCapitalisation": "Auto capitalisation",
+        "autoCapitalisationDescription": "Automatically capitalise the first letter when typing a message.",
+        "spellCheck": "Spell check",
+        "spellCheckDescription": "Underline misspelled words while typing.",
+        "sendMessageWith": "Send message with",
+        "sendMessageWithDescription": "Keyboard shortcut for sending messages",
+        "enter": "Enter",
+        "enterDescription": "Use Shift+Enter for new lines",
+        "commandEnter": "Command+Enter",
+        "commandEnterDescription": "Use Enter for new lines",
+        "ctrlEnter": "Ctrl+Enter"
+      }
+    },
+    "channels": {
+      "title": "Channel Settings",
+      "subtitle": "View configured channels, account health, and runtime connectivity using Client-native UI.",
+      "metrics": {
+        "configuredChannels": "Configured Channels",
+        "enabledChannels": "Enabled Channels",
+        "runningAccounts": "Running Accounts",
+        "connectedAccounts": "Connected Accounts"
+      },
+      "cards": {
+        "configured": "Configured",
+        "notConfigured": "Not Configured",
+        "accounts": "{{count}} accounts",
+        "running": "{{count}} running",
+        "connected": "{{count}} connected",
+        "loading": "Loading channels...",
+        "enabled": "Enabled",
+        "off": "Off"
+      },
+      "dialog": {
+        "titleFallback": "Channel Details",
+        "description": "Read-only channel status details. The backend currently exposes read endpoints here, so this desktop page intentionally avoids fake edit controls.",
+        "configured": "Configured",
+        "accounts": "Accounts",
+        "running": "Running",
+        "connected": "Connected",
+        "loadingAccounts": "Loading accounts...",
+        "noAccounts": "No accounts reported for this channel.",
+        "agent": "Agent: {{value}}",
+        "connectedStatus": "Connected: {{value}}",
+        "runningStatus": "Running: {{value}}",
+        "noActivity": "No activity",
+        "unknown": "unknown"
+      }
+    },
+    "models": {
+      "title": "Model Providers",
+      "subtitle": "Manage provider endpoints, credentials, and the model catalog exposed to desktop users.",
+      "searchPlaceholder": "Search providers or models",
+      "addProvider": "Add Provider",
+      "loading": "Loading model providers...",
+      "empty": "No model providers configured yet.",
+      "statusEnabled": "Enabled",
+      "statusOff": "Off",
+      "statusDisabled": "Disabled",
+      "turnOff": "Turn Off",
+      "enable": "Enable",
+      "edit": "Edit",
+      "delete": "Delete",
+      "priority": "Priority: {{value}}",
+      "created": "Created: {{value}}",
+      "updated": "Updated: {{value}}",
+      "dialog": {
+        "editTitle": "Edit Provider",
+        "addTitle": "Add Provider",
+        "description": "Configure an API endpoint and the model names exposed through it. UI remains Client-native while functionality follows the Web product.",
+        "providerKey": "Provider Key",
+        "displayName": "Display Name",
+        "baseUrl": "Base URL",
+        "apiKey": "API Key",
+        "apiKeyKeepCurrent": "API Key (leave blank to keep current)",
+        "models": "Models",
+        "status": "Status",
+        "priority": "Priority",
+        "remark": "Remark",
+        "optionalRemark": "Optional note for teammates",
+        "save": "Save",
+        "saving": "Saving...",
+        "deleteTitle": "Delete Provider",
+        "deleteDescription": "Delete {{name}}? This removes the provider from the desktop model catalog."
+      }
+    },
+    "preferences": {
+      "sections": {
+        "basicInfo": "Basic Info",
+        "basicInfoDescription": "Help Craft Agent personalize responses to you.",
+        "location": "Location",
+        "locationDescription": "Enables location-aware responses like weather, local time, and regional context.",
+        "notes": "Notes",
+        "notesDescription": "Free-form context that helps Craft Agent understand your preferences."
+      },
+      "rows": {
+        "name": "Name",
+        "nameDescription": "How Craft Agent should address you.",
+        "timezone": "Timezone",
+        "timezoneDescription": "Used for relative dates like 'tomorrow' or 'next week'.",
+        "language": "Language",
+        "languageDescription": "Preferred language for Craft Agent's responses.",
+        "city": "City",
+        "cityDescription": "Your city for local information and context.",
+        "country": "Country",
+        "countryDescription": "Your country for regional formatting and context."
+      },
+      "placeholders": {
+        "name": "Your name",
+        "timezone": "e.g., America/New_York",
+        "language": "e.g., English",
+        "city": "e.g., New York",
+        "country": "e.g., USA",
+        "notes": "Any additional information you'd like to share with the AI assistant..."
+      }
+    },
+    "shortcuts": {
+      "listNavigation": "List Navigation",
+      "sessionList": "Session List",
+      "chatInput": "Chat Input",
+      "items": {
+        "navigateList": "Navigate items in list",
+        "firstItem": "Go to first item",
+        "lastItem": "Go to last item",
+        "focusChatInput": "Focus chat input",
+        "openContextMenu": "Open context menu",
+        "addExcludedFilter": "Add filter as excluded",
+        "sendMessage": "Send message",
+        "newLine": "New line",
+        "closeDialog": "Close dialog / blur input"
+      }
+    },
+    "permissions": {
+      "aboutTitle": "About Permissions",
+      "aboutP1": "Permissions control how much autonomy your agent has. In Explore mode, the agent can only read and research, which is ideal for understanding a problem before making changes. When you are ready, switch to Execute mode to let the agent implement the plan autonomously.",
+      "aboutP2": "A good workflow is to start in Explore, review the proposed plan, and then execute with confidence.",
+      "defaultTitle": "Default Permissions",
+      "defaultDescription": "App-level patterns allowed in Explore mode. Commands not on this list are blocked.",
+      "defaultEmptyTitle": "No default permissions found.",
+      "defaultEmptyDescription": "Default permissions should be at {{path}}",
+      "workspaceTitle": "Agent Environment Customizations",
+      "workspaceDescription": "Agent-scoped rules that extend the app defaults above.",
+      "workspaceEmptyTitle": "No custom permissions configured.",
+      "workspaceEmptyDescription": "Create a {{file}} file in this agent's workspace to add custom rules."
+    },
+    "labels": {
+      "title": "Labels",
+      "aboutTitle": "About Labels",
+      "aboutP1": "Labels help you organize sessions with colored tags. Use them to categorize conversations by project, topic, or priority so related sessions are easier to find later.",
+      "aboutP2": "Each label can optionally carry a value with a specific type, such as text, number, or date. This turns labels into structured metadata.",
+      "aboutP3": "Auto-apply rules assign labels automatically when a message matches a regex pattern, so common workflows can be tagged without manual work.",
+      "hierarchyTitle": "Label Hierarchy",
+      "hierarchyDescription": "All labels configured for this agent's workspace. Labels can be nested to form groups.",
+      "hierarchyEmptyTitle": "No labels configured.",
+      "hierarchyEmptyDescription": "Labels can be created by the agent or by editing {{file}} in this agent's workspace.",
+      "autoRulesTitle": "Auto-Apply Rules",
+      "autoRulesDescription": "Regex patterns that automatically apply labels when matched in user messages. For example, pasting a Linear issue URL can automatically tag the session with the project name and issue ID."
+    },
+    "workspace": {
+      "sections": {
+        "info": "Agent Info",
+        "permissions": "Permissions",
+        "modeCycling": "Mode Cycling",
+        "defaultSources": "Default Sources",
+        "advanced": "Advanced"
+      },
+      "rows": {
+        "name": "Name",
+        "icon": "Icon",
+        "edit": "Edit",
+        "change": "Change",
+        "changeEllipsis": "Change...",
+        "uploading": "Uploading...",
+        "untitled": "Untitled",
+        "renameTitle": "Rename agent",
+        "renamePlaceholder": "Enter agent name...",
+        "defaultMode": "Default mode",
+        "defaultModeDescription": "Control what AI can do",
+        "defaultSourcesDescription": "Sources auto-enabled for new sessions",
+        "noSources": "No sources configured for this agent.",
+        "defaultWorkingDirectory": "Default Working Directory",
+        "defaultWorkingDirectoryUnset": "Not set (uses session folder)",
+        "clear": "Clear",
+        "localMcpServers": "Local MCP Servers",
+        "localMcpServersDescription": "Enable stdio subprocess servers"
+      },
+      "modes": {
+        "safeLabel": "Explore",
+        "safeDescription": "Read-only, no changes allowed",
+        "askLabel": "Ask",
+        "askDescription": "Prompts before making edits",
+        "allowAllLabel": "Execute",
+        "allowAllDescription": "Full autonomous execution",
+        "cyclingDescription": "Select which modes to cycle through with Shift+Tab"
+      }
+    },
+    "ai": {
+      "banner": {
+        "title": "Credential Issue Detected",
+        "reauthenticate": "Re-authenticate",
+        "fileCorrupted": "Credential file is corrupted. Please re-authenticate.",
+        "decryptionFailed": "Credentials from another machine detected. Please re-authenticate on this device.",
+        "noDefaultCredentials": "No credentials found for your default connection.",
+        "genericIssue": "Credential issue detected."
+      },
+      "connectionRow": {
+        "defaultBadge": "Default",
+        "rename": "Rename",
+        "setAsDefault": "Set as default",
+        "reauthenticate": "Re-authenticate",
+        "edit": "Edit",
+        "validate": "Validate Connection",
+        "delete": "Delete",
+        "validating": "Validating...",
+        "valid": "Connection valid",
+        "validationFailed": "Validation failed",
+        "notAuthenticated": "Not authenticated",
+        "unknown": "Unknown",
+        "providerAnthropicSubscription": "Anthropic Subscription",
+        "providerAnthropicApi": "Anthropic API",
+        "providerAnthropicCompat": "Anthropic Compatible",
+        "providerBedrock": "AWS Bedrock",
+        "providerVertex": "Google Vertex",
+        "providerCraftBackend": "Craft Agents Backend",
+        "providerCraftBackendCompat": "Craft Agents Backend Compatible"
+      },
+      "workspaceOverrides": {
+        "connectionOverrideLabel": "workspace connection override",
+        "modelOverrideLabel": "workspace model override",
+        "thinkingOverrideLabel": "workspace thinking override",
+        "usingDefaults": "Using defaults",
+        "loading": "Loading...",
+        "connection": "Connection",
+        "connectionDescription": "API connection for new chats",
+        "model": "Model",
+        "modelDescription": "AI model for new chats",
+        "thinking": "Thinking",
+        "thinkingDescription": "Reasoning depth for new chats",
+        "useDefault": "Use default",
+        "inheritFromApp": "Inherit from app settings"
+      },
+      "sections": {
+        "default": "Default",
+        "defaultDescription": "Settings for new chats when no agent override is set.",
+        "workspaceOverrides": "Workspace Overrides",
+        "workspaceOverridesDescription": "Override default settings per workspace.",
+        "connections": "Connections",
+        "connectionsDescription": "Manage your AI provider connections."
+      },
+      "defaults": {
+        "connection": "Connection",
+        "connectionDescription": "API connection for new chats",
+        "model": "Model",
+        "modelDescription": "AI model for new chats",
+        "thinking": "Thinking",
+        "thinkingDescription": "Reasoning depth for new chats",
+        "noConnections": "No connections configured. Add a connection to get started.",
+        "addConnection": "+ Add Connection",
+        "closeEsc": "Close (Esc)",
+        "renameConnectionTitle": "Rename Connection",
+        "renameConnectionPlaceholder": "Enter connection name..."
+      }
+    },
+    "auth": {
+      "login": {
+        "title": "Sign In",
+        "description": "Sign in to access your desktop local agents. Model and provider setup will happen after login if needed.",
+        "signIn": "Sign In",
+        "signingIn": "Signing in...",
+        "resetApp": "Reset app and start fresh...",
+        "username": "Username",
+        "usernamePlaceholder": "Enter your username",
+        "password": "Password",
+        "passwordPlaceholder": "Enter your password",
+        "captcha": "Captcha",
+        "captchaPlaceholder": "Enter the code",
+        "refreshCaptcha": "Refresh",
+        "loadingCaptcha": "Loading...",
+        "unavailableCaptcha": "Unavailable",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password",
+        "failedLoadCaptcha": "Failed to load captcha",
+        "loginFailed": "Login failed"
+      }
+    },
+    "onboarding": {
+      "common": {
+        "back": "Back",
+        "continue": "Continue",
+        "loading": "Loading...",
+        "cancel": "Cancel"
+      },
+      "providerSelect": {
+        "title": "Welcome to Craft Agents",
+        "description": "How would you like to connect?",
+        "claudeName": "Claude Pro / Max",
+        "claudeDescription": "Use your Anthropic subscription.",
+        "chatgptName": "Codex · ChatGPT Plus",
+        "chatgptDescription": "Use your ChatGPT Plus or Pro subscription.",
+        "copilotName": "GitHub Copilot",
+        "copilotDescription": "Use your GitHub Copilot subscription.",
+        "apiKeyName": "I have an API key",
+        "apiKeyDescription": "Anthropic, OpenRouter, Google or any compatible provider.",
+        "localName": "Local model",
+        "localDescription": "Run models locally with Ollama."
+      },
+      "welcome": {
+        "titleNew": "Welcome to Craft Agents",
+        "titleExisting": "Update Settings",
+        "descriptionNew": "Agents with the UX they deserve. Connect anything. Organize your sessions. Everything you need to do the work of your life!",
+        "descriptionExisting": "Update your API connection or change your setup.",
+        "getStarted": "Get Started",
+        "checking": "Checking..."
+      },
+      "apiSetup": {
+        "title": "Set up your Agent",
+        "description": "Select how you'd like to power your AI agents. You can add more connections later.",
+        "segmentAnthropic": "Claude",
+        "segmentPi": "Craft Agents Backend",
+        "beta": "Beta",
+        "segmentDescriptionAnthropic": "Use Claude Agent SDK as the main agent. Configure it with your Claude subscription or API key.",
+        "segmentDescriptionPi": "Use Craft Agents Backend as the main agent. Configure it with your API key, OAuth subscription, or custom endpoint.",
+        "optionClaudeName": "Claude Pro/Max",
+        "optionClaudeDescription": "Use your Claude subscription for unlimited access.",
+        "optionAnthropicApiName": "Anthropic API Key",
+        "optionAnthropicApiDescription": "Pay-as-you-go via Anthropic, OpenRouter, or compatible APIs.",
+        "optionChatgptName": "ChatGPT Plus",
+        "optionChatgptDescription": "Use your ChatGPT subscription with Craft Agents Backend.",
+        "optionCopilotName": "GitHub Copilot",
+        "optionCopilotDescription": "Use your GitHub Copilot subscription with Craft Agents Backend.",
+        "optionApiName": "API Key",
+        "optionApiDescription": "Use provider presets (Anthropic, OpenAI, Google, etc.) via Craft Agents Backend."
+      },
+      "credentials": {
+        "chatgptTitle": "Connect ChatGPT",
+        "chatgptDescription": "Use your ChatGPT subscription to power Craft Agents.",
+        "connecting": "Connecting...",
+        "signInWithChatgpt": "Sign in with ChatGPT",
+        "chatgptBody": "Click the button above to sign in with your OpenAI account. A browser window will open for authentication.",
+        "chatgptConnected": "Connected! Your ChatGPT subscription is ready.",
+        "copilotTitle": "Connect GitHub Copilot",
+        "copilotDescription": "Use your GitHub Copilot subscription to power Craft Agents.",
+        "waitingAuth": "Waiting for authorization...",
+        "signInWithGithub": "Sign in with GitHub",
+        "copilotEnterCode": "Enter this code on GitHub to authorize:",
+        "copiedToClipboard": "Copied to clipboard",
+        "browserOpened": "A browser window should have opened to github.com/login/device",
+        "clickSignInGithub": "Click the button above to sign in with your GitHub account.",
+        "copilotConnected": "Connected! Your GitHub Copilot subscription is ready.",
+        "authCodeTitle": "Enter Authorization Code",
+        "authCodeDescription": "Copy the code from the browser page and paste it below.",
+        "claudeTitle": "Connect Claude Account",
+        "claudeDescription": "Use your Claude subscription to power multi-agent workflows.",
+        "signInWithClaude": "Sign in with Claude",
+        "apiTitle": "API Configuration",
+        "apiDescriptionPi": "Select a provider preset and enter the API key. For arbitrary Anthropic-compatible endpoints, use Anthropic API Key mode.",
+        "apiDescriptionAnthropic": "Enter your API key. Optionally configure a custom endpoint for OpenRouter, Ollama, or compatible APIs.",
+        "validating": "Validating..."
+      },
+      "localModel": {
+        "title": "Local Model",
+        "description": "Connect to Ollama or any OpenAI-compatible local server.",
+        "connecting": "Connecting...",
+        "endpoint": "Endpoint",
+        "endpointPlaceholder": "http://localhost:11434",
+        "endpointHint": "Default Ollama port is 11434. Change it if you use a custom setup.",
+        "modelLabel": "Model",
+        "required": "required",
+        "endpointRequired": "Endpoint URL is required.",
+        "modelRequired": "At least one model name is required.",
+        "modelPlaceholder": "e.g. qwen3-coder, llama3.3",
+        "modelHint": "Use any model pulled via ollama pull. Use commas to provide multiple models."
+      },
+      "gitBash": {
+        "title": "Git Bash Required",
+        "description": "Craft Agent needs Git Bash to run shell commands on Windows. It was not found on your system.",
+        "installTitle": "Install Git for Windows",
+        "installDescription": "The easiest way to get Git Bash. It's free and includes everything you need.",
+        "downloadButton": "Download Git for Windows",
+        "alreadyInstalledTitle": "Already have Git installed?",
+        "alreadyInstalledDescription": "If Git is installed in a non-standard location, you can specify the path to bash.exe.",
+        "pathPlaceholder": "C:\\Program Files\\Git\\bin\\bash.exe",
+        "usePath": "Use this path",
+        "recheck": "Re-check",
+        "checking": "Checking...",
+        "browse": "Browse..."
+      }
+    },
+    "updates": {
+      "readyTitle": "Update v{{version}} ready",
+      "readyDescription": "Restart to apply the update.",
+      "restart": "Restart",
+      "installing": "Installing update...",
+      "installingDescription": "The app will restart automatically.",
+      "failedInstall": "Failed to install update",
+      "upToDate": "You're up to date",
+      "upToDateDescription": "Version {{version}} is the latest.",
+      "failedCheck": "Failed to check for updates"
+    },
+    "lists": {
+      "sessions": {
+        "noArchivedTitle": "No archived sessions",
+        "noArchivedDescription": "Sessions you archive will appear here. Archive sessions to keep your list tidy while preserving conversations.",
+        "noSessionsTitle": "No sessions yet",
+        "noSessionsDescription": "Sessions with your agent appear here. Start one to get going.",
+        "newSession": "New Session",
+        "noResultsCurrentFilter": "No results in current filter",
+        "noSessionsFound": "No sessions found",
+        "searchDescription": "Searched titles and message content",
+        "clearSearch": "Clear search",
+        "renameTitle": "Rename Session",
+        "renamePlaceholder": "Enter session name...",
+        "ariaLabel": "Sessions"
+      },
+      "agents": {
+        "groups": {
+          "local": "Local",
+          "remote": "Remote"
+        },
+        "badges": {
+          "local": "Local",
+          "current": "Current",
+          "localAgent": "Local agent",
+          "currentAgent": "Current agent"
+        },
+        "actions": {
+          "newLocal": "New Local Agent",
+          "openSettings": "Open Settings",
+          "retryConnection": "Retry Connection",
+          "apiPending": "API Pending"
+        },
+        "introTitle": "Local-first agent home",
+        "introDescription": "Use the middle panel to browse Local and Remote groups. The details view here follows the currently selected local agent.",
+        "emptySelection": "Select a local agent from the middle panel to inspect its environment details.",
+        "fields": {
+          "environment": "Environment",
+          "permissionMode": "Permission mode",
+          "defaultSources": "Default sources",
+          "localMcp": "Local MCP",
+          "created": "Created",
+          "lastActive": "Last active"
+        },
+        "values": {
+          "notAvailable": "Not available",
+          "loading": "Loading...",
+          "enabled": "Enabled",
+          "disabled": "Disabled"
+        },
+        "remote": {
+          "title": "Remote agents",
+          "pendingConnected": "Server transport is wired. Remote agent list API is the next integration step.",
+          "pendingUnavailable": "Remote agent list will appear here once the client is connected to a server-side agent API.",
+          "descriptionUnavailable": "Remote transport status is unavailable. Remote agent listing can be connected here once the desktop client has a server-side agent API.",
+          "descriptionLocalMode": "This client is currently running in local mode. Remote agents will appear here once remote transport and server-side agent APIs are enabled.",
+          "descriptionConnected": "Remote transport is connected. The remaining integration is the server-side remote agent list and detail API.",
+          "descriptionFallback": "Remote transport is not ready yet. Retry the connection after the remote server is available.",
+          "endpoint": "Endpoint: {{url}}"
+        },
+        "status": {
+          "unavailable": "Unavailable",
+          "localMode": "Local mode",
+          "connected": "Connected",
+          "connecting": "Connecting",
+          "reconnecting": "Reconnecting",
+          "failed": "Failed",
+          "disconnected": "Disconnected",
+          "idle": "Idle"
+        }
+      },
+      "skills": {
+        "emptyTitle": "No skills configured",
+        "emptyDescription": "Skills are reusable instructions that teach your agent specialized behaviors.",
+        "addSkill": "Add Skill"
+      },
+      "sources": {
+        "emptyTitleAll": "No sources configured.",
+        "emptyTitleByType": "No {{type}} sources configured.",
+        "description": "Sources connect your agent to external data — MCP servers, REST APIs, and local folders.",
+        "addSource": "Add Source",
+        "typeApi": "API",
+        "typeMcp": "MCP",
+        "typeLocalFolder": "local folder",
+        "badgeApi": "API",
+        "badgeMcp": "MCP",
+        "badgeLocal": "Local",
+        "statusAuthRequired": "Auth Required",
+        "statusDisconnected": "Disconnected",
+        "statusNotTested": "Not Tested",
+        "statusDisabled": "Disabled"
+      }
+    },
+    "sourceInfo": {
+      "notFound": "Source not found",
+      "failedLoad": "Failed to load source",
+      "failedLoadTools": "Failed to load tools",
+      "deletedSource": "Deleted source: {{name}}",
+      "failedDelete": "Failed to delete source",
+      "never": "Never",
+      "justNow": "Just now",
+      "minutesAgo": "{{count}} minute ago",
+      "minutesAgoPlural": "{{count}} minutes ago",
+      "hoursAgo": "{{count}} hour ago",
+      "hoursAgoPlural": "{{count}} hours ago",
+      "daysAgo": "{{count}} day ago",
+      "daysAgoPlural": "{{count}} days ago",
+      "sourceDisabledTitle": "Source Disabled",
+      "sourceDisabledDescription": "Local MCP servers are disabled in Settings > Advanced. Enable them to use this source.",
+      "connectionTitle": "Connection",
+      "connectionDescriptionMcpStdio": "Local command that spawns this MCP server.",
+      "connectionDescriptionMcp": "Server URL and connection status.",
+      "connectionDescriptionApi": "Base URL for API requests.",
+      "connectionDescriptionLocal": "Filesystem path for this source.",
+      "connectionDescriptionDefault": "Connection details.",
+      "permissionsTitle": "Permissions",
+      "permissionsDescriptionMcp": "Tool patterns allowed in Explore mode.",
+      "permissionsDescriptionApi": "API endpoints allowed in Explore mode.",
+      "permissionsDescriptionDefault": "Access rules for Explore mode.",
+      "toolsTitle": "Tools",
+      "toolsDescription": "Operations exposed by this server.",
+      "documentationTitle": "Documentation",
+      "documentationDescription": "Context and guidelines for the agent.",
+      "labels": {
+        "type": "Type",
+        "url": "URL",
+        "lastTested": "Last Tested"
+      }
+    },
+    "skillInfo": {
+      "notFound": "Skill not found",
+      "failedLoad": "Failed to load skill",
+      "deletedSkill": "Deleted skill: {{name}}",
+      "failedDelete": "Failed to delete skill",
+      "metadataTitle": "Metadata",
+      "labels": {
+        "slug": "Slug",
+        "name": "Name",
+        "description": "Description",
+        "location": "Location",
+        "requiredSources": "Required Sources"
+      },
+      "permissionModesTitle": "Permission Modes",
+      "permissionModesIntro": "How \"Always Allowed Tools\" interacts with permission modes:",
+      "modes": {
+        "explore": "Explore",
+        "blocked": "Blocked — write tools blocked regardless",
+        "askToEdit": "Ask to Edit",
+        "autoApproved": "Auto-approved — no prompts for allowed tools",
+        "auto": "Auto",
+        "noEffect": "No effect — all tools already auto-approved"
+      },
+      "instructionsTitle": "Instructions",
+      "noInstructions": "*No instructions provided.*"
+    },
+    "cronBuilder": {
+      "presets": {
+        "everyMinute": "Every Minute",
+        "every15Min": "Every 15 Min",
+        "everyHour": "Every Hour",
+        "dailyMidnight": "Daily (Midnight)",
+        "daily9am": "Daily (9 AM)",
+        "weekdays9am": "Weekdays (9 AM)",
+        "monthlyFirst": "Monthly (1st)"
+      },
+      "descriptions": {
+        "everyMinute": "Runs every minute",
+        "every15Min": "Runs every 15 minutes",
+        "everyHour": "Runs at the start of every hour",
+        "dailyMidnight": "Runs daily at midnight",
+        "daily9am": "Runs daily at 9:00 AM",
+        "weekdays9am": "Runs weekdays at 9:00 AM",
+        "monthlyFirst": "Runs on the 1st of each month"
+      },
+      "fields": {
+        "minute": "Minute",
+        "hour": "Hour",
+        "day": "Day",
+        "month": "Month",
+        "weekday": "Weekday"
+      },
+      "months": {
+        "jan": "Jan",
+        "feb": "Feb",
+        "mar": "Mar",
+        "apr": "Apr",
+        "may": "May",
+        "jun": "Jun",
+        "jul": "Jul",
+        "aug": "Aug",
+        "sep": "Sep",
+        "oct": "Oct",
+        "nov": "Nov",
+        "dec": "Dec"
+      },
+      "weekdays": {
+        "sun": "Sun",
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat"
+      },
+      "errors": {
+        "needs5Parts": "Cron expression must have exactly 5 parts",
+        "invalidValue": "Invalid value '{{value}}' for {{field}}"
+      },
+      "systemDefault": "System default",
+      "nextRuns": "Next runs:",
+      "timezone": "Timezone:",
+      "commonSchedules": "Common Schedules",
+      "customSchedule": "Custom Schedule",
+      "advanced": "Advanced"
+    },
+    "apiKeyInput": {
+      "apiKey": "API Key",
+      "endpoint": "Endpoint",
+      "protocol": "Protocol",
+      "defaultModel": "Default Model",
+      "loadingModels": "Loading models...",
+      "searchModels": "Search models...",
+      "selectModel": "Select model...",
+      "openaiCompatible": "OpenAI Compatible",
+      "anthropicCompatible": "Anthropic Compatible",
+      "required": "required",
+      "optional": "optional",
+      "reasoning": "reasoning",
+      "pasteKeyPlaceholder": "Paste your key here...",
+      "baseUrlPlaceholder": "https://your-api-endpoint.com",
+      "modelPlaceholder": "e.g. claude-opus-4-6, claude-sonnet-4-6, claude-haiku-4-5",
+      "protocolHint": "Most third-party APIs (Ollama, vLLM, DashScope) use OpenAI Compatible.",
+      "modelListHint": "Comma-separated list. The first model is the default. The last is used for summarization.",
+      "customEndpointHint": "Required for custom endpoints. Use the provider-specific model ID.",
+      "modelRequiredError": "Default model is required for custom endpoints.",
+      "tierBest": "Best",
+      "tierBestDesc": "most capable",
+      "tierBalanced": "Balanced",
+      "tierBalancedDesc": "good for everyday use",
+      "tierFast": "Fast",
+      "tierFastDesc": "summarization & utility",
+      "providers": {
+        "anthropic": "Anthropic",
+        "openai": "OpenAI",
+        "openaiEu": "OpenAI EU",
+        "openaiUs": "OpenAI US",
+        "googleAiStudio": "Google AI Studio",
+        "openrouter": "OpenRouter",
+        "azureOpenai": "Azure OpenAI",
+        "amazonBedrock": "Amazon Bedrock",
+        "groq": "Groq",
+        "mistral": "Mistral",
+        "xai": "xAI (Grok)",
+        "cerebras": "Cerebras",
+        "zai": "z.ai (GLM)",
+        "huggingface": "Hugging Face",
+        "minimaxGlobal": "Minimax Global",
+        "minimaxCn": "Minimax CN",
+        "kimiCoding": "Kimi (Coding)",
+        "vercelAiGateway": "Vercel AI Gateway",
+        "craftAgentsBackend": "Craft Agents Backend (Direct)",
+        "custom": "Custom"
+      }
+    },
+    "automationInfo": {
+      "editFile": "Edit File",
+      "paused": "Paused",
+      "pausedDescription": "This automation is turned off. Enable it to start running again.",
+      "when": "When",
+      "whenDescription": "What causes this automation to run",
+      "event": "Event",
+      "timing": "Timing",
+      "onlyWhenMatching": "Only when matching",
+      "repeats": "Repeats",
+      "scheduleExpression": "Schedule expression",
+      "nextRuns": "Next runs",
+      "timezone": "Timezone",
+      "systemDefault": "System default",
+      "then": "Then",
+      "thenDescription": "{{count}} action to perform",
+      "thenDescriptionPlural": "{{count}} actions to perform",
+      "settings": "Settings",
+      "accessLevel": "Access Level",
+      "status": "Status",
+      "active": "Active",
+      "disabled": "Disabled",
+      "labels": "Labels",
+      "recentActivity": "Recent Activity",
+      "lastRuns": "Last {{count}} runs",
+      "rawConfig": "Raw config"
+    },
+    "editPopover": {
+      "defaultPlaceholder": "Describe what you'd like to change",
+      "compactPlaceholders": {
+        "0": "Just tell me what to change",
+        "1": "Describe the update",
+        "2": "What should I modify?"
+      },
+      "configs": {
+        "workspacePermissions": {
+          "label": "Permission Settings",
+          "example": "Allow running 'make build' in Explore mode"
+        },
+        "defaultPermissions": {
+          "label": "Default Permissions",
+          "example": "Allow git fetch command"
+        },
+        "skillInstructions": {
+          "label": "Skill Instructions",
+          "example": "Add error handling guidelines"
+        },
+        "skillMetadata": {
+          "label": "Skill Metadata",
+          "example": "Update the skill description"
+        },
+        "sourceGuide": {
+          "label": "Source Documentation",
+          "example": "Add rate limit documentation"
+        },
+        "sourceConfig": {
+          "label": "Source Configuration",
+          "example": "Update the display name"
+        },
+        "sourcePermissions": {
+          "label": "Source Permissions",
+          "example": "Allow list operations in Explore mode"
+        },
+        "sourceToolPermissions": {
+          "label": "Tool Permissions",
+          "example": "Only allow read operations (list, get, search)"
+        },
+        "preferencesNotes": {
+          "label": "Preferences Notes",
+          "example": "Add coding style preferences"
+        },
+        "addSource": {
+          "label": "Add Source",
+          "example": "Connect to my Craft space",
+          "placeholder": "What would you like to connect?"
+        },
+        "addSourceApi": {
+          "label": "Add API",
+          "example": "Connect to the OpenAI API",
+          "placeholder": "What API would you like to connect?"
+        },
+        "addSourceMcp": {
+          "label": "Add MCP Server",
+          "example": "Connect to Linear",
+          "placeholder": "What MCP server would you like to connect?"
+        },
+        "addSourceLocal": {
+          "label": "Add Local Folder",
+          "example": "Connect to my Obsidian vault",
+          "placeholder": "What folder would you like to connect?"
+        },
+        "addSkill": {
+          "label": "Add Skill",
+          "example": "Review PRs following our code standards",
+          "placeholder": "What should I learn to do?"
+        },
+        "editStatuses": {
+          "label": "Status Configuration",
+          "example": "Add a \"Blocked\" status"
+        },
+        "editLabels": {
+          "label": "Label Configuration",
+          "example": "Add a \"Bug\" label with red color"
+        },
+        "editAutoRules": {
+          "label": "Auto-Apply Rules",
+          "example": "Add a rule to detect GitHub issue URLs"
+        },
+        "addLabel": {
+          "label": "Add Label",
+          "example": "A red \"Bug\" label",
+          "placeholder": "What label would you like to create?"
+        },
+        "editViews": {
+          "label": "Views Configuration",
+          "example": "Add a \"Stale\" view for sessions inactive > 7 days"
+        },
+        "editToolIcons": {
+          "label": "Tool Icons",
+          "example": "Add an icon for my custom CLI tool \"deploy\""
+        },
+        "automationConfig": {
+          "label": "Automation Configuration",
+          "example": "Change the cron schedule to every 30 minutes"
+        }
+      }
+    },
+    "chatPage": {
+      "linkCopied": "Link copied to clipboard",
+      "failedToShare": "Failed to share",
+      "unknownError": "Unknown error",
+      "shareUpdated": "Share updated",
+      "failedToUpdateShare": "Failed to update share",
+      "sharingStopped": "Sharing stopped",
+      "failedToStopSharing": "Failed to stop sharing"
+    }
+  }
+}

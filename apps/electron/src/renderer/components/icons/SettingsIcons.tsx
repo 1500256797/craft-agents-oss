@@ -9,6 +9,7 @@
  * across the settings UI.
  */
 
+import { Cpu, Radio } from 'lucide-react'
 import type { SettingsSubpage } from '../../../shared/types'
 
 type IconProps = { className?: string }
@@ -28,6 +29,14 @@ export const AiSettingsIcon = ({ className }: IconProps) => (
       fill="currentColor"
     />
   </svg>
+)
+
+export const ModelsIcon = ({ className }: IconProps) => (
+  <Cpu className={className} />
+)
+
+export const ChannelsIcon = ({ className }: IconProps) => (
+  <Radio className={className} />
 )
 
 /** Custom app settings icon (toggle switches) */
@@ -165,11 +174,12 @@ export const PreferencesIcon = ({ className }: IconProps) => (
 export const SETTINGS_ICONS: Record<SettingsSubpage, React.ComponentType<IconProps>> = {
   app: AppSettingsIcon,
   ai: AiSettingsIcon,
+  models: ModelsIcon,
+  channels: ChannelsIcon,
   appearance: AppearanceIcon,
   input: InputIcon,
   workspace: WorkspaceIcon,
   permissions: PermissionsIcon,
-  labels: LabelsIcon,
   shortcuts: ShortcutsIcon,
   preferences: PreferencesIcon,
 }

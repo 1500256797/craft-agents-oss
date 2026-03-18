@@ -56,7 +56,7 @@ export function AddWorkspaceStep_OpenFolder({
 
       <AddWorkspaceStepHeader
         title="Choose existing folder"
-        description="Choose any folder to use as workspace."
+        description="Use any folder for this local agent."
       />
 
       <div className="mt-6 w-full space-y-6">
@@ -86,12 +86,12 @@ export function AddWorkspaceStep_OpenFolder({
         {selectedPath && (
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">
-              Workspace name
+              Agent name
             </label>
             <Input
               value={workspaceName}
               onChange={(e) => setWorkspaceName(e.target.value)}
-              placeholder="My Workspace"
+              placeholder="My Agent"
               disabled={isCreating}
             />
           </div>
@@ -104,7 +104,7 @@ export function AddWorkspaceStep_OpenFolder({
           loading={isCreating}
           loadingText="Opening..."
         >
-          Open
+          Use Folder
         </AddWorkspacePrimaryButton>
       </div>
     </AddWorkspaceContainer>

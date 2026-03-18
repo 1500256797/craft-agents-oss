@@ -16,6 +16,7 @@
  */
 
 import type { SettingsSubpage } from './settings-registry'
+import type { ModuleSubpage } from './module-registry'
 import type { PermissionMode } from '@craft-agent/shared/agent/mode-types'
 
 // Helper to build query strings from params
@@ -182,6 +183,10 @@ export const routes = {
       subpage
         ? `settings/${subpage}` as const
         : 'settings' as const,
+
+    /** Business module view (module navigator) */
+    module: (subpage: ModuleSubpage) =>
+      `module/${subpage}` as const,
   },
 } as const
 

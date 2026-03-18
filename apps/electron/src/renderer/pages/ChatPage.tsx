@@ -21,6 +21,7 @@ import { rendererPerf } from '@/lib/perf'
 import { routes } from '@/lib/navigate'
 import { ensureSessionMessagesLoadedAtom, loadedSessionsAtom, sessionMetaMapAtom } from '@/atoms/sessions'
 import { getSessionTitle } from '@/utils/session'
+import { useI18n } from '@/context/I18nContext'
 // Model resolution: connection.defaultModel (no hardcoded defaults)
 import { resolveEffectiveConnectionSlug, isSessionConnectionUnavailable } from '@config/llm-connections'
 
@@ -29,6 +30,8 @@ export interface ChatPageProps {
 }
 
 const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
+  const { t } = useI18n()
+
   // Diagnostic: mark when component runs
   React.useLayoutEffect(() => {
     rendererPerf.markSessionSwitch(sessionId, 'panel.mounted')
@@ -382,14 +385,14 @@ const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
     const result = await window.electronAPI.sessionCommand(sessionId, { type: 'shareToViewer' }) as { success: boolean; url?: string; error?: string } | undefined
     if (result?.success && result.url) {
       await navigator.clipboard.writeText(result.url)
-      toast.success('Link copied to clipboard', {
+      toast.success(t('common.chatPage.linkCopied'), {
         description: result.url,
         action: { label: 'Open', onClick: () => window.electronAPI.openUrl(result.url!) },
       })
     } else {
-      toast.error('Failed to share', { description: result?.error || 'Unknown error' })
+      toast.error(t('common.chatPage.failedToShare'), { description: result?.error || t('common.chatPage.unknownError') })
     }
-  }, [sessionId])
+  }, [sessionId, t])
 
   const handleOpenInBrowser = React.useCallback(() => {
     if (sharedUrl) window.electronAPI.openUrl(sharedUrl)
@@ -398,27 +401,27 @@ const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
   const handleCopyLink = React.useCallback(async () => {
     if (sharedUrl) {
       await navigator.clipboard.writeText(sharedUrl)
-      toast.success('Link copied to clipboard')
+      toast.success(t('common.chatPage.linkCopied'))
     }
-  }, [sharedUrl])
+  }, [sharedUrl, t])
 
   const handleUpdateShare = React.useCallback(async () => {
     const result = await window.electronAPI.sessionCommand(sessionId, { type: 'updateShare' }) as { success: boolean; error?: string } | undefined
     if (result?.success) {
-      toast.success('Share updated')
+      toast.success(t('common.chatPage.shareUpdated'))
     } else {
-      toast.error('Failed to update share', { description: result?.error })
+      toast.error(t('common.chatPage.failedToUpdateShare'), { description: result?.error })
     }
-  }, [sessionId])
+  }, [sessionId, t])
 
   const handleRevokeShare = React.useCallback(async () => {
     const result = await window.electronAPI.sessionCommand(sessionId, { type: 'revokeShare' }) as { success: boolean; error?: string } | undefined
     if (result?.success) {
-      toast.success('Sharing stopped')
+      toast.success(t('common.chatPage.sharingStopped'))
     } else {
-      toast.error('Failed to stop sharing', { description: result?.error })
+      toast.error(t('common.chatPage.failedToStopSharing'), { description: result?.error })
     }
-  }, [sessionId])
+  }, [sessionId, t])
 
   // Share button with dropdown menu rendered in PanelHeader actions slot
   const shareButton = React.useMemo(() => (

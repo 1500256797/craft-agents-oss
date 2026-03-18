@@ -3,9 +3,12 @@ import type { HandlerDeps } from '../handler-deps'
 
 import { registerAuthHandlers } from './auth'
 import { registerAutomationsHandlers } from './automations'
+import { registerChannelsHandlers } from './channels'
 import { registerFilesHandlers } from './files'
+import { registerKnowledgeBaseHandlers } from './knowledge-base'
 import { registerLabelsHandlers } from './labels'
 import { registerLlmConnectionsHandlers } from './llm-connections'
+import { registerModelProvidersHandlers } from './model-providers'
 import { registerOAuthHandlers } from './oauth'
 import { registerOnboardingHandlers } from './onboarding'
 import { registerSessionsHandlers } from './sessions'
@@ -20,9 +23,12 @@ import { registerWorkspaceCoreHandlers } from './workspace'
 export function registerCoreRpcHandlers(server: RpcServer, deps: HandlerDeps): void {
   registerAuthHandlers(server, deps)
   registerAutomationsHandlers(server, deps)
+  registerChannelsHandlers(server, deps)
   registerFilesHandlers(server, deps)
+  registerKnowledgeBaseHandlers(server, deps)
   registerLabelsHandlers(server, deps)
   registerLlmConnectionsHandlers(server, deps)
+  registerModelProvidersHandlers(server, deps)
   registerOAuthHandlers(server, deps)
   registerOnboardingHandlers(server, deps)
   registerSessionsHandlers(server, deps)

@@ -18,10 +18,12 @@ import {
 import { DropdownMenuProvider } from '@/components/ui/menu-context'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
+import { useI18n } from '@/context/I18nContext'
 import type { DetailsPageMeta } from '@/lib/navigation-registry'
 import type { SettingsSubpage } from '../../../shared/types'
 import { SETTINGS_ITEMS } from '../../../shared/menu-schema'
 import { SETTINGS_ICONS } from '@/components/icons/SettingsIcons'
+import { getSettingsPageCopy } from '../../../shared/i18n'
 
 export const meta: DetailsPageMeta = {
   navigator: 'settings',
@@ -64,6 +66,8 @@ interface SettingsItemRowProps {
 function SettingsItemRow({ item, isSelected, isFirst, onSelect }: SettingsItemRowProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const Icon = item.icon
+  const { t, resolvedLanguage } = useI18n()
+  const itemCopy = getSettingsPageCopy(resolvedLanguage, item.id, item.label, item.description)
 
   // Open settings page in a new window via deep link
   const handleOpenInNewWindow = () => {
@@ -112,10 +116,10 @@ function SettingsItemRow({ item, isSelected, isFirst, onSelect }: SettingsItemRo
                 isSelected ? 'text-foreground' : 'text-foreground/80'
               )}
             >
-              {item.label}
+              {itemCopy.label}
             </span>
             <span className="text-xs text-foreground/60 line-clamp-1">
-              {item.description}
+              {itemCopy.description}
             </span>
           </div>
         </button>
@@ -137,7 +141,7 @@ function SettingsItemRow({ item, isSelected, isFirst, onSelect }: SettingsItemRo
                 <DropdownMenuProvider>
                   <StyledDropdownMenuItem onClick={handleOpenInNewWindow}>
                     <AppWindow className="h-3.5 w-3.5" />
-                    <span className="flex-1">Open in New Window</span>
+                    <span className="flex-1">{t('settings.navigator.openInNewWindow')}</span>
                   </StyledDropdownMenuItem>
                 </DropdownMenuProvider>
               </StyledDropdownMenuContent>

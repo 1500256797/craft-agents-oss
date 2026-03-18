@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils'
 import { automationSelection } from '@/hooks/useEntitySelection'
 import { APP_EVENTS, AGENT_EVENTS, getEventDisplayName, type AutomationListItem, type AutomationListFilter } from './types'
 import { formatShortRelativeTime } from './utils'
+import { useI18n } from '@/context/I18nContext'
 
 const {
   useSelection: useAutomationSelection,
@@ -178,6 +179,7 @@ export function AutomationsListPanel({
   workspaceRootPath,
   className,
 }: AutomationsListPanelProps) {
+  const { t } = useI18n()
   const [searchQuery, setSearchQuery] = useState('')
   const [searchActive, setSearchActive] = useState(false)
 
@@ -254,7 +256,7 @@ export function AutomationsListPanel({
                   Add Automation
                 </button>
               }
-              {...getEditConfig('automation-config', workspaceRootPath)}
+              {...getEditConfig('automation-config', workspaceRootPath, t)}
             />
           )}
         </EntityListEmptyScreen>

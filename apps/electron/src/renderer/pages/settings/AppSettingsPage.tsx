@@ -31,6 +31,7 @@ import {
   SettingsInput,
 } from '@/components/settings'
 import { useUpdateChecker } from '@/hooks/useUpdateChecker'
+import { useI18n } from '@/context/I18nContext'
 
 export const meta: DetailsPageMeta = {
   navigator: 'settings',
@@ -92,6 +93,7 @@ function validateProxyUrl(url: string): string | undefined {
 // ============================================
 
 export default function AppSettingsPage() {
+  const { t } = useI18n()
   // Notifications state
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
 
@@ -174,11 +176,11 @@ export default function AppSettingsPage() {
       setProxyForm(form)
       setSavedProxyForm(form)
     } catch (error) {
-      setProxyError(error instanceof Error ? error.message : 'Failed to save')
+      setProxyError(error instanceof Error ? error.message : t('common.errors.failedToSave'))
     } finally {
       setIsSavingProxy(false)
     }
-  }, [proxyForm])
+  }, [proxyForm, t])
 
   const handleResetProxy = useCallback(() => {
     setProxyForm(savedProxyForm)
@@ -187,17 +189,17 @@ export default function AppSettingsPage() {
 
   return (
     <div className="h-full flex flex-col">
-      <PanelHeader title="App" actions={<HeaderMenu route={routes.view.settings('app')} helpFeature="app-settings" />} />
+      <PanelHeader title={t('settings.pages.app.title')} actions={<HeaderMenu route={routes.view.settings('app')} helpFeature="app-settings" />} />
       <div className="flex-1 min-h-0 mask-fade-y">
         <ScrollArea className="h-full">
           <div className="px-5 py-7 max-w-3xl mx-auto">
             <div className="space-y-8">
               {/* Notifications */}
-              <SettingsSection title="Notifications">
+              <SettingsSection title={t('settings.app.sections.notifications')}>
                 <SettingsCard>
                   <SettingsToggle
-                    label="Desktop notifications"
-                    description="Get notified when AI finishes working in a chat."
+                    label={t('settings.app.rows.desktopNotifications')}
+                    description={t('settings.app.rows.desktopNotificationsDescription')}
                     checked={notificationsEnabled}
                     onCheckedChange={handleNotificationsEnabledChange}
                   />
@@ -205,11 +207,11 @@ export default function AppSettingsPage() {
               </SettingsSection>
 
               {/* Power */}
-              <SettingsSection title="Power">
+              <SettingsSection title={t('settings.app.sections.power')}>
                 <SettingsCard>
                   <SettingsToggle
-                    label="Keep screen awake"
-                    description="Prevent the screen from turning off while sessions are running."
+                    label={t('settings.app.rows.keepScreenAwake')}
+                    description={t('settings.app.rows.keepScreenAwakeDescription')}
                     checked={keepAwakeEnabled}
                     onCheckedChange={handleKeepAwakeEnabledChange}
                   />
@@ -217,35 +219,35 @@ export default function AppSettingsPage() {
               </SettingsSection>
 
               {/* Network */}
-              <SettingsSection title="Network">
+              <SettingsSection title={t('settings.app.sections.network')}>
                 <SettingsCard>
                   <SettingsToggle
-                    label="HTTP proxy"
-                    description="Route network traffic through a proxy server."
+                    label={t('settings.app.rows.httpProxyEnabled')}
+                    description={t('settings.app.rows.httpProxyEnabledDescription')}
                     checked={proxyForm.enabled}
                     onCheckedChange={(enabled) => setProxyForm(prev => ({ ...prev, enabled }))}
                   />
                   {proxyForm.enabled && (
                     <>
                       <SettingsInput
-                        label="HTTP Proxy"
+                        label={t('settings.app.rows.httpProxy')}
                         value={proxyForm.httpProxy}
                         onChange={(value) => setProxyForm(prev => ({ ...prev, httpProxy: value }))}
-                        placeholder="http://proxy.example.com:8080"
+                        placeholder={t('settings.app.placeholders.proxyUrl')}
                         inCard
                       />
                       <SettingsInput
-                        label="HTTPS Proxy"
+                        label={t('settings.app.rows.httpsProxy')}
                         value={proxyForm.httpsProxy}
                         onChange={(value) => setProxyForm(prev => ({ ...prev, httpsProxy: value }))}
-                        placeholder="http://proxy.example.com:8080"
+                        placeholder={t('settings.app.placeholders.proxyUrl')}
                         inCard
                       />
                       <SettingsInput
-                        label="Bypass Rules"
+                        label={t('settings.app.rows.bypassRules')}
                         value={proxyForm.noProxy}
                         onChange={(value) => setProxyForm(prev => ({ ...prev, noProxy: value }))}
-                        placeholder="localhost, 127.0.0.1, .example.com"
+                        placeholder={t('settings.app.placeholders.bypassRules')}
                         inCard
                       />
                     </>
@@ -261,7 +263,7 @@ export default function AppSettingsPage() {
                         onClick={handleResetProxy}
                         disabled={!isProxyDirty || isSavingProxy}
                       >
-                        Reset
+                        {t('common.actions.reset')}
                       </Button>
                       <Button
                         size="sm"
@@ -271,10 +273,10 @@ export default function AppSettingsPage() {
                         {isSavingProxy ? (
                           <>
                             <Spinner className="mr-1.5" />
-                            Saving...
+                            {t('common.actions.saving')}
                           </>
                         ) : (
-                          'Save'
+                          t('common.actions.save')
                         )}
                       </Button>
                     </SettingsCardFooter>
@@ -283,22 +285,27 @@ export default function AppSettingsPage() {
               </SettingsSection>
 
               {/* About */}
-              <SettingsSection title="About">
+              <SettingsSection title={t('settings.app.sections.about')}>
                 <SettingsCard>
-                  <SettingsRow label="Version">
+                  <SettingsRow label={t('settings.app.rows.version')}>
                     <div className="flex items-center gap-2">
                       <span className="text-muted-foreground">
-                        {updateChecker.updateInfo?.currentVersion ?? 'Loading...'}
+                        {updateChecker.updateInfo?.currentVersion ?? t('settings.app.rows.loadingVersion')}
                       </span>
                       {updateChecker.isDownloading && updateChecker.updateInfo?.latestVersion && (
                         <div className="flex items-center gap-2 text-muted-foreground text-sm">
                           <Spinner className="w-3 h-3" />
-                          <span>Downloading v{updateChecker.updateInfo.latestVersion} ({updateChecker.downloadProgress}%)</span>
+                          <span>
+                            {t('settings.app.rows.downloadingVersion', {
+                              version: updateChecker.updateInfo.latestVersion,
+                              progress: updateChecker.downloadProgress,
+                            })}
+                          </span>
                         </div>
                       )}
                     </div>
                   </SettingsRow>
-                  <SettingsRow label="Check for updates">
+                  <SettingsRow label={t('settings.app.rows.checkForUpdates')}>
                     <Button
                       variant="outline"
                       size="sm"
@@ -308,20 +315,22 @@ export default function AppSettingsPage() {
                       {isCheckingForUpdates ? (
                         <>
                           <Spinner className="mr-1.5" />
-                          Checking...
+                          {t('common.actions.checking')}
                         </>
                       ) : (
-                        'Check Now'
+                        t('common.actions.checkNow')
                       )}
                     </Button>
                   </SettingsRow>
                   {updateChecker.isReadyToInstall && updateChecker.updateInfo?.latestVersion && (
-                    <SettingsRow label="Update ready">
+                    <SettingsRow label={t('settings.app.rows.updateReady')}>
                       <Button
                         size="sm"
                         onClick={updateChecker.installUpdate}
                       >
-                        Restart to Update to v{updateChecker.updateInfo.latestVersion}
+                        {t('settings.app.rows.restartToUpdate', {
+                          version: updateChecker.updateInfo.latestVersion,
+                        })}
                       </Button>
                     </SettingsRow>
                   )}

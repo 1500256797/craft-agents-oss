@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import { useMenuComponents } from '@/components/ui/menu-context'
 import { getFileManagerName } from '@/lib/platform'
+import { useI18n } from '@/context/I18nContext'
 
 export interface SourceMenuProps {
   /** Source slug */
@@ -47,19 +48,20 @@ export function SourceMenu({
 }: SourceMenuProps) {
   // Get menu components from context (works with both DropdownMenu and ContextMenu)
   const { MenuItem, Separator } = useMenuComponents()
+  const { t } = useI18n()
 
   return (
     <>
       {/* Open in New Window */}
       <MenuItem onClick={onOpenInNewWindow}>
         <AppWindow className="h-3.5 w-3.5" />
-        <span className="flex-1">Open in New Window</span>
+        <span className="flex-1">{t('common.actions.openInNewWindow')}</span>
       </MenuItem>
 
       {/* Show in file manager */}
       <MenuItem onClick={onShowInFinder}>
         <FolderOpen className="h-3.5 w-3.5" />
-        <span className="flex-1">{`Show in ${getFileManagerName()}`}</span>
+        <span className="flex-1">{t('common.actions.showIn', { name: getFileManagerName() })}</span>
       </MenuItem>
 
       <Separator />
@@ -67,7 +69,7 @@ export function SourceMenu({
       {/* Delete */}
       <MenuItem onClick={onDelete} variant="destructive">
         <Trash2 className="h-3.5 w-3.5" />
-        <span className="flex-1">Delete Source</span>
+        <span className="flex-1">{t('common.actions.deleteSource')}</span>
       </MenuItem>
     </>
   )

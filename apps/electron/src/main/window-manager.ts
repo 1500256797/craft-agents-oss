@@ -8,6 +8,7 @@ import type { SavedWindow } from './window-state'
 
 // Vite dev server URL for hot reload
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
+const MAC_TRAFFIC_LIGHT_POSITION = { x: 18, y: 14 }
 
 /**
  * Get the appropriate background material for Windows transparency effects
@@ -144,7 +145,7 @@ export class WindowManager {
       // macOS-specific: hidden title bar with inset traffic lights
       ...(isMac && {
         titleBarStyle: 'hiddenInset',
-        trafficLightPosition: { x: 18, y: 16 },
+        trafficLightPosition: MAC_TRAFFIC_LIGHT_POSITION,
         vibrancy: 'under-window',
         visualEffectState: 'active',
       }),
@@ -315,6 +316,12 @@ export class WindowManager {
     window.on('blur', () => {
       this.pushToWindow(window, RPC_CHANNELS.window.FOCUS_STATE, false)
     })
+    window.on('enter-full-screen', () => {
+      this.pushToWindow(window, RPC_CHANNELS.window.FULLSCREEN_STATE, true)
+    })
+    window.on('leave-full-screen', () => {
+      this.pushToWindow(window, RPC_CHANNELS.window.FULLSCREEN_STATE, false)
+    })
 
     // Detect Cmd/Ctrl+W before close events so renderer can distinguish close source.
     // Intent is short-lived to avoid stale classification.
@@ -452,6 +459,15 @@ export class WindowManager {
   getWorkspaceForWindow(webContentsId: number): string | null {
     const managed = this.windows.get(webContentsId)
     return managed?.workspaceId ?? null
+  }
+
+  /**
+   * Get fullscreen state for a window (by webContents.id).
+   */
+  getWindowFullscreenState(webContentsId: number): boolean {
+    const managed = this.windows.get(webContentsId)
+    if (!managed || managed.window.isDestroyed()) return false
+    return managed.window.isFullScreen()
   }
 
   /**
@@ -639,7 +655,7 @@ export class WindowManager {
       // setWindowButtonVisibility can reset position to default, so we need
       // to restore the custom position using the modern setWindowButtonPosition API
       if (visible) {
-        managed.window.setWindowButtonPosition({ x: 18, y: 19 })
+        managed.window.setWindowButtonPosition(MAC_TRAFFIC_LIGHT_POSITION)
       }
     }
   }

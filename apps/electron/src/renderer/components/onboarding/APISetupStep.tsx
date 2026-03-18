@@ -3,24 +3,18 @@ import { cn } from "@/lib/utils"
 import { Check, CreditCard, Key, Cpu } from "lucide-react"
 import { StepFormLayout, BackButton, ContinueButton } from "./primitives"
 import type { LlmAuthType, LlmProviderType } from "@craft-agent/shared/config/llm-connections"
+import { useI18n } from "@/context/I18nContext"
 
 /** Provider segment for the segmented control */
 export type ProviderSegment = 'anthropic' | 'pi'
 
-const SEGMENT_LABELS: Record<ProviderSegment, string> = {
-  anthropic: 'Claude',
-  pi: 'Craft Agents Backend',
-}
-
-const BetaBadge = () => (
-  <span className="inline px-1.5 pt-[2px] pb-[3px] text-[10px] font-accent font-bold rounded-[4px] bg-accent text-background ml-1 relative -top-[1px]">
-    Beta
-  </span>
-)
-
-const SEGMENT_DESCRIPTIONS: Record<ProviderSegment, React.ReactNode> = {
-  anthropic: <>Use Claude Agent SDK as the main agent.<br />Configure with your Claude subscription or API key.</>,
-  pi: <>Use Craft Agents Backend as the main agent.<BetaBadge /><br />Configure with your API key, OAuth subscription, or custom endpoint.</>,
+const BetaBadge = () => {
+  const { t } = useI18n()
+  return (
+    <span className="inline px-1.5 pt-[2px] pb-[3px] text-[10px] font-accent font-bold rounded-[4px] bg-accent text-background ml-1 relative -top-[1px]">
+      {t('onboarding.apiSetup.beta')}
+    </span>
+  )
 }
 
 /**
@@ -68,44 +62,6 @@ interface ApiSetupOption {
   icon: React.ReactNode
   providerType: LlmProviderType
 }
-
-const API_SETUP_OPTIONS: ApiSetupOption[] = [
-  {
-    id: 'claude_oauth',
-    name: 'Claude Pro/Max',
-    description: 'Use your Claude subscription for unlimited access.',
-    icon: <CreditCard className="size-4" />,
-    providerType: 'anthropic',
-  },
-  {
-    id: 'anthropic_api_key',
-    name: 'Anthropic API Key',
-    description: 'Pay-as-you-go via Anthropic, OpenRouter, or compatible APIs.',
-    icon: <Key className="size-4" />,
-    providerType: 'anthropic',
-  },
-  {
-    id: 'pi_chatgpt_oauth',
-    name: 'ChatGPT Plus',
-    description: 'Use your ChatGPT subscription with Craft Agents Backend.',
-    icon: <Cpu className="size-4" />,
-    providerType: 'pi',
-  },
-  {
-    id: 'pi_copilot_oauth',
-    name: 'GitHub Copilot',
-    description: 'Use your GitHub Copilot subscription with Craft Agents Backend.',
-    icon: <Cpu className="size-4" />,
-    providerType: 'pi',
-  },
-  {
-    id: 'pi_api_key',
-    name: 'API Key',
-    description: 'Use provider presets (Anthropic, OpenAI, Google, etc.) via Craft Agents Backend.',
-    icon: <Key className="size-4" />,
-    providerType: 'pi',
-  },
-]
 
 interface APISetupStepProps {
   selectedMethod: ApiSetupMethod | null
@@ -185,6 +141,7 @@ function ProviderSegmentedControl({
   activeSegment: ProviderSegment
   onSegmentChange: (segment: ProviderSegment) => void
 }) {
+  const { t } = useI18n()
   const segments: ProviderSegment[] = ['anthropic', 'pi']
 
   return (
@@ -200,7 +157,7 @@ function ProviderSegmentedControl({
               : "text-muted-foreground hover:text-foreground"
           )}
         >
-          {SEGMENT_LABELS[segment]}
+          {segment === 'anthropic' ? t('onboarding.apiSetup.segmentAnthropic') : t('onboarding.apiSetup.segmentPi')}
         </button>
       ))}
     </div>
@@ -222,10 +179,52 @@ export function APISetupStep({
   onBack,
   initialSegment = 'anthropic',
 }: APISetupStepProps) {
+  const { t } = useI18n()
   const [activeSegment, setActiveSegment] = useState<ProviderSegment>(initialSegment)
+  const apiSetupOptions: ApiSetupOption[] = [
+    {
+      id: 'claude_oauth',
+      name: t('onboarding.apiSetup.optionClaudeName'),
+      description: t('onboarding.apiSetup.optionClaudeDescription'),
+      icon: <CreditCard className="size-4" />,
+      providerType: 'anthropic',
+    },
+    {
+      id: 'anthropic_api_key',
+      name: t('onboarding.apiSetup.optionAnthropicApiName'),
+      description: t('onboarding.apiSetup.optionAnthropicApiDescription'),
+      icon: <Key className="size-4" />,
+      providerType: 'anthropic',
+    },
+    {
+      id: 'pi_chatgpt_oauth',
+      name: t('onboarding.apiSetup.optionChatgptName'),
+      description: t('onboarding.apiSetup.optionChatgptDescription'),
+      icon: <Cpu className="size-4" />,
+      providerType: 'pi',
+    },
+    {
+      id: 'pi_copilot_oauth',
+      name: t('onboarding.apiSetup.optionCopilotName'),
+      description: t('onboarding.apiSetup.optionCopilotDescription'),
+      icon: <Cpu className="size-4" />,
+      providerType: 'pi',
+    },
+    {
+      id: 'pi_api_key',
+      name: t('onboarding.apiSetup.optionApiName'),
+      description: t('onboarding.apiSetup.optionApiDescription'),
+      icon: <Key className="size-4" />,
+      providerType: 'pi',
+    },
+  ]
+  const segmentDescriptions: Record<ProviderSegment, React.ReactNode> = {
+    anthropic: <>{t('onboarding.apiSetup.segmentDescriptionAnthropic')}</>,
+    pi: <>{t('onboarding.apiSetup.segmentDescriptionPi')} <BetaBadge /></>,
+  }
 
   // Filter options based on active segment
-  const filteredOptions = API_SETUP_OPTIONS.filter(o => o.providerType === activeSegment)
+  const filteredOptions = apiSetupOptions.filter(o => o.providerType === activeSegment)
 
   // Handle segment change - clear selection if it doesn't belong to new segment
   const handleSegmentChange = (segment: ProviderSegment) => {
@@ -236,8 +235,8 @@ export function APISetupStep({
 
   return (
     <StepFormLayout
-      title="Set up your Agent"
-      description={<>Select how you'd like to power your AI agents.<br />You can add more connections later.</>}
+      title={t('onboarding.apiSetup.title')}
+      description={t('onboarding.apiSetup.description')}
       actions={
         <>
           <BackButton onClick={onBack} />
@@ -254,7 +253,7 @@ export function APISetupStep({
       {/* Segment description */}
       <div className="bg-foreground-2 rounded-[8px] p-4 mb-3">
         <p className="text-sm text-muted-foreground text-center">
-          {SEGMENT_DESCRIPTIONS[activeSegment]}
+          {segmentDescriptions[activeSegment]}
         </p>
       </div>
 

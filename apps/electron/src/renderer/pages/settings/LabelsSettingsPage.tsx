@@ -30,6 +30,7 @@ import {
 } from '@/components/settings'
 import { routes } from '@/lib/navigate'
 import type { DetailsPageMeta } from '@/lib/navigation-registry'
+import { useI18n } from '@/context/I18nContext'
 
 export const meta: DetailsPageMeta = {
   navigator: 'settings',
@@ -37,24 +38,25 @@ export const meta: DetailsPageMeta = {
 }
 
 export default function LabelsSettingsPage() {
+  const { t } = useI18n()
   const { activeWorkspaceId } = useAppShellContext()
   const activeWorkspace = useActiveWorkspace()
   const { labels, isLoading } = useLabels(activeWorkspaceId)
 
   // Resolve edit configs using the workspace root path
   const rootPath = activeWorkspace?.rootPath || ''
-  const labelsEditConfig = getEditConfig('edit-labels', rootPath)
-  const autoRulesEditConfig = getEditConfig('edit-auto-rules', rootPath)
+  const labelsEditConfig = getEditConfig('edit-labels', rootPath, t)
+  const autoRulesEditConfig = getEditConfig('edit-auto-rules', rootPath, t)
 
   // Secondary action: open the labels config file directly in system editor
   const editFileAction = rootPath ? {
-    label: 'Edit File',
+    label: t('settings.appearance.rows.editFile'),
     filePath: `${rootPath}/labels/config.json`,
   } : undefined
 
   return (
     <div className="h-full flex flex-col">
-      <PanelHeader title="Labels" actions={<HeaderMenu route={routes.view.settings('labels')} />} />
+      <PanelHeader title={t('settings.labels.title')} actions={<HeaderMenu route="settings/labels" />} />
       <div className="flex-1 min-h-0 mask-fade-y">
         <ScrollArea className="h-full">
           <div className="px-5 py-7 max-w-3xl mx-auto">
@@ -66,25 +68,19 @@ export default function LabelsSettingsPage() {
               ) : (
                 <>
                   {/* About Section */}
-                  <SettingsSection title="About Labels">
+                  <SettingsSection title={t('settings.labels.aboutTitle')}>
                     <SettingsCard className="px-4 py-3.5">
                       <div className="text-sm text-muted-foreground leading-relaxed space-y-1.5">
-                        <p>
-                          Labels help you organize sessions with colored tags. Use them to categorize conversations by project, topic, or priority — making it easy to filter and find related sessions later.
-                        </p>
-                        <p>
-                          Each label can optionally carry a <span className="text-foreground/80 font-medium">value</span> with a specific type (text, number, or date). This turns labels into structured metadata — for example, a "priority" label with value 3, or a "due" label with a date.
-                        </p>
-                        <p>
-                          <span className="text-foreground/80 font-medium">Auto-apply rules</span> assign labels automatically when a message matches a regex pattern. For example, pasting a Linear issue URL can auto-tag the session with the project name and issue ID — no manual tagging needed.
-                        </p>
+                        <p>{t('settings.labels.aboutP1')}</p>
+                        <p>{t('settings.labels.aboutP2')}</p>
+                        <p>{t('settings.labels.aboutP3')}</p>
                         <p>
                           <button
                             type="button"
                             onClick={() => window.electronAPI?.openUrl(getDocUrl('labels'))}
                             className="text-foreground/70 hover:text-foreground underline underline-offset-2"
                           >
-                            Learn more
+                            {t('common.actions.learnMore')}
                           </button>
                         </p>
                       </div>
@@ -93,8 +89,8 @@ export default function LabelsSettingsPage() {
 
                   {/* Label Hierarchy Section */}
                   <SettingsSection
-                    title="Label Hierarchy"
-                    description="All labels configured for this workspace. Labels can be nested to form groups."
+                    title={t('settings.labels.hierarchyTitle')}
+                    description={t('settings.labels.hierarchyDescription')}
                     action={
                       <EditPopover
                         trigger={<EditButton />}
@@ -113,13 +109,15 @@ export default function LabelsSettingsPage() {
                           searchable
                           maxHeight={350}
                           fullscreen
-                          fullscreenTitle="Label Hierarchy"
+                          fullscreenTitle={t('settings.labels.hierarchyTitle')}
                         />
                       ) : (
                         <div className="p-8 text-center text-muted-foreground">
-                          <p className="text-sm">No labels configured.</p>
+                          <p className="text-sm">{t('settings.labels.hierarchyEmptyTitle')}</p>
                           <p className="text-xs mt-1 text-foreground/40">
-                            Labels can be created by the agent or by editing <code className="bg-foreground/5 px-1 rounded">labels/config.json</code> in your workspace.
+                            {t('settings.labels.hierarchyEmptyDescription', {
+                              file: 'labels/config.json',
+                            })}
                           </p>
                         </div>
                       )}
@@ -128,8 +126,8 @@ export default function LabelsSettingsPage() {
 
                   {/* Auto-Apply Rules Section */}
                   <SettingsSection
-                    title="Auto-Apply Rules"
-                    description="Regex patterns that automatically apply labels when matched in user messages. For example, paste a Linear issue URL and automatically tag the session with the project name and issue ID."
+                    title={t('settings.labels.autoRulesTitle')}
+                    description={t('settings.labels.autoRulesDescription')}
                     action={
                       <EditPopover
                         trigger={<EditButton />}
@@ -147,7 +145,7 @@ export default function LabelsSettingsPage() {
                         searchable
                         maxHeight={350}
                         fullscreen
-                        fullscreenTitle="Auto-Apply Rules"
+                        fullscreenTitle={t('settings.labels.autoRulesTitle')}
                       />
                     </SettingsCard>
                   </SettingsSection>

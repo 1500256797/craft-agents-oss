@@ -5,6 +5,7 @@ import { deriveConnectionStatus } from '@/components/ui/source-status-indicator'
 import { EntityPanel } from '@/components/ui/entity-panel'
 import { EntityListBadge } from '@/components/ui/entity-list-badge'
 import { EntityListEmptyScreen } from '@/components/ui/entity-list-empty'
+import { useI18n } from '@/context/I18nContext'
 import { sourceSelection } from '@/hooks/useEntitySelection'
 import { SourceMenu } from './SourceMenu'
 import { EditPopover, getEditConfig, type EditContextKey } from '@/components/ui/EditPopover'
@@ -22,12 +23,6 @@ const SOURCE_STATUS_CONFIG: Record<string, { label: string; colorClass: string }
   failed: { label: 'Disconnected', colorClass: 'bg-destructive/10 text-destructive' },
   untested: { label: 'Not Tested', colorClass: 'bg-foreground/10 text-foreground/50' },
   local_disabled: { label: 'Disabled', colorClass: 'bg-foreground/10 text-foreground/50' },
-}
-
-const SOURCE_TYPE_FILTER_LABELS: Record<string, string> = {
-  api: 'API',
-  mcp: 'MCP',
-  local: 'local folder',
 }
 
 export interface SourcesListPanelProps {
@@ -51,17 +46,28 @@ export function SourcesListPanel({
   localMcpEnabled = true,
   className,
 }: SourcesListPanelProps) {
+  const { t } = useI18n()
+  const typeFilterLabels = React.useMemo(
+    () => ({
+    api: t('settings.lists.sources.typeApi'),
+    mcp: t('settings.lists.sources.typeMcp'),
+    local: t('settings.lists.sources.typeLocalFolder'),
+    }),
+    [t],
+  )
+
   const filteredSources = React.useMemo(() => {
     if (!sourceFilter) return sources
-    return sources.filter(s => s.config.type === sourceFilter.sourceType)
+    return sources.filter((source) => source.config.type === sourceFilter.sourceType)
   }, [sources, sourceFilter])
 
   const emptyMessage = React.useMemo(() => {
     if (sourceFilter?.kind === 'type') {
-      return `No ${SOURCE_TYPE_FILTER_LABELS[sourceFilter.sourceType] ?? sourceFilter.sourceType} sources configured.`
+      const sourceTypeLabel = typeFilterLabels[sourceFilter.sourceType as keyof typeof typeFilterLabels] ?? sourceFilter.sourceType
+      return t('settings.lists.sources.emptyTitleByType', { type: sourceTypeLabel })
     }
-    return 'No sources configured.'
-  }, [sourceFilter])
+    return t('settings.lists.sources.emptyTitleAll')
+  }, [sourceFilter, t, typeFilterLabels])
 
   return (
     <EntityPanel<LoadedSource>
@@ -75,7 +81,7 @@ export function SourcesListPanel({
         <EntityListEmptyScreen
           icon={<DatabaseZap />}
           title={emptyMessage}
-          description="Sources connect your agent to external data — MCP servers, REST APIs, and local folders."
+          description={t('settings.lists.sources.description')}
           docKey="sources"
         >
           {workspaceRootPath && (
@@ -83,12 +89,13 @@ export function SourcesListPanel({
               align="center"
               trigger={
                 <button className="inline-flex items-center h-7 px-3 text-xs font-medium rounded-[8px] bg-background shadow-minimal hover:bg-foreground/[0.03] transition-colors">
-                  Add Source
+                  {t('settings.lists.sources.addSource')}
                 </button>
               }
               {...getEditConfig(
                 sourceFilter?.kind === 'type' ? `add-source-${sourceFilter.sourceType}` as EditContextKey : 'add-source',
-                workspaceRootPath
+                workspaceRootPath,
+                t
               )}
             />
           )}
@@ -104,10 +111,22 @@ export function SourcesListPanel({
           title: source.config.name,
           badges: (
             <>
-              {typeConfig && <EntityListBadge colorClass={typeConfig.colorClass}>{typeConfig.label}</EntityListBadge>}
+              {typeConfig && <EntityListBadge colorClass={typeConfig.colorClass}>
+                {source.config.type === 'mcp'
+                  ? t('settings.lists.sources.badgeMcp')
+                  : source.config.type === 'api'
+                    ? t('settings.lists.sources.badgeApi')
+                    : t('settings.lists.sources.badgeLocal')}
+              </EntityListBadge>}
               {statusConfig && (
                 <EntityListBadge colorClass={statusConfig.colorClass} tooltip={source.config.connectionError || undefined} className="cursor-default">
-                  {statusConfig.label}
+                  {connectionStatus === 'needs_auth'
+                    ? t('settings.lists.sources.statusAuthRequired')
+                    : connectionStatus === 'failed'
+                      ? t('settings.lists.sources.statusDisconnected')
+                      : connectionStatus === 'untested'
+                        ? t('settings.lists.sources.statusNotTested')
+                        : t('settings.lists.sources.statusDisabled')}
                 </EntityListBadge>
               )}
               {subtitle && <span className="truncate">{subtitle}</span>}

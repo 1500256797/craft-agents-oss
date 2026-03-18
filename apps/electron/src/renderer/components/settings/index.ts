@@ -31,6 +31,10 @@ export {
   type SettingsCardProps,
 } from './SettingsCard'
 
+export {
+  SettingsPageFrame,
+} from './SettingsPageFrame'
+
 // Rows
 export {
   SettingsRow,

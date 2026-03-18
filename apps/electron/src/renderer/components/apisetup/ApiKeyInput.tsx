@@ -28,6 +28,7 @@ import {
   resolvePresetStateForBaseUrlChange,
   type PresetKey,
 } from "./submit-helpers"
+import { useI18n } from '@/context/I18nContext'
 
 import type { CustomEndpointApi, CustomEndpointConfig } from '@config/llm-connections'
 
@@ -78,48 +79,49 @@ interface Preset {
   placeholder?: string
 }
 
-// Anthropic provider presets - for Claude Code backend
-// Also used by Pi API key flow (same providers, routed via Pi SDK)
-const ANTHROPIC_PRESETS: Preset[] = [
-  { key: 'anthropic', label: 'Anthropic', url: 'https://api.anthropic.com', placeholder: 'sk-ant-...' },
-  { key: 'openai', label: 'OpenAI', url: 'https://api.openai.com/v1', placeholder: 'sk-...' },
-  { key: 'openai-eu', label: 'OpenAI EU', url: 'https://eu.api.openai.com/v1', placeholder: 'sk-...' },
-  { key: 'openai-us', label: 'OpenAI US', url: 'https://us.api.openai.com/v1', placeholder: 'sk-...' },
-  { key: 'google', label: 'Google AI Studio', url: 'https://generativelanguage.googleapis.com/v1beta', placeholder: 'AIza...' },
-  { key: 'openrouter', label: 'OpenRouter', url: 'https://openrouter.ai/api/v1', placeholder: 'sk-or-...' },
-  { key: 'azure-openai-responses', label: 'Azure OpenAI', url: '', placeholder: 'Paste your key here...' },
-  { key: 'amazon-bedrock', label: 'Amazon Bedrock', url: 'https://bedrock-runtime.us-east-1.amazonaws.com', placeholder: 'AKIA...' },
-  { key: 'groq', label: 'Groq', url: 'https://api.groq.com/openai/v1', placeholder: 'gsk_...' },
-  { key: 'mistral', label: 'Mistral', url: 'https://api.mistral.ai/v1', placeholder: 'Paste your key here...' },
-  { key: 'xai', label: 'xAI (Grok)', url: 'https://api.x.ai/v1', placeholder: 'xai-...' },
-  { key: 'cerebras', label: 'Cerebras', url: 'https://api.cerebras.ai/v1', placeholder: 'csk-...' },
-  { key: 'zai', label: 'z.ai (GLM)', url: 'https://api.z.ai/api/coding/paas/v4', placeholder: 'Paste your key here...' },
-  { key: 'huggingface', label: 'Hugging Face', url: 'https://router.huggingface.co/v1', placeholder: 'hf_...' },
-  { key: 'minimax-global', label: 'Minimax Global', url: 'https://api.minimax.io/anthropic', placeholder: 'Paste your key here...' },
-  { key: 'minimax-cn', label: 'Minimax CN', url: 'https://api.minimaxi.com/anthropic', placeholder: 'Paste your key here...' },
-  { key: 'kimi-coding', label: 'Kimi (Coding)', url: 'https://api.kimi.com/coding', placeholder: 'sk-kimi-...' },
-  { key: 'vercel-ai-gateway', label: 'Vercel AI Gateway', url: 'https://ai-gateway.vercel.sh', placeholder: 'Paste your key here...' },
-  { key: 'custom', label: 'Custom', url: '', placeholder: 'Paste your key here...' },
-]
+function getAnthropicPresets(t: (key: string) => string): Preset[] {
+  return [
+    { key: 'anthropic', label: t('common.apiKeyInput.providers.anthropic'), url: 'https://api.anthropic.com', placeholder: 'sk-ant-...' },
+    { key: 'openai', label: t('common.apiKeyInput.providers.openai'), url: 'https://api.openai.com/v1', placeholder: 'sk-...' },
+    { key: 'openai-eu', label: t('common.apiKeyInput.providers.openaiEu'), url: 'https://eu.api.openai.com/v1', placeholder: 'sk-...' },
+    { key: 'openai-us', label: t('common.apiKeyInput.providers.openaiUs'), url: 'https://us.api.openai.com/v1', placeholder: 'sk-...' },
+    { key: 'google', label: t('common.apiKeyInput.providers.googleAiStudio'), url: 'https://generativelanguage.googleapis.com/v1beta', placeholder: 'AIza...' },
+    { key: 'openrouter', label: t('common.apiKeyInput.providers.openrouter'), url: 'https://openrouter.ai/api/v1', placeholder: 'sk-or-...' },
+    { key: 'azure-openai-responses', label: t('common.apiKeyInput.providers.azureOpenai'), url: '', placeholder: t('common.apiKeyInput.pasteKeyPlaceholder') },
+    { key: 'amazon-bedrock', label: t('common.apiKeyInput.providers.amazonBedrock'), url: 'https://bedrock-runtime.us-east-1.amazonaws.com', placeholder: 'AKIA...' },
+    { key: 'groq', label: t('common.apiKeyInput.providers.groq'), url: 'https://api.groq.com/openai/v1', placeholder: 'gsk_...' },
+    { key: 'mistral', label: t('common.apiKeyInput.providers.mistral'), url: 'https://api.mistral.ai/v1', placeholder: t('common.apiKeyInput.pasteKeyPlaceholder') },
+    { key: 'xai', label: t('common.apiKeyInput.providers.xai'), url: 'https://api.x.ai/v1', placeholder: 'xai-...' },
+    { key: 'cerebras', label: t('common.apiKeyInput.providers.cerebras'), url: 'https://api.cerebras.ai/v1', placeholder: 'csk-...' },
+    { key: 'zai', label: t('common.apiKeyInput.providers.zai'), url: 'https://api.z.ai/api/coding/paas/v4', placeholder: t('common.apiKeyInput.pasteKeyPlaceholder') },
+    { key: 'huggingface', label: t('common.apiKeyInput.providers.huggingface'), url: 'https://router.huggingface.co/v1', placeholder: 'hf_...' },
+    { key: 'minimax-global', label: t('common.apiKeyInput.providers.minimaxGlobal'), url: 'https://api.minimax.io/anthropic', placeholder: t('common.apiKeyInput.pasteKeyPlaceholder') },
+    { key: 'minimax-cn', label: t('common.apiKeyInput.providers.minimaxCn'), url: 'https://api.minimaxi.com/anthropic', placeholder: t('common.apiKeyInput.pasteKeyPlaceholder') },
+    { key: 'kimi-coding', label: t('common.apiKeyInput.providers.kimiCoding'), url: 'https://api.kimi.com/coding', placeholder: 'sk-kimi-...' },
+    { key: 'vercel-ai-gateway', label: t('common.apiKeyInput.providers.vercelAiGateway'), url: 'https://ai-gateway.vercel.sh', placeholder: t('common.apiKeyInput.pasteKeyPlaceholder') },
+    { key: 'custom', label: t('common.apiKeyInput.providers.custom'), url: '', placeholder: t('common.apiKeyInput.pasteKeyPlaceholder') },
+  ]
+}
 
-// OpenAI provider presets - for Codex backend
-// Only direct OpenAI is supported; 3PP providers (OpenRouter, Vercel, Ollama) should be
-// configured via the Anthropic/Claude connection which routes through the Claude Agent SDK.
-const OPENAI_PRESETS: Preset[] = [
-  { key: 'openai', label: 'OpenAI', url: '' },
-]
+function getOpenaiPresets(t: (key: string) => string): Preset[] {
+  return [
+    { key: 'openai', label: t('common.apiKeyInput.providers.openai'), url: '' },
+  ]
+}
 
-// Pi provider presets - unified API for 20+ LLM providers
-const PI_PRESETS: Preset[] = [
-  { key: 'pi', label: 'Craft Agents Backend (Direct)', url: '' },
-  { key: 'openrouter', label: 'OpenRouter', url: 'https://openrouter.ai/api' },
-  { key: 'custom', label: 'Custom', url: '' },
-]
+function getPiPresets(t: (key: string) => string): Preset[] {
+  return [
+    { key: 'pi', label: t('common.apiKeyInput.providers.craftAgentsBackend'), url: '' },
+    { key: 'openrouter', label: t('common.apiKeyInput.providers.openrouter'), url: 'https://openrouter.ai/api' },
+    { key: 'custom', label: t('common.apiKeyInput.providers.custom'), url: '' },
+  ]
+}
 
-// Google AI Studio preset - single endpoint, no custom URL needed
-const GOOGLE_PRESETS: Preset[] = [
-  { key: 'google', label: 'Google AI Studio', url: '' },
-]
+function getGooglePresets(t: (key: string) => string): Preset[] {
+  return [
+    { key: 'google', label: t('common.apiKeyInput.providers.googleAiStudio'), url: '' },
+  ]
+}
 
 /** Presets that require the Pi SDK for authentication — hidden in Anthropic API Key mode */
 const PI_ONLY_PRESET_KEYS: ReadonlySet<string> = new Set(['minimax-global', 'minimax-cn'])
@@ -129,13 +131,14 @@ const COMPAT_OPENAI_DEFAULTS = 'openai/gpt-5.2-codex, openai/gpt-5.1-codex-mini'
 const COMPAT_MINIMAX_DEFAULTS = 'MiniMax-M2.5, MiniMax-M2.5-highspeed'
 const COMPAT_KIMI_DEFAULTS = 'k2p5, kimi-k2-thinking'
 
-function getPresetsForProvider(providerType: 'anthropic' | 'openai' | 'pi' | 'google' | 'pi_api_key'): Preset[] {
-  if (providerType === 'pi_api_key') return ANTHROPIC_PRESETS
-  if (providerType === 'google') return GOOGLE_PRESETS
-  if (providerType === 'pi') return PI_PRESETS
-  if (providerType === 'openai') return OPENAI_PRESETS
+function getPresetsForProvider(providerType: 'anthropic' | 'openai' | 'pi' | 'google' | 'pi_api_key', t: (key: string) => string): Preset[] {
+  const anthropicPresets = getAnthropicPresets(t)
+  if (providerType === 'pi_api_key') return anthropicPresets
+  if (providerType === 'google') return getGooglePresets(t)
+  if (providerType === 'pi') return getPiPresets(t)
+  if (providerType === 'openai') return getOpenaiPresets(t)
   // Anthropic mode: exclude presets that only work via Pi SDK
-  return ANTHROPIC_PRESETS.filter(p => !PI_ONLY_PRESET_KEYS.has(p.key))
+  return anthropicPresets.filter(p => !PI_ONLY_PRESET_KEYS.has(p.key))
 }
 
 function getPresetForUrl(url: string, presets: Preset[]): PresetKey {
@@ -163,8 +166,10 @@ export function ApiKeyInput({
   providerType = 'anthropic',
   initialValues,
 }: ApiKeyInputProps) {
+  const { t } = useI18n()
+
   // Get presets based on provider type
-  const presets = getPresetsForProvider(providerType)
+  const presets = getPresetsForProvider(providerType, t)
   const defaultPreset = presets[0]
 
   // Compute initial preset: explicit (Pi piAuthProvider), derived from URL, or default
@@ -207,7 +212,7 @@ export function ApiKeyInput({
     ?? (providerType === 'google' ? 'AIza...'
     : providerType === 'pi' ? 'pi-...'
     : providerType === 'openai' ? 'sk-...'
-    : 'Paste your key here...')
+    : t('common.apiKeyInput.pasteKeyPlaceholder'))
 
   // Fetch Pi SDK models when a provider is selected in pi_api_key flow.
   // Returns all models sorted by cost (expensive-first) for the searchable tier dropdowns.
@@ -329,7 +334,7 @@ export function ApiKeyInput({
     const isUsingDefaultEndpoint = isDefaultProviderPreset || !effectiveBaseUrl
     const requiresModel = !isDefaultProviderPreset && !!effectiveBaseUrl
     if (requiresModel && parsedModels.length === 0) {
-      setModelError('Default model is required for custom endpoints.')
+      setModelError(t('common.apiKeyInput.modelRequiredError'))
       return
     }
 
@@ -354,9 +359,9 @@ export function ApiKeyInput({
   }
 
   const tierConfigs = [
-    { label: 'Best', desc: 'most capable', value: bestModel, onChange: setBestModel },
-    { label: 'Balanced', desc: 'good for everyday use', value: defaultModel, onChange: setDefaultModel },
-    { label: 'Fast', desc: 'summarization & utility', value: cheapModel, onChange: setCheapModel },
+    { label: t('common.apiKeyInput.tierBest'), desc: t('common.apiKeyInput.tierBestDesc'), value: bestModel, onChange: setBestModel },
+    { label: t('common.apiKeyInput.tierBalanced'), desc: t('common.apiKeyInput.tierBalancedDesc'), value: defaultModel, onChange: setDefaultModel },
+    { label: t('common.apiKeyInput.tierFast'), desc: t('common.apiKeyInput.tierFastDesc'), value: cheapModel, onChange: setCheapModel },
   ]
   const activeTierConfig = openTier ? tierConfigs.find(t => t.label === openTier) : null
 
@@ -364,7 +369,7 @@ export function ApiKeyInput({
     <form id={formId} onSubmit={handleSubmit} className="space-y-6">
       {/* API Key */}
       <div className="space-y-2">
-        <Label htmlFor="api-key">API Key</Label>
+        <Label htmlFor="api-key">{t('common.apiKeyInput.apiKey')}</Label>
         <div className={cn(
           "relative rounded-md shadow-minimal transition-colors",
           "bg-foreground-2 focus-within:bg-background"
@@ -401,7 +406,7 @@ export function ApiKeyInput({
       {presets.length > 1 && (
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="base-url">Endpoint</Label>
+          <Label htmlFor="base-url">{t('common.apiKeyInput.endpoint')}</Label>
           <DropdownMenu>
             <DropdownMenuTrigger
               disabled={isDisabled}
@@ -435,7 +440,7 @@ export function ApiKeyInput({
               type="text"
               value={baseUrl}
               onChange={(e) => handleBaseUrlChange(e.target.value)}
-              placeholder="https://your-api-endpoint.com"
+              placeholder={t('common.apiKeyInput.baseUrlPlaceholder')}
               className="border-0 bg-transparent shadow-none"
               disabled={isDisabled}
             />
@@ -447,15 +452,15 @@ export function ApiKeyInput({
       {/* Protocol Toggle — visible as soon as Custom preset is selected */}
       {activePreset === 'custom' && !isDefaultProviderPreset && (
         <div className="space-y-2">
-          <Label>Protocol</Label>
+          <Label>{t('common.apiKeyInput.protocol')}</Label>
           <div className={cn(
             "flex rounded-md shadow-minimal overflow-hidden",
             "bg-foreground-2",
             isDisabled && "opacity-50 pointer-events-none"
           )}>
             {([
-              { value: 'openai-completions' as const, label: 'OpenAI Compatible' },
-              { value: 'anthropic-messages' as const, label: 'Anthropic Compatible' },
+              { value: 'openai-completions' as const, label: t('common.apiKeyInput.openaiCompatible') },
+              { value: 'anthropic-messages' as const, label: t('common.apiKeyInput.anthropicCompatible') },
             ]).map(({ value, label }) => (
               <button
                 key={value}
@@ -474,7 +479,7 @@ export function ApiKeyInput({
             ))}
           </div>
           <p className="text-xs text-foreground/30">
-            Most third-party APIs (Ollama, vLLM, DashScope) use OpenAI Compatible.
+            {t('common.apiKeyInput.protocolHint')}
           </p>
         </div>
       )}
@@ -485,7 +490,7 @@ export function ApiKeyInput({
           {piModelsLoading ? (
             <div className="flex items-center gap-2 py-3 text-muted-foreground">
               <Loader2 className="size-3.5 animate-spin" />
-              <span className="text-xs">Loading models...</span>
+              <span className="text-xs">{t('common.apiKeyInput.loadingModels')}</span>
             </div>
           ) : (
             <>
@@ -518,7 +523,7 @@ export function ApiKeyInput({
                     )}
                   >
                     <span className="truncate text-foreground">
-                      {piModels.find(m => m.id === value)?.name ?? 'Select model...'}
+                      {piModels.find(m => m.id === value)?.name ?? t('common.apiKeyInput.selectModel')}
                     </span>
                     <ChevronDown className="size-3 opacity-50 shrink-0" />
                   </button>
@@ -547,7 +552,7 @@ export function ApiKeyInput({
                           ref={tierFilterInputRef}
                           value={tierFilter}
                           onValueChange={setTierFilter}
-                          placeholder="Search models..."
+                          placeholder={t('common.apiKeyInput.searchModels')}
                           autoFocus
                           className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground placeholder:select-none"
                         />
@@ -572,7 +577,7 @@ export function ApiKeyInput({
                               <div className="flex items-center gap-2 min-w-0">
                                 <span className="truncate">{model.name}</span>
                                 {model.reasoning && (
-                                  <span className="text-[10px] text-foreground/30 shrink-0">reasoning</span>
+                                  <span className="text-[10px] text-foreground/30 shrink-0">{t('common.apiKeyInput.reasoning')}</span>
                                 )}
                               </div>
                               <Check className={cn("size-3 shrink-0", activeTierConfig.value === model.id ? "opacity-100" : "opacity-0")} />
@@ -592,9 +597,9 @@ export function ApiKeyInput({
       ) : !isDefaultProviderPreset && (
         <div className="space-y-2">
           <Label htmlFor="connection-default-model" className="text-muted-foreground font-normal">
-            Default Model{' '}
+            {t('common.apiKeyInput.defaultModel')}{' '}
             <span className="text-foreground/30">
-              · {baseUrl.trim() ? 'required' : 'optional'}
+              · {baseUrl.trim() ? t('common.apiKeyInput.required') : t('common.apiKeyInput.optional')}
             </span>
           </Label>
           <div className={cn(
@@ -610,7 +615,7 @@ export function ApiKeyInput({
                 setConnectionDefaultModel(e.target.value)
                 setModelError(null)
               }}
-              placeholder="e.g. claude-opus-4-6, claude-sonnet-4-6, claude-haiku-4-5"
+              placeholder={t('common.apiKeyInput.modelPlaceholder')}
               className="border-0 bg-transparent shadow-none"
               disabled={isDisabled}
             />
@@ -619,11 +624,11 @@ export function ApiKeyInput({
             <p className="text-xs text-destructive">{modelError}</p>
           )}
           <p className="text-xs text-foreground/30">
-            Comma-separated list. The first model is the default. The last is used for summarization.
+            {t('common.apiKeyInput.modelListHint')}
           </p>
           {(activePreset === 'custom' || !activePreset) && (
             <p className="text-xs text-foreground/30">
-              Required for custom endpoints. Use the provider-specific model ID.
+              {t('common.apiKeyInput.customEndpointHint')}
             </p>
           )}
         </div>

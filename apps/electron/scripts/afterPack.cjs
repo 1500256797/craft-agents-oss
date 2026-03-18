@@ -28,6 +28,7 @@ module.exports = async function afterPack(context) {
   const appPath = context.appOutDir;
   const resourcesDir = path.join(appPath, 'Craft Agents.app', 'Contents', 'Resources');
   const precompiledAssets = path.join(context.packager.projectDir, 'resources', 'Assets.car');
+  const iconCatalogSource = path.join(context.packager.projectDir, 'resources', 'icon.icon', 'Assets', 'icon.svg');
 
   console.log(`afterPack: projectDir=${context.packager.projectDir}`);
   console.log(`afterPack: looking for Assets.car at ${precompiledAssets}`);
@@ -37,6 +38,16 @@ module.exports = async function afterPack(context) {
     console.log('Warning: Pre-compiled Assets.car not found in resources/');
     console.log('The app will use the fallback icon.icns on all macOS versions');
     return;
+  }
+
+  if (fs.existsSync(iconCatalogSource)) {
+    const assetsStat = fs.statSync(precompiledAssets);
+    const sourceStat = fs.statSync(iconCatalogSource);
+    if (sourceStat.mtimeMs > assetsStat.mtimeMs) {
+      console.log('Warning: Assets.car is older than resources/icon.icon/Assets/icon.svg');
+      console.log('Skipping stale Liquid Glass icon so the app uses the updated fallback icon.icns');
+      return;
+    }
   }
 
   // Copy pre-compiled Assets.car to the app bundle

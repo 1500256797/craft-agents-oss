@@ -3,11 +3,25 @@ import { join } from 'path'
 import { homedir } from 'os'
 import { RPC_CHANNELS } from '@craft-agent/shared/protocol'
 import { getCredentialManager } from '@craft-agent/shared/credentials'
+import {
+  clearAccountSession,
+  getAccountSessionState,
+  getCaptchaId,
+  getCaptchaImageDataUrl,
+  getCurrentAccountUser,
+  loginAccount,
+  type AccountLoginInput,
+} from '@craft-agent/shared/account-auth'
 import type { RpcServer } from '@craft-agent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 import { requestClientConfirmDialog } from '@craft-agent/server-core/transport'
 
 export const HANDLED_CHANNELS = [
+  RPC_CHANNELS.auth.LOGIN,
+  RPC_CHANNELS.auth.GET_CURRENT_USER,
+  RPC_CHANNELS.auth.GET_SESSION_STATE,
+  RPC_CHANNELS.auth.GET_CAPTCHA_ID,
+  RPC_CHANNELS.auth.GET_CAPTCHA_IMAGE,
   RPC_CHANNELS.auth.LOGOUT,
   RPC_CHANNELS.auth.SHOW_LOGOUT_CONFIRMATION,
   RPC_CHANNELS.auth.SHOW_DELETE_SESSION_CONFIRMATION,
@@ -15,6 +29,46 @@ export const HANDLED_CHANNELS = [
 ] as const
 
 export function registerAuthHandlers(server: RpcServer, deps: HandlerDeps): void {
+  server.handle(RPC_CHANNELS.auth.GET_SESSION_STATE, async () => {
+    return getAccountSessionState()
+  })
+
+  server.handle(RPC_CHANNELS.auth.GET_CURRENT_USER, async () => {
+    const session = await getAccountSessionState()
+    if (!session.authenticated) {
+      return null
+    }
+
+    try {
+      return await getCurrentAccountUser()
+    } catch (error) {
+      deps.platform.logger.warn('Failed to fetch current account user, clearing desktop account session', error)
+      await clearAccountSession()
+      return null
+    }
+  })
+
+  server.handle(RPC_CHANNELS.auth.GET_CAPTCHA_ID, async () => {
+    return getCaptchaId()
+  })
+
+  server.handle(RPC_CHANNELS.auth.GET_CAPTCHA_IMAGE, async (_ctx, captchaId: string, reload?: boolean) => {
+    return getCaptchaImageDataUrl(captchaId, Boolean(reload))
+  })
+
+  server.handle(RPC_CHANNELS.auth.LOGIN, async (_ctx, input: AccountLoginInput) => {
+    try {
+      await loginAccount(input)
+      const user = await getCurrentAccountUser()
+      return { success: true, user }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Login failed'
+      deps.platform.logger.warn('Desktop account login failed', message)
+      await clearAccountSession()
+      return { success: false, error: message }
+    }
+  })
+
   // Show logout confirmation dialog (routed to client)
   server.handle(RPC_CHANNELS.auth.SHOW_LOGOUT_CONFIRMATION, async (ctx) => {
     const result = await requestClientConfirmDialog(server, ctx.clientId, {
@@ -50,6 +104,7 @@ export function registerAuthHandlers(server: RpcServer, deps: HandlerDeps): void
   // Logout - clear all credentials and config
   server.handle(RPC_CHANNELS.auth.LOGOUT, async () => {
     try {
+      await clearAccountSession()
       const manager = getCredentialManager()
 
       // List and delete all stored credentials

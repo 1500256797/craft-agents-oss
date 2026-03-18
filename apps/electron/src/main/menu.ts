@@ -5,6 +5,8 @@ import type { MenuItem } from '../shared/menu-schema'
 import type { WindowManager } from './window-manager'
 import type { EventSink } from '@craft-agent/server-core/transport'
 import { mainLog } from './logger'
+import { getUiLanguage } from '@craft-agent/shared/config/storage'
+import { getMenuItemLabel, getMenuSectionLabel, resolveUiLanguage, translateUi } from '../shared/i18n'
 
 type ClientResolver = (webContentsId: number) => string | undefined
 
@@ -47,6 +49,9 @@ export async function rebuildMenu(): Promise<void> {
 
   const windowManager = cachedWindowManager
   const isMac = process.platform === 'darwin'
+  const locale = resolveUiLanguage(getUiLanguage(), app.getLocale())
+  const t = (key: string, params?: Record<string, string | number>, fallback?: string) =>
+    translateUi(locale, key, params, fallback)
 
   // On Windows/Linux, hide the native menu entirely
   // Users access menu via the Craft logo dropdown in the app
@@ -63,13 +68,13 @@ export async function rebuildMenu(): Promise<void> {
   // Build the update menu item based on state
   const updateMenuItem: Electron.MenuItemConstructorOptions = updateReady
     ? {
-        label: `Install Update…\t【${updateInfo.latestVersion}】`,
+        label: t('menu.mainMenu.installUpdateEllipsis', { version: updateInfo.latestVersion ?? '' }),
         click: async () => {
           await installUpdate()
         }
       }
     : {
-        label: 'Check for Updates…',
+        label: t('menu.mainMenu.checkForUpdatesEllipsis'),
         click: async () => {
           await checkForUpdates({ autoDownload: true })
         }
@@ -78,38 +83,38 @@ export async function rebuildMenu(): Promise<void> {
   const template: Electron.MenuItemConstructorOptions[] = [
     // App menu (macOS only)
     ...(isMac ? [{
-      label: 'Craft Agents',
+      label: t('menu.mainMenu.appName'),
       submenu: [
-        { role: 'about' as const, label: 'About Craft Agents' },
+        { role: 'about' as const, label: t('menu.mainMenu.about') },
         updateMenuItem,
         { type: 'separator' as const },
         {
-          label: 'Settings...',
+          label: t('menu.mainMenu.settingsEllipsis'),
           accelerator: 'CmdOrCtrl+,',
           registerAccelerator: false,  // Action registry handles the keyboard shortcut
           click: () => sendToRenderer(RPC_CHANNELS.menu.OPEN_SETTINGS)
         },
         { type: 'separator' as const },
-        { role: 'hide' as const, label: 'Hide Craft Agents' },
+        { role: 'hide' as const, label: t('menu.mainMenu.hideApp') },
         { role: 'hideOthers' as const },
         { role: 'unhide' as const },
         { type: 'separator' as const },
-        { role: 'quit' as const, label: 'Quit Craft Agents' }
+        { role: 'quit' as const, label: t('menu.mainMenu.quitApp') }
       ]
     }] : []),
 
     // File menu
     {
-      label: 'File',
+      label: t('menu.mainMenu.file'),
       submenu: [
         {
-          label: 'New Chat',
+          label: t('menu.mainMenu.newChat'),
           accelerator: 'CmdOrCtrl+N',
           registerAccelerator: false,  // Action registry handles the keyboard shortcut
           click: () => sendToRenderer(RPC_CHANNELS.menu.NEW_CHAT)
         },
         {
-          label: 'New Window',
+          label: t('menu.mainMenu.newWindow'),
           accelerator: 'CmdOrCtrl+Shift+N',
           registerAccelerator: false,  // Action registry handles the keyboard shortcut
           click: () => {
@@ -129,20 +134,20 @@ export async function rebuildMenu(): Promise<void> {
 
     // Edit menu (from shared schema)
     {
-      label: EDIT_MENU.label,
-      submenu: EDIT_MENU.items.map(toElectronMenuItem),
+      label: getMenuSectionLabel(locale, EDIT_MENU),
+      submenu: EDIT_MENU.items.map((item) => toElectronMenuItem(item, locale)),
     },
 
     // View menu (from shared schema + dev-only items)
     {
-      label: VIEW_MENU.label,
+      label: getMenuSectionLabel(locale, VIEW_MENU),
       submenu: [
-        ...VIEW_MENU.items.map(toElectronMenuItem),
+        ...VIEW_MENU.items.map((item) => toElectronMenuItem(item, locale)),
         // Dev tools only in development
         ...(!app.isPackaged ? [
           { type: 'separator' as const },
           {
-            label: 'Reload',
+            label: t('menu.mainMenu.reload'),
             accelerator: 'CmdOrCtrl+R',
             click: (_menuItem: Electron.MenuItem, window: Electron.BaseWindow | undefined) => {
               const browserWindow = window instanceof BrowserWindow ? window : BrowserWindow.getFocusedWindow()
@@ -156,7 +161,7 @@ export async function rebuildMenu(): Promise<void> {
             }
           },
           {
-            label: 'Force Reload',
+            label: t('menu.mainMenu.forceReload'),
             accelerator: 'CmdOrCtrl+Shift+R',
             click: (_menuItem: Electron.MenuItem, window: Electron.BaseWindow | undefined) => {
               const browserWindow = window instanceof BrowserWindow ? window : BrowserWindow.getFocusedWindow()
@@ -177,9 +182,9 @@ export async function rebuildMenu(): Promise<void> {
 
     // Window menu (from shared schema + macOS-specific items)
     {
-      label: WINDOW_MENU.label,
+      label: getMenuSectionLabel(locale, WINDOW_MENU),
       submenu: [
-        ...WINDOW_MENU.items.map(toElectronMenuItem),
+        ...WINDOW_MENU.items.map((item) => toElectronMenuItem(item, locale)),
         ...(isMac ? [
           { type: 'separator' as const },
           { role: 'front' as const }
@@ -189,10 +194,10 @@ export async function rebuildMenu(): Promise<void> {
 
     // Debug menu (development only)
     ...(!app.isPackaged ? [{
-      label: 'Debug',
+      label: t('menu.mainMenu.debug'),
       submenu: [
         {
-          label: 'Check for Updates',
+          label: t('menu.appMenu.checkForUpdates'),
           click: async () => {
             const { checkForUpdates } = await import('./auto-update')
             const info = await checkForUpdates({ autoDownload: true })
@@ -200,7 +205,7 @@ export async function rebuildMenu(): Promise<void> {
           }
         },
         {
-          label: 'Install Update',
+          label: t('menu.appMenu.installUpdate'),
           click: async () => {
             const { installUpdate } = await import('./auto-update')
             try {
@@ -212,7 +217,7 @@ export async function rebuildMenu(): Promise<void> {
         },
         { type: 'separator' as const },
         {
-          label: 'Reset to Defaults...',
+          label: t('menu.mainMenu.resetToDefaultsEllipsis'),
           click: async () => {
             const { dialog } = await import('electron')
             await dialog.showMessageBox({
@@ -228,14 +233,14 @@ export async function rebuildMenu(): Promise<void> {
 
     // Help menu
     {
-      label: 'Help',
+      label: t('menu.mainMenu.help'),
       submenu: [
         {
-          label: 'Help & Documentation',
+          label: t('menu.mainMenu.helpAndDocs'),
           click: () => shell.openExternal('https://agents.craft.do/docs')
         },
         {
-          label: 'Keyboard Shortcuts',
+          label: t('menu.mainMenu.keyboardShortcuts'),
           accelerator: 'CmdOrCtrl+/',
           registerAccelerator: false,  // Action registry handles the keyboard shortcut
           click: () => sendToRenderer(RPC_CHANNELS.menu.KEYBOARD_SHORTCUTS)
@@ -268,19 +273,22 @@ function sendToRenderer(channel: MenuBroadcastChannel): void {
 /**
  * Converts a MenuItem from the shared schema to Electron MenuItemConstructorOptions.
  */
-function toElectronMenuItem(item: MenuItem): Electron.MenuItemConstructorOptions {
+function toElectronMenuItem(item: MenuItem, locale: 'en' | 'zh-CN'): Electron.MenuItemConstructorOptions {
   if (item.type === 'separator') {
     return { type: 'separator' }
   }
 
   if (item.type === 'role') {
     // Use Electron's built-in role - it handles accelerators automatically
-    return { role: item.role as Electron.MenuItemConstructorOptions['role'] }
+    return {
+      role: item.role as Electron.MenuItemConstructorOptions['role'],
+      label: getMenuItemLabel(locale, item) ?? item.label,
+    }
   }
 
   if (item.type === 'action') {
     return {
-      label: item.label,
+      label: getMenuItemLabel(locale, item) ?? item.label,
       accelerator: item.shortcut,
       registerAccelerator: false,  // Action registry handles the keyboard shortcut
       click: () => sendToRenderer(item.ipcChannel as MenuBroadcastChannel),

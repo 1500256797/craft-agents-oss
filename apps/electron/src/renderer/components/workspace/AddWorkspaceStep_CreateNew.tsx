@@ -59,7 +59,7 @@ export function AddWorkspaceStep_CreateNew({
       try {
         const result = await window.electronAPI.checkWorkspaceSlug(slug)
         if (result.exists) {
-          setError(`A workspace named "${slug}" already exists`)
+          setError(`A local agent named "${slug}" already exists`)
         } else {
           setError(null)
         }
@@ -106,21 +106,21 @@ export function AddWorkspaceStep_CreateNew({
       </button>
 
       <AddWorkspaceStepHeader
-        title="Create workspace"
-        description="Enter a name and choose where to store your workspace."
+        title="Create local agent"
+        description="Enter a name and choose where to store this local agent."
       />
 
       <div className="mt-6 w-full space-y-6">
         {/* Workspace name */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-foreground mb-2.5">
-            Workspace name
+            Agent name
           </label>
           <div className="bg-background shadow-minimal rounded-lg">
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="My Workspace"
+              placeholder="My Agent"
               disabled={isCreating}
               autoFocus
               className="border-0 bg-transparent shadow-none"
@@ -154,7 +154,7 @@ export function AddWorkspaceStep_CreateNew({
             onChange={() => setLocationOption('custom')}
             disabled={isCreating}
             title="Choose a location"
-            subtitle={customPath || "Pick a place to put your new workspace."}
+            subtitle={customPath || "Pick a place to store your new local agent."}
             action={locationOption === 'custom' ? (
               <AddWorkspaceSecondaryButton
                 onClick={(e) => {
@@ -176,7 +176,7 @@ export function AddWorkspaceStep_CreateNew({
           loading={isCreating}
           loadingText="Creating..."
         >
-          Create
+          Create Agent
         </AddWorkspacePrimaryButton>
       </div>
     </AddWorkspaceContainer>

@@ -3,9 +3,10 @@ import { dirname } from 'path'
 import { RPC_CHANNELS } from '@craft-agent/shared/protocol'
 import { getPreferencesPath, getSessionDraft, setSessionDraft, deleteSessionDraft, getAllSessionDrafts, getWorkspaceByNameOrId } from '@craft-agent/shared/config'
 import { getWorkspaceOrThrow } from '@craft-agent/server-core/handlers'
-import type { RpcServer } from '@craft-agent/server-core/transport'
+import { pushTyped, type RpcServer } from '@craft-agent/server-core/transport'
 import type { HandlerDeps } from './handler-deps'
 import { requestClientOpenFileDialog } from '@craft-agent/server-core/transport'
+import type { UiLanguage } from '@craft-agent/shared/config/types'
 
 export const CORE_HANDLED_CHANNELS = [
   RPC_CHANNELS.workspace.SETTINGS_GET,
@@ -25,6 +26,8 @@ export const CORE_HANDLED_CHANNELS = [
   RPC_CHANNELS.power.GET_KEEP_AWAKE,
   RPC_CHANNELS.appearance.GET_RICH_TOOL_DESCRIPTIONS,
   RPC_CHANNELS.appearance.SET_RICH_TOOL_DESCRIPTIONS,
+  RPC_CHANNELS.locale.GET_UI_LANGUAGE,
+  RPC_CHANNELS.locale.SET_UI_LANGUAGE,
   RPC_CHANNELS.settings.GET_NETWORK_PROXY,
   RPC_CHANNELS.sessions.GET_MODEL,
   RPC_CHANNELS.sessions.SET_MODEL,
@@ -258,6 +261,21 @@ export function registerSettingsHandlers(server: RpcServer, deps: HandlerDeps): 
   server.handle(RPC_CHANNELS.appearance.SET_RICH_TOOL_DESCRIPTIONS, async (_ctx, enabled: boolean) => {
     const { setRichToolDescriptions } = await import('@craft-agent/shared/config/storage')
     setRichToolDescriptions(enabled)
+  })
+
+  // Get UI language setting
+  server.handle(RPC_CHANNELS.locale.GET_UI_LANGUAGE, async () => {
+    const { getUiLanguage } = await import('@craft-agent/shared/config/storage')
+    return getUiLanguage()
+  })
+
+  // Set UI language setting and broadcast to all windows
+  server.handle(RPC_CHANNELS.locale.SET_UI_LANGUAGE, async (_ctx, language: UiLanguage) => {
+    const { setUiLanguage } = await import('@craft-agent/shared/config/storage')
+    const { rebuildMenu } = await import('../menu')
+    setUiLanguage(language)
+    pushTyped(server, RPC_CHANNELS.locale.CHANGED, { to: 'all' }, language)
+    await rebuildMenu()
   })
 
   // ============================================================

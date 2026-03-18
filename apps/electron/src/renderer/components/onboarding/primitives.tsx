@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { Spinner } from "@craft-agent/ui"
+import { useI18n } from "@/context/I18nContext"
 
 /* =============================================================================
    ONBOARDING PRIMITIVES
@@ -243,9 +244,10 @@ interface BackButtonProps extends Omit<ButtonProps, 'variant' | 'children'> {
  * BackButton - Consistent back/cancel button
  */
 export function BackButton({ children = 'Back', className, ...props }: BackButtonProps) {
+  const { t } = useI18n()
   return (
     <Button variant="ghost" className={cn("flex-1 max-w-[320px] bg-foreground-2 shadow-minimal text-foreground hover:bg-foreground/5 rounded-lg", className)} {...props}>
-      {children}
+      {children === 'Back' ? t('onboarding.common.back') : children}
     </Button>
   )
 }
@@ -267,15 +269,16 @@ export function ContinueButton({
   disabled,
   ...props
 }: ContinueButtonProps) {
+  const { t } = useI18n()
   return (
     <Button className={cn("flex-1 max-w-[320px] bg-background shadow-minimal text-foreground hover:bg-foreground/5 rounded-lg", className)} disabled={disabled || loading} {...props}>
       {loading ? (
         <>
           <Spinner className="mr-2" />
-          {loadingText}
+          {loadingText === 'Loading...' ? t('onboarding.common.loading') : loadingText}
         </>
       ) : (
-        children
+        children === 'Continue' ? t('onboarding.common.continue') : children
       )}
     </Button>
   )

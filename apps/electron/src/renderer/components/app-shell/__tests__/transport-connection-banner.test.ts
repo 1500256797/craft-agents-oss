@@ -39,11 +39,23 @@ describe('shouldShowTransportConnectionBanner', () => {
 })
 
 describe('getTransportBannerCopy', () => {
+  // Mock translation function
+  const mockT = (key: string, params?: any) => {
+    const translations: Record<string, string> = {
+      'common.banners.cannotConnectToRemote': 'Cannot connect to remote server',
+      'common.banners.authFailed': 'Authentication failed. Verify CRAFT_SERVER_TOKEN.',
+      'common.banners.reconnectingToRemote': 'Reconnecting to remote server',
+      'common.banners.retryIn': `retry in ${params?.ms}ms`,
+      'common.banners.attempt': `attempt ${params?.count}`,
+    }
+    return translations[key] || key
+  }
+
   it('maps auth failures to token guidance', () => {
     const copy = getTransportBannerCopy(state({
       status: 'failed',
       lastError: { kind: 'auth', message: 'Invalid token', code: 'AUTH_FAILED' },
-    }))
+    }), mockT)
 
     expect(copy.title).toContain('Cannot connect')
     expect(copy.description).toContain('CRAFT_SERVER_TOKEN')
@@ -57,7 +69,7 @@ describe('getTransportBannerCopy', () => {
       attempt: 3,
       nextRetryInMs: 2000,
       lastError: { kind: 'network', message: 'Connection lost' },
-    }))
+    }), mockT)
 
     expect(copy.title).toContain('Reconnecting')
     expect(copy.description).toContain('attempt 3')

@@ -10,6 +10,7 @@ import {
 import { Spinner } from '@craft-agent/ui'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { useI18n } from '@/context/I18nContext'
 import type { BackgroundTask } from './ActiveTasksBar'
 
 /** Terminal data for overlay display */
@@ -62,6 +63,7 @@ export interface TaskActionMenuProps {
  */
 export function TaskActionMenu({ task, sessionId, onKillTask, onInsertMessage, onShowTerminalOverlay, className }: TaskActionMenuProps) {
   const [open, setOpen] = React.useState(false)
+  const { t } = useI18n()
 
   // Local timer for shell tasks (since they don't get task_progress events)
   // For agent tasks, we use elapsedSeconds from events
@@ -86,7 +88,7 @@ export function TaskActionMenu({ task, sessionId, onKillTask, onInsertMessage, o
 
   const handleViewOutput = async () => {
     if (!onShowTerminalOverlay) {
-      toast.error('Terminal overlay not available')
+      toast.error(t('common.errors.terminalOverlayNotAvailable'))
       return
     }
 
@@ -103,7 +105,7 @@ export function TaskActionMenu({ task, sessionId, onKillTask, onInsertMessage, o
       })
       setOpen(false)
     } catch (err) {
-      toast.error('Failed to load task output')
+      toast.error(t('common.errors.failedToLoadTaskOutput'))
     }
   }
 
@@ -128,7 +130,7 @@ export function TaskActionMenu({ task, sessionId, onKillTask, onInsertMessage, o
             "data-[state=open]:bg-white/80 dark:data-[state=open]:bg-white/15",
             className
           )}
-          title="Click for task actions"
+          title={t('common.tasks.clickForActions')}
         >
           {/* Spinner */}
           <div className="flex items-center justify-center shrink-0">
@@ -137,7 +139,7 @@ export function TaskActionMenu({ task, sessionId, onKillTask, onInsertMessage, o
 
           {/* Type badge */}
           <span className="opacity-60">
-            {task.type === 'agent' ? 'Task' : 'Shell'}
+            {task.type === 'agent' ? t('common.tasks.task') : t('common.tasks.shell')}
           </span>
 
           {/* Task ID (shortened) */}
@@ -158,7 +160,7 @@ export function TaskActionMenu({ task, sessionId, onKillTask, onInsertMessage, o
         {/* View Output - Primary action */}
         <StyledDropdownMenuItem onClick={handleViewOutput}>
           <ArrowUpRight />
-          View Output
+          {t('common.actions.viewOutput')}
         </StyledDropdownMenuItem>
 
         {/* Stop Task - Only show for shell tasks (inserts kill command into input) */}
@@ -167,7 +169,7 @@ export function TaskActionMenu({ task, sessionId, onKillTask, onInsertMessage, o
             <StyledDropdownMenuSeparator />
             <StyledDropdownMenuItem onClick={handleStopTask}>
               <Square />
-              Stop Task
+              {t('common.actions.stopTask')}
             </StyledDropdownMenuItem>
           </>
         )}

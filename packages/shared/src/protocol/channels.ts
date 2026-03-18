@@ -52,6 +52,8 @@ export const RPC_CHANNELS = {
     SET_TRAFFIC_LIGHTS: 'window:setTrafficLights',
     FOCUS_STATE: 'window:focusState',
     GET_FOCUS_STATE: 'window:getFocusState',
+    FULLSCREEN_STATE: 'window:fullscreenState',
+    GET_FULLSCREEN_STATE: 'window:getFullscreenState',
   },
   file: {
     READ: 'file:read',
@@ -84,6 +86,11 @@ export const RPC_CHANNELS = {
     GET_ALL_WORKSPACE_THEMES: 'theme:getAllWorkspaceThemes',
     BROADCAST_WORKSPACE_THEME: 'theme:broadcastWorkspaceTheme',
     WORKSPACE_THEME_CHANGED: 'theme:workspaceThemeChanged',
+  },
+  locale: {
+    GET_UI_LANGUAGE: 'locale:getUiLanguage',
+    SET_UI_LANGUAGE: 'locale:setUiLanguage',
+    CHANGED: 'locale:changed',
   },
   system: {
     VERSIONS: 'system:versions',
@@ -129,6 +136,11 @@ export const RPC_CHANNELS = {
     NAVIGATE: 'deeplink:navigate',
   },
   auth: {
+    LOGIN: 'auth:login',
+    GET_CURRENT_USER: 'auth:getCurrentUser',
+    GET_SESSION_STATE: 'auth:getSessionState',
+    GET_CAPTCHA_ID: 'auth:getCaptchaId',
+    GET_CAPTCHA_IMAGE: 'auth:getCaptchaImage',
     LOGOUT: 'auth:logout',
     SHOW_LOGOUT_CONFIRMATION: 'auth:showLogoutConfirmation',
     SHOW_DELETE_SESSION_CONFIRMATION: 'auth:showDeleteSessionConfirmation',
@@ -243,6 +255,29 @@ export const RPC_CHANNELS = {
     CREATE: 'labels:create',
     DELETE: 'labels:delete',
     CHANGED: 'labels:changed',
+  },
+  channels: {
+    GET_TYPES: 'channels:getTypes',
+    GET_USER_CHANNELS: 'channels:getUserChannels',
+    GET_ACCOUNTS: 'channels:getAccounts',
+    GET_SNAPSHOT: 'channels:getSnapshot',
+  },
+  modelProviders: {
+    LIST: 'modelProviders:list',
+    CREATE: 'modelProviders:create',
+    UPDATE: 'modelProviders:update',
+    DELETE: 'modelProviders:delete',
+    SET_STATUS: 'modelProviders:setStatus',
+  },
+  knowledgeBase: {
+    LIST: 'knowledgeBase:list',
+    CREATE: 'knowledgeBase:create',
+    UPDATE: 'knowledgeBase:update',
+    DELETE: 'knowledgeBase:delete',
+    LIST_DOCUMENTS: 'knowledgeBase:listDocuments',
+    UPLOAD_DOCUMENT: 'knowledgeBase:uploadDocument',
+    DELETE_DOCUMENT: 'knowledgeBase:deleteDocument',
+    GET_TASK_STATUS: 'knowledgeBase:getTaskStatus',
   },
   views: {
     LIST: 'views:list',

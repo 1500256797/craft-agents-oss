@@ -228,6 +228,39 @@ export class CredentialManager {
     });
   }
 
+  /** Get product account session credentials */
+  async getAccountSession(): Promise<{
+    accessToken: string;
+    tokenType?: string;
+    expiresAt?: number;
+  } | null> {
+    const cred = await this.get({ type: 'account_session' });
+    if (!cred) return null;
+    return {
+      accessToken: cred.value,
+      tokenType: cred.tokenType,
+      expiresAt: cred.expiresAt,
+    };
+  }
+
+  /** Set product account session credentials */
+  async setAccountSession(credentials: {
+    accessToken: string;
+    tokenType?: string;
+    expiresAt?: number;
+  }): Promise<void> {
+    await this.set({ type: 'account_session' }, {
+      value: credentials.accessToken,
+      tokenType: credentials.tokenType,
+      expiresAt: credentials.expiresAt,
+    });
+  }
+
+  /** Delete product account session credentials */
+  async deleteAccountSession(): Promise<boolean> {
+    return this.delete({ type: 'account_session' });
+  }
+
   /** Get workspace MCP OAuth credentials */
   async getWorkspaceOAuth(workspaceId: string): Promise<{
     accessToken: string;

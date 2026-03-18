@@ -7,6 +7,7 @@
 
 import type { PermissionMode } from '../agent/mode-manager.ts';
 import type { ThinkingLevel } from '../agent/thinking-levels.ts';
+import type { UiLanguage } from './types.ts';
 
 export interface ConfigDefaults {
   version: string;
@@ -14,6 +15,7 @@ export interface ConfigDefaults {
   defaults: {
     notificationsEnabled: boolean;
     colorTheme: string;
+    uiLanguage: UiLanguage;
     autoCapitalisation: boolean;
     sendMessageKey: 'enter' | 'cmd-enter';
     spellCheck: boolean;

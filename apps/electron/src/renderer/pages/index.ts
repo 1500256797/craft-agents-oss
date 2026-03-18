@@ -11,11 +11,12 @@ export {
   SettingsNavigator,
   AppSettingsPage,
   AiSettingsPage,
+  ModelsSettingsPage,
+  ChannelsSettingsPage,
   AppearanceSettingsPage,
   InputSettingsPage,
   WorkspaceSettingsPage,
   PermissionsSettingsPage,
-  LabelsSettingsPage,
   ShortcutsPage,
   PreferencesPage,
 } from './settings'

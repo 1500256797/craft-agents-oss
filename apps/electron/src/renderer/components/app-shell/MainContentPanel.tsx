@@ -28,6 +28,7 @@ import {
   isSessionsNavigation,
   isSourcesNavigation,
   isSettingsNavigation,
+  isModuleNavigation,
   isSkillsNavigation,
   isAutomationsNavigation,
 } from '@/contexts/NavigationContext'
@@ -38,9 +39,14 @@ import type { SessionStatusId } from '@/config/session-status-config'
 import { SourceInfoPage, ChatPage } from '@/pages'
 import SkillInfoPage from '@/pages/SkillInfoPage'
 import { getSettingsPageComponent } from '@/pages/settings/settings-pages'
+import { useI18n } from '@/context/I18nContext'
 import { AutomationInfoPage } from '../automations/AutomationInfoPage'
 import type { ExecutionEntry } from '../automations/types'
 import { automationsAtom } from '@/atoms/automations'
+import ModulePlaceholderPage from '@/pages/modules/ModulePlaceholderPage'
+import AgentsPage from '@/pages/modules/AgentsPage'
+import ModelsPage from '@/pages/modules/ModelsPage'
+import KnowledgeBasePage from '@/pages/modules/KnowledgeBasePage'
 
 export interface MainContentPanelProps {
   /** Whether both sidebar and navigator are hidden (focus mode / CMD+.) */
@@ -60,6 +66,7 @@ export function MainContentPanel({
   className,
   navStateOverride,
 }: MainContentPanelProps) {
+  const { t } = useI18n()
   const globalNavState = useNavigationState()
   const navState = navStateOverride ?? globalNavState
   const {
@@ -202,6 +209,38 @@ export function MainContentPanel({
     )
   }
 
+  if (isModuleNavigation(navState)) {
+    if (navState.subpage === 'agents') {
+      return wrapWithStoplight(
+        <Panel variant="grow" className={className}>
+          <AgentsPage />
+        </Panel>
+      )
+    }
+
+    if (navState.subpage === 'models') {
+      return wrapWithStoplight(
+        <Panel variant="grow" className={className}>
+          <ModelsPage />
+        </Panel>
+      )
+    }
+
+    if (navState.subpage === 'knowledge-base') {
+      return wrapWithStoplight(
+        <Panel variant="grow" className={className}>
+          <KnowledgeBasePage />
+        </Panel>
+      )
+    }
+
+    return wrapWithStoplight(
+      <Panel variant="grow" className={className}>
+        <ModulePlaceholderPage subpage={navState.subpage} />
+      </Panel>
+    )
+  }
+
   // Sources navigator - show source info, multi-select panel, or empty state
   if (isSourcesNavigation(navState)) {
     if (isSourceMultiSelectActive) {
@@ -229,7 +268,7 @@ export function MainContentPanel({
     return wrapWithStoplight(
       <Panel variant="grow" className={className}>
         <div className="flex items-center justify-center h-full text-muted-foreground">
-          <p className="text-sm">No sources configured</p>
+          <p className="text-sm">{t('common.sidebar.empty.noSourcesConfigured')}</p>
         </div>
       </Panel>
     )
@@ -262,7 +301,7 @@ export function MainContentPanel({
     return wrapWithStoplight(
       <Panel variant="grow" className={className}>
         <div className="flex items-center justify-center h-full text-muted-foreground">
-          <p className="text-sm">No skills configured</p>
+          <p className="text-sm">{t('common.sidebar.empty.noSkillsConfigured')}</p>
         </div>
       </Panel>
     )
@@ -292,7 +331,7 @@ export function MainContentPanel({
     return wrapWithStoplight(
       <Panel variant="grow" className={className}>
         <div className="flex items-center justify-center h-full text-muted-foreground">
-          <p className="text-sm">No automations configured</p>
+          <p className="text-sm">{t('common.sidebar.empty.noAutomationsConfigured')}</p>
         </div>
       </Panel>
     )

@@ -77,6 +77,7 @@ import { ensureSessionMessagesLoadedAtom } from "@/atoms/sessions"
 import { AppShellProvider, type AppShellContextType } from "@/context/AppShellContext"
 import { EscapeInterruptProvider, useEscapeInterrupt } from "@/context/EscapeInterruptContext"
 import { useTheme } from "@/context/ThemeContext"
+import { useI18n } from "@/context/I18nContext"
 import { getResizeGradientStyle } from "@/hooks/useResizeGradient"
 import { useAction, useActionLabel } from "@/actions"
 import { useFocusZone } from "@/hooks/keyboard"
@@ -106,13 +107,16 @@ import {
   isSessionsNavigation,
   isSourcesNavigation,
   isSettingsNavigation,
+  isModuleNavigation,
   isSkillsNavigation,
   isAutomationsNavigation,
   type NavigationState,
 } from "@/contexts/NavigationContext"
 import type { SettingsSubpage } from "../../../shared/types"
+import { getModulePage, type ModuleSubpage } from "../../../shared/module-registry"
 import { SourcesListPanel } from "./SourcesListPanel"
 import { SkillsListPanel } from "./SkillsListPanel"
+import { SidebarAccountBar } from "./SidebarAccountBar"
 import { AutomationsListPanel } from "../automations/AutomationsListPanel"
 import { APP_EVENTS, AGENT_EVENTS, type AutomationFilterKind, AUTOMATION_TYPE_TO_FILTER_KIND } from "../automations/types"
 import { useAutomations } from "@/hooks/useAutomations"
@@ -120,6 +124,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { PanelHeader } from "./PanelHeader"
 import { EditPopover, getEditConfig, type EditContextKey } from "@/components/ui/EditPopover"
 import SettingsNavigator from "@/pages/settings/SettingsNavigator"
+import { ModuleNavigatorPanel } from "./ModuleNavigatorPanel"
 import {
   PANEL_GAP,
   PANEL_EDGE_INSET,
@@ -209,6 +214,7 @@ function FilterModeSubMenuItems({
   onChangeMode: (mode: FilterMode) => void
   onRemove: () => void
 }) {
+  const { t } = useI18n()
   return (
     <>
       <StyledDropdownMenuItem
@@ -216,21 +222,21 @@ function FilterModeSubMenuItems({
         className={cn(mode === 'include' && "bg-foreground/[0.03]")}
       >
         <Check className="h-3.5 w-3.5 shrink-0" />
-        <span className="flex-1">Include</span>
+        <span className="flex-1">{t('common.sidebar.filters.include')}</span>
       </StyledDropdownMenuItem>
       <StyledDropdownMenuItem
         onClick={(e) => { e.preventDefault(); onChangeMode('exclude') }}
         className={cn(mode === 'exclude' && "bg-foreground/[0.03]")}
       >
         <X className="h-3.5 w-3.5 shrink-0" />
-        <span className="flex-1">Exclude</span>
+        <span className="flex-1">{t('common.sidebar.filters.exclude')}</span>
       </StyledDropdownMenuItem>
       <StyledDropdownMenuSeparator />
       <StyledDropdownMenuItem
         onClick={(e) => { e.preventDefault(); onRemove() }}
       >
         <Trash2 className="h-3.5 w-3.5 shrink-0" />
-        <span className="flex-1">Clear</span>
+        <span className="flex-1">{t('common.sidebar.filters.clear')}</span>
       </StyledDropdownMenuItem>
     </>
   )
@@ -491,6 +497,7 @@ function AppShellContent({
   menuNewChatTrigger,
   isFocusedMode = false,
 }: AppShellProps) {
+  const { t } = useI18n()
   // Destructure commonly used values from context
   // Note: sessions is NOT destructured here - we use sessionMetaMapAtom instead
   // to prevent closures from retaining the full messages array
@@ -560,7 +567,7 @@ function AppShellContent({
   const sessionListHandleRef = React.useRef<HTMLDivElement>(null)
   const [session, setSession] = useSession()
   const { resolvedMode, isDark, setMode } = useTheme()
-  const { canGoBack, canGoForward, goBack, goForward, navigateToSource, navigateToSession } = useNavigation()
+  const { goBack, goForward, navigateToSource, navigateToSession } = useNavigation()
 
   // Double-Esc interrupt feature: first Esc shows warning, second Esc interrupts
   const { handleEscapePress } = useEscapeInterrupt()
@@ -773,7 +780,7 @@ function AppShellContent({
   const [collapsedItems, setCollapsedItems] = React.useState<Set<string>>(() => {
     const saved = storage.get<string[] | null>(storage.KEYS.collapsedSidebarItems, null)
     if (saved !== null) return new Set(saved)
-    return new Set(['nav:labels'])
+    return new Set()
   })
   const isExpanded = React.useCallback((id: string) => !collapsedItems.has(id), [collapsedItems])
   const toggleExpanded = React.useCallback((id: string) => {
@@ -862,7 +869,7 @@ function AppShellContent({
       setExpandedFolders(new Set(newExpandedFolders))
 
       const newCollapsedItems = storage.get<string[] | null>(storage.KEYS.collapsedSidebarItems, null, activeWorkspaceId)
-      setCollapsedItems(newCollapsedItems !== null ? new Set(newCollapsedItems) : new Set(['nav:labels']))
+      setCollapsedItems(newCollapsedItems !== null ? new Set(newCollapsedItems) : new Set())
     }
 
     previousWorkspaceRef.current = activeWorkspaceId
@@ -1677,6 +1684,22 @@ function AppShellContent({
     navigate(routes.view.skills())
   }, [])
 
+  const handleModuleClick = useCallback((subpage: ModuleSubpage) => {
+    navigate(routes.view.module(subpage))
+  }, [])
+
+  const handleScheduledTasksClick = useCallback(() => {
+    handleModuleClick('scheduled-tasks')
+  }, [handleModuleClick])
+
+  const handleAgentsClick = useCallback(() => {
+    handleModuleClick('agents')
+  }, [handleModuleClick])
+
+  const handleKnowledgeBaseClick = useCallback(() => {
+    handleModuleClick('knowledge-base')
+  }, [handleModuleClick])
+
   // Handlers for automations view
   const handleAutomationsClick = useCallback(() => {
     navigate(routes.view.automations())
@@ -1913,36 +1936,27 @@ function AppShellContent({
   const unifiedSidebarItems = React.useMemo((): SidebarItem[] => {
     const result: SidebarItem[] = []
 
-    // 1. Sessions section: All Sessions (expandable) with status items, Flagged, Archived as children
+    // 1. Primary desktop IA
     result.push({ id: 'nav:allSessions', type: 'nav', action: handleAllSessionsClick })
-    for (const state of effectiveSessionStatuses) {
-      result.push({ id: `nav:state:${state.id}`, type: 'nav', action: () => handleSessionStatusClick(state.id) })
-    }
-    result.push({ id: 'nav:flagged', type: 'nav', action: handleFlaggedClick })
-    result.push({ id: 'nav:archived', type: 'nav', action: handleArchivedClick })
-
-    // 2. Labels section header + regular label tree for keyboard nav
-    result.push({ id: 'nav:labels', type: 'nav', action: () => handleLabelClick('__all__') })
-    // Flatten regular label tree for keyboard navigation (depth-first)
-    const flattenTree = (nodes: LabelTreeNode[]) => {
-      for (const node of nodes) {
-        if (node.label) {
-          result.push({ id: `nav:label:${node.fullId}`, type: 'nav', action: () => handleLabelClick(node.fullId) })
-        }
-        if (node.children.length > 0) flattenTree(node.children)
-      }
-    }
-    flattenTree(labelTree)
-
-    // 3. Sources, Skills, Settings
+    result.push({ id: 'nav:scheduled-tasks', type: 'nav', action: handleScheduledTasksClick })
+    result.push({ id: 'nav:agents', type: 'nav', action: handleAgentsClick })
+    result.push({ id: 'nav:knowledge-base', type: 'nav', action: handleKnowledgeBaseClick })
     result.push({ id: 'nav:sources', type: 'nav', action: handleSourcesClick })
     result.push({ id: 'nav:skills', type: 'nav', action: handleSkillsClick })
-    result.push({ id: 'nav:automations', type: 'nav', action: handleAutomationsClick })
     result.push({ id: 'nav:settings', type: 'nav', action: () => handleSettingsClick('app') })
     result.push({ id: 'nav:whats-new', type: 'nav', action: handleWhatsNewClick })
 
     return result
-  }, [handleAllSessionsClick, handleFlaggedClick, handleArchivedClick, handleSessionStatusClick, effectiveSessionStatuses, handleLabelClick, labelConfigs, labelTree, viewConfigs, handleViewClick, handleSourcesClick, handleSkillsClick, handleAutomationsClick, handleSettingsClick, handleWhatsNewClick])
+  }, [
+    handleAgentsClick,
+    handleAllSessionsClick,
+    handleKnowledgeBaseClick,
+    handleScheduledTasksClick,
+    handleSourcesClick,
+    handleSkillsClick,
+    handleSettingsClick,
+    handleWhatsNewClick,
+  ])
 
   // Toggle folder expanded state
   const handleToggleFolder = React.useCallback((path: string) => {
@@ -2053,46 +2067,50 @@ function AppShellContent({
   const listTitle = React.useMemo(() => {
     // Sources navigator
     if (isSourcesNavigation(navState)) {
-      return 'Sources'
+      return t('common.sidebar.listTitle.sources')
+    }
+
+    if (isModuleNavigation(navState)) {
+      return getModulePage(navState.subpage).label
     }
 
     // Skills navigator
     if (isSkillsNavigation(navState)) {
-      return 'All Skills'
+      return t('common.sidebar.listTitle.allSkills')
     }
 
     // Automations navigator
     if (isAutomationsNavigation(navState)) {
-      if (!automationFilter) return 'All Automations'
+      if (!automationFilter) return t('common.sidebar.listTitle.allAutomations')
       switch (automationFilter.automationType) {
-        case 'scheduled': return 'Scheduled'
-        case 'event': return 'Event-based'
-        case 'agentic': return 'Agentic'
-        default: return 'All Automations'
+        case 'scheduled': return t('common.sidebar.listTitle.scheduled')
+        case 'event': return t('common.sidebar.listTitle.eventBased')
+        case 'agentic': return t('common.sidebar.listTitle.agentic')
+        default: return t('common.sidebar.listTitle.allAutomations')
       }
     }
 
     // Settings navigator
-    if (isSettingsNavigation(navState)) return 'Settings'
+    if (isSettingsNavigation(navState)) return t('common.sidebar.listTitle.settings')
 
     // Sessions navigator - use sessionFilter
-    if (!sessionFilter) return 'All Sessions'
+    if (!sessionFilter) return t('common.sidebar.listTitle.allSessions')
 
     switch (sessionFilter.kind) {
       case 'flagged':
-        return 'Flagged'
+        return t('common.sidebar.listTitle.flagged')
       case 'state': {
         const state = effectiveSessionStatuses.find(s => s.id === sessionFilter.stateId)
-        return state?.label || 'All Sessions'
+        return state?.label || t('common.sidebar.listTitle.allSessions')
       }
       case 'label':
-        return sessionFilter.labelId === '__all__' ? 'Labels' : getLabelDisplayName(labelConfigs, sessionFilter.labelId)
+        return sessionFilter.labelId === '__all__' ? t('common.sidebar.listTitle.labels') : getLabelDisplayName(labelConfigs, sessionFilter.labelId)
       case 'view':
-        return sessionFilter.viewId === '__all__' ? 'Views' : viewConfigs.find(v => v.id === sessionFilter.viewId)?.name || 'Views'
+        return sessionFilter.viewId === '__all__' ? t('common.sidebar.listTitle.views') : viewConfigs.find(v => v.id === sessionFilter.viewId)?.name || t('common.sidebar.listTitle.views')
       default:
-        return 'All Sessions'
+        return t('common.sidebar.listTitle.recentSessions')
     }
-  }, [navState, sessionFilter, effectiveSessionStatuses, labelConfigs, viewConfigs, automationFilter])
+  }, [navState, sessionFilter, effectiveSessionStatuses, labelConfigs, viewConfigs, automationFilter, t])
 
   // Build recursive sidebar items from label tree.
   // Each node renders with condensed height (compact: true) since many labels expected.
@@ -2172,10 +2190,6 @@ function AppShellContent({
           onOpenSettingsSubpage={handleSettingsClick}
           onOpenKeyboardShortcuts={onOpenKeyboardShortcuts}
           onOpenStoredUserPreferences={onOpenStoredUserPreferences}
-          onBack={goBack}
-          onForward={goForward}
-          canGoBack={canGoBack}
-          canGoForward={canGoForward}
           onToggleSidebar={handleToggleSidebar}
           onToggleFocusMode={() => setIsSidebarAndNavigatorHidden(prev => !prev)}
           onAddSessionPanel={() => handleNewChat(true)}
@@ -2214,7 +2228,7 @@ function AppShellContent({
                               data-tutorial="new-chat-button"
                             >
                               <SquarePenRounded className="h-3.5 w-3.5 shrink-0" />
-                              New Session
+                              {t('common.sidebar.nav.startChat')}
                             </Button>
                           </ContextMenuTrigger>
                           <StyledContextMenuContent>
@@ -2236,18 +2250,14 @@ function AppShellContent({
                   getItemProps={getSidebarItemProps}
                   focusedItemId={focusedSidebarItemId}
                   links={[
-                    // --- Sessions Section ---
-                    // All Sessions: expandable with status children (sortable) + Flagged & Archived as trailing items
+                    // --- Recent Sessions ---
                     {
                       id: "nav:allSessions",
-                      title: "All Sessions",
+                      title: t('common.sidebar.nav.recentSessions'),
                       label: String(workspaceSessionMetas.length),
                       icon: Inbox,
                       variant: sessionFilter?.kind === 'allSessions' ? "default" : "ghost",
                       onClick: handleAllSessionsClick,
-                      expandable: true,
-                      expanded: isExpanded('nav:allSessions'),
-                      onToggle: () => toggleExpanded('nav:allSessions'),
                       contextMenu: {
                         type: 'allSessions',
                         onConfigureStatuses: openConfigureStatuses,
@@ -2266,72 +2276,35 @@ function AppShellContent({
                           window.electronAPI.markAllSessionsRead(activeWorkspaceId)
                         },
                       },
-                      // Enable flat DnD reorder for status items
-                      sortable: { onReorder: handleStatusReorder },
-                      items: [
-                        // Status items (sortable via SortableStatusList)
-                        ...effectiveSessionStatuses.map(state => ({
-                          id: `nav:state:${state.id}`,
-                          title: state.label,
-                          label: String(sessionStatusCounts[state.id] || 0),
-                          icon: state.icon,
-                          iconColor: state.resolvedColor,
-                          iconColorable: state.iconColorable,
-                          variant: (sessionFilter?.kind === 'state' && sessionFilter.stateId === state.id ? "default" : "ghost") as "default" | "ghost",
-                          onClick: () => handleSessionStatusClick(state.id),
-                          contextMenu: {
-                            type: 'status' as const,
-                            statusId: state.id,
-                            onConfigureStatuses: openConfigureStatuses,
-                          },
-                        })),
-                        // Separator: SortableStatusList splits here — items after become non-sortable trailingItems
-                        { id: 'separator:states-flagged', type: 'separator' as const },
-                        // Flagged (trailing, non-sortable)
-                        {
-                          id: "nav:flagged",
-                          title: "Flagged",
-                          label: String(flaggedCount),
-                          icon: <Flag className="h-3.5 w-3.5" />,
-                          variant: (sessionFilter?.kind === 'flagged' ? "default" : "ghost") as "default" | "ghost",
-                          onClick: handleFlaggedClick,
-                        },
-                        // Archived (trailing, non-sortable)
-                        {
-                          id: "nav:archived",
-                          title: "Archived",
-                          label: archivedCount > 0 ? String(archivedCount) : undefined,
-                          icon: Archive,
-                          variant: (sessionFilter?.kind === 'archived' ? "default" : "ghost") as "default" | "ghost",
-                          onClick: handleArchivedClick,
-                        },
-                      ],
                     },
-                    // Labels: navigable header (shows all labeled sessions) + hierarchical tree (drag-and-drop reorder + re-parent)
+                    { id: "separator:recent-modules", type: "separator" },
+                    // --- Business Modules ---
                     {
-                      id: "nav:labels",
-                      title: "Labels",
-                      icon: Tag,
-                      // Only highlighted when "Labels" itself is selected (not sub-labels)
-                      variant: (sessionFilter?.kind === 'label' && sessionFilter.labelId === '__all__') ? "default" as const : "ghost" as const,
-                      // Clicking navigates to "all labeled sessions" view
-                      onClick: () => handleLabelClick('__all__'),
-                      expandable: true,
-                      expanded: isExpanded('nav:labels'),
-                      onToggle: () => toggleExpanded('nav:labels'),
-                      contextMenu: {
-                        type: 'labels' as const,
-                        onConfigureLabels: openConfigureLabels,
-                        onAddLabel: handleAddLabel,
-                      },
-                      items: buildLabelSidebarItems(labelTree),
+                      id: "nav:scheduled-tasks",
+                      title: t('common.sidebar.nav.scheduledTasks'),
+                      icon: Clock,
+                      variant: (isModuleNavigation(navState) && navState.subpage === 'scheduled-tasks') ? "default" : "ghost",
+                      onClick: handleScheduledTasksClick,
                     },
-                    // --- Separator ---
-                    { id: "separator:chats-sources", type: "separator" },
-                    // --- Sources & Skills Section ---
+                    {
+                      id: "nav:agents",
+                      title: t('common.sidebar.nav.agents'),
+                      icon: Bot,
+                      variant: (isModuleNavigation(navState) && navState.subpage === 'agents') ? "default" : "ghost",
+                      onClick: handleAgentsClick,
+                    },
+                    {
+                      id: "nav:knowledge-base",
+                      title: t('common.sidebar.nav.knowledgeBase'),
+                      icon: DatabaseZap,
+                      variant: (isModuleNavigation(navState) && navState.subpage === 'knowledge-base') ? "default" : "ghost",
+                      onClick: handleKnowledgeBaseClick,
+                    },
+                    { id: "separator:modules-tools", type: "separator" },
+                    // --- Sources & Skills ---
                     {
                       id: "nav:sources",
-                      title: "Sources",
+                      title: t('common.sidebar.nav.sources'),
                       label: String(sources.length),
                       icon: DatabaseZap,
                       variant: (isSourcesNavigation(navState) && !sourceFilter) ? "default" : "ghost",
@@ -2347,7 +2320,7 @@ function AppShellContent({
                       items: [
                         {
                           id: "nav:sources:api",
-                          title: "APIs",
+                          title: t('common.sidebar.nav.apis'),
                           label: String(sourceTypeCounts.api),
                           icon: Globe,
                           variant: (sourceFilter?.kind === 'type' && sourceFilter.sourceType === 'api') ? "default" : "ghost",
@@ -2360,7 +2333,7 @@ function AppShellContent({
                         },
                         {
                           id: "nav:sources:mcp",
-                          title: "MCPs",
+                          title: t('common.sidebar.nav.mcps'),
                           label: String(sourceTypeCounts.mcp),
                           icon: <McpIcon className="h-3.5 w-3.5" />,
                           variant: (sourceFilter?.kind === 'type' && sourceFilter.sourceType === 'mcp') ? "default" : "ghost",
@@ -2373,7 +2346,7 @@ function AppShellContent({
                         },
                         {
                           id: "nav:sources:local",
-                          title: "Local Folders",
+                          title: t('common.sidebar.nav.localFolders'),
                           label: String(sourceTypeCounts.local),
                           icon: FolderOpen,
                           variant: (sourceFilter?.kind === 'type' && sourceFilter.sourceType === 'local') ? "default" : "ghost",
@@ -2388,7 +2361,7 @@ function AppShellContent({
                     },
                     {
                       id: "nav:skills",
-                      title: "Skills",
+                      title: t('common.sidebar.nav.skills'),
                       label: String(skills.length),
                       icon: Zap,
                       variant: isSkillsNavigation(navState) ? "default" : "ghost",
@@ -2398,56 +2371,11 @@ function AppShellContent({
                         onAddSkill: openAddSkill,
                       },
                     },
-                    {
-                      id: "nav:automations",
-                      title: "Automations",
-                      label: String(automations.length),
-                      icon: ListTodo,
-                      variant: (isAutomationsNavigation(navState) && !automationFilter) ? "default" : "ghost",
-                      onClick: handleAutomationsClick,
-                      expandable: true,
-                      expanded: isExpanded('nav:automations'),
-                      onToggle: () => toggleExpanded('nav:automations'),
-                      contextMenu: {
-                        type: 'automations' as const,
-                        onAddAutomation: openAddAutomation,
-                      },
-                      items: [
-                        {
-                          id: "nav:automations:scheduled",
-                          title: "Scheduled",
-                          label: String(automationTypeCounts.scheduled),
-                          icon: Clock,
-                          variant: (automationFilter?.kind === 'type' && automationFilter.automationType === 'scheduled') ? "default" : "ghost",
-                          onClick: handleAutomationsScheduledClick,
-                          contextMenu: { type: 'automations' as const, onAddAutomation: openAddAutomation },
-                        },
-                        {
-                          id: "nav:automations:event",
-                          title: "Event-based",
-                          label: String(automationTypeCounts.event),
-                          icon: Radio,
-                          variant: (automationFilter?.kind === 'type' && automationFilter.automationType === 'event') ? "default" : "ghost",
-                          onClick: handleAutomationsEventClick,
-                          contextMenu: { type: 'automations' as const, onAddAutomation: openAddAutomation },
-                        },
-                        {
-                          id: "nav:automations:agentic",
-                          title: "Agentic",
-                          label: String(automationTypeCounts.agentic),
-                          icon: Bot,
-                          variant: (automationFilter?.kind === 'type' && automationFilter.automationType === 'agentic') ? "default" : "ghost",
-                          onClick: handleAutomationsAgenticClick,
-                          contextMenu: { type: 'automations' as const, onAddAutomation: openAddAutomation },
-                        },
-                      ],
-                    },
-                    // --- Separator ---
                     { id: "separator:skills-settings", type: "separator" },
-                    // --- Settings ---
+                    // --- Settings & Meta ---
                     {
                       id: "nav:settings",
-                      title: "Settings",
+                      title: t('common.sidebar.nav.settings'),
                       icon: Settings,
                       variant: isSettingsNavigation(navState) ? "default" : "ghost",
                       onClick: () => handleSettingsClick('app'),
@@ -2455,7 +2383,7 @@ function AppShellContent({
                     // --- What's New ---
                     {
                       id: "nav:whats-new",
-                      title: "What's New",
+                      title: t('common.sidebar.nav.whatsNew'),
                       icon: hasUnseenReleaseNotes ? (
                         <span className="relative">
                           <Cake className="h-3.5 w-3.5" />
@@ -2470,6 +2398,14 @@ function AppShellContent({
                 {/* Agent Tree: Hierarchical list of agents */}
                 {/* Agents section removed */}
                 </div>
+                <SidebarAccountBar
+                  workspaces={workspaces}
+                  activeWorkspaceId={activeWorkspaceId}
+                  onSelectWorkspace={onSelectWorkspace}
+                  onWorkspaceCreated={() => onRefreshWorkspaces?.()}
+                  workspaceUnreadMap={workspaceUnreadMap}
+                  onLogout={onReset}
+                />
               </div>
 
             </div>
@@ -2533,7 +2469,7 @@ function AppShellContent({
                       >
                         {/* Header with title and clear button (only clears user-added filters, never pinned) */}
                         <div className="flex items-center justify-between px-2 py-1.5">
-                          <span className="text-xs font-medium text-muted-foreground">Filter Chats</span>
+                          <span className="text-xs font-medium text-muted-foreground">{t('common.sidebar.filters.filterChats')}</span>
                           {(listFilter.size > 0 || labelFilter.size > 0) && (
                             <button
                               onClick={(e) => {
@@ -2543,7 +2479,7 @@ function AppShellContent({
                               }}
                               className="text-xs text-muted-foreground hover:text-foreground"
                             >
-                              Clear
+                              {t('common.sidebar.filters.clear')}
                             </button>
                           )}
                         </div>
@@ -2613,7 +2549,7 @@ function AppShellContent({
                                   }
                                 }
                               }}
-                              placeholder="Search statuses & labels..."
+                              placeholder={t('common.sidebar.filters.searchPlaceholder')}
                               className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
                               autoFocus
                             />
@@ -2633,7 +2569,7 @@ function AppShellContent({
                                   <StyledDropdownMenuItem disabled>
                                     <FilterMenuRow
                                       icon={<Flag className="h-3.5 w-3.5" />}
-                                      label="Flagged"
+                                      label={t('common.sidebar.filters.flagged')}
                                       accessory={<Check className="h-3 w-3 text-muted-foreground" />}
                                     />
                                   </StyledDropdownMenuItem>
@@ -2742,7 +2678,7 @@ function AppShellContent({
                             <DropdownMenuSub>
                               <StyledDropdownMenuSubTrigger>
                                 <Inbox className="h-3.5 w-3.5" />
-                                <span className="flex-1">Statuses</span>
+                                <span className="flex-1">{t('common.sidebar.filters.statuses')}</span>
                               </StyledDropdownMenuSubTrigger>
                               <StyledDropdownMenuSubContent minWidth="min-w-[180px]">
                                 {effectiveSessionStatuses.map(state => {
@@ -2815,12 +2751,12 @@ function AppShellContent({
                             <DropdownMenuSub>
                               <StyledDropdownMenuSubTrigger>
                                 <Tag className="h-3.5 w-3.5" />
-                                <span className="flex-1">Labels</span>
+                                <span className="flex-1">{t('common.sidebar.filters.labels')}</span>
                               </StyledDropdownMenuSubTrigger>
                               <StyledDropdownMenuSubContent minWidth="min-w-[180px]">
                                 {labelConfigs.length === 0 ? (
                                   <StyledDropdownMenuItem disabled>
-                                    <span className="text-muted-foreground">No labels configured</span>
+                                    <span className="text-muted-foreground">{t('common.sidebar.filters.noLabelsConfigured')}</span>
                                   </StyledDropdownMenuItem>
                                 ) : (
                                   <FilterLabelItems
@@ -2841,17 +2777,17 @@ function AppShellContent({
                                 <DropdownMenuSub>
                                   <StyledDropdownMenuSubTrigger>
                                     <Layers className="h-3.5 w-3.5" />
-                                    <span className="flex-1">Group</span>
+                                    <span className="flex-1">{t('common.sidebar.filters.group')}</span>
                                   </StyledDropdownMenuSubTrigger>
                                   <StyledDropdownMenuSubContent minWidth="min-w-[140px]">
                                     <StyledDropdownMenuItem onClick={() => setChatGroupingMode('date')}>
                                       <Calendar className="h-3.5 w-3.5" />
-                                      <span className="flex-1">Date</span>
+                                      <span className="flex-1">{t('common.sidebar.filters.date')}</span>
                                       {chatGroupingMode === 'date' && <Check className="h-3 w-3 text-muted-foreground" />}
                                     </StyledDropdownMenuItem>
                                     <StyledDropdownMenuItem onClick={() => setChatGroupingMode('status')}>
                                       <Inbox className="h-3.5 w-3.5" />
-                                      <span className="flex-1">Status</span>
+                                      <span className="flex-1">{t('common.sidebar.filters.status')}</span>
                                       {chatGroupingMode === 'status' && <Check className="h-3 w-3 text-muted-foreground" />}
                                     </StyledDropdownMenuItem>
                                   </StyledDropdownMenuSubContent>
@@ -2866,7 +2802,7 @@ function AppShellContent({
                               }}
                             >
                               <Search className="h-3.5 w-3.5" />
-                              <span className="flex-1">Search</span>
+                              <span className="flex-1">{t('common.sidebar.filters.search')}</span>
                             </StyledDropdownMenuItem>
                           </>
                         ) : (
@@ -2877,7 +2813,7 @@ function AppShellContent({
                                 Supports keyboard navigation (ArrowUp/Down/Enter in input). */}
                             {filterDropdownResults.states.length === 0 && filterDropdownResults.labels.length === 0 ? (
                               <div className="px-3 py-4 text-center text-xs text-muted-foreground">
-                                No matching statuses or labels
+                                {t('common.sidebar.filters.noMatchingStatusesOrLabels')}
                               </div>
                             ) : (
                               <div ref={filterDropdownListRef} className="max-h-[240px] overflow-y-auto py-1">
@@ -2885,7 +2821,7 @@ function AppShellContent({
                                 {filterDropdownResults.states.length > 0 && (
                                   <>
                                     <div className="px-3 pt-1.5 pb-1 text-[11px] font-medium text-muted-foreground/60 uppercase tracking-wider">
-                                      Statuses
+                                      {t('common.sidebar.filters.statuses')}
                                     </div>
                                     {filterDropdownResults.states.map((state, index) => {
                                       const applyColor = state.iconColorable
@@ -2973,7 +2909,7 @@ function AppShellContent({
                                 {filterDropdownResults.labels.length > 0 && (
                                   <>
                                     <div className="px-3 pt-1.5 pb-1 text-[11px] font-medium text-muted-foreground/60 uppercase tracking-wider">
-                                      Labels
+                                      {t('common.sidebar.filters.labels')}
                                     </div>
                                     {filterDropdownResults.labels.map((item, index) => {
                                       // Offset by state count for unified index
@@ -3066,13 +3002,14 @@ function AppShellContent({
                       trigger={
                         <HeaderIconButton
                           icon={<Plus className="h-4 w-4" />}
-                          tooltip="Add Source"
+                          tooltip={t('common.sidebar.filters.addSourceTooltip')}
                           data-tutorial="add-source-button"
                         />
                       }
                       {...getEditConfig(
                         sourceFilter?.kind === 'type' ? `add-source-${sourceFilter.sourceType}` as EditContextKey : 'add-source',
-                        activeWorkspace.rootPath
+                        activeWorkspace.rootPath,
+                        t
                       )}
                     />
                   )}
@@ -3082,11 +3019,11 @@ function AppShellContent({
                       trigger={
                         <HeaderIconButton
                           icon={<Plus className="h-4 w-4" />}
-                          tooltip="Add Skill"
+                          tooltip={t('common.sidebar.filters.addSkillTooltip')}
                           data-tutorial="add-skill-button"
                         />
                       }
-                      {...getEditConfig('add-skill', activeWorkspace.rootPath)}
+                      {...getEditConfig('add-skill', activeWorkspace.rootPath, t)}
                     />
                   )}
                   {/* Add Automation button (only for automations mode) */}
@@ -3095,16 +3032,19 @@ function AppShellContent({
                       trigger={
                         <HeaderIconButton
                           icon={<Plus className="h-4 w-4" />}
-                          tooltip="Add Automation"
+                          tooltip={t('common.sidebar.filters.addAutomationTooltip')}
                         />
                       }
-                      {...getEditConfig('automation-config', activeWorkspace.rootPath)}
+                      {...getEditConfig('automation-config', activeWorkspace.rootPath, t)}
                     />
                   )}
                 </>
               }
             />
             {/* Content: SessionList, SourcesListPanel, or SettingsNavigator based on navigation state */}
+            {isModuleNavigation(navState) && (
+              <ModuleNavigatorPanel subpage={navState.subpage} />
+            )}
             {isSourcesNavigation(navState) && (
               /* Sources List - filtered by type if sourceFilter is active */
               <SourcesListPanel
@@ -3312,7 +3252,7 @@ function AppShellContent({
               label: 'Edit File',
               filePath: `${activeWorkspace.rootPath}/statuses/config.json`,
             }}
-            {...getEditConfig('edit-statuses', activeWorkspace.rootPath)}
+            {...getEditConfig('edit-statuses', activeWorkspace.rootPath, t)}
           />
           {/* Configure Labels EditPopover - anchored near sidebar */}
           <EditPopover
@@ -3334,7 +3274,7 @@ function AppShellContent({
             }}
             {...(() => {
               // Spread base config, override context to include which label was right-clicked
-              const config = getEditConfig('edit-labels', activeWorkspace.rootPath)
+              const config = getEditConfig('edit-labels', activeWorkspace.rootPath, t)
               const targetLabel = editLabelTargetId.current
                 ? findLabelById(labelConfigs, editLabelTargetId.current)
                 : undefined
@@ -3368,7 +3308,7 @@ function AppShellContent({
               label: 'Edit File',
               filePath: `${activeWorkspace.rootPath}/views.json`,
             }}
-            {...getEditConfig('edit-views', activeWorkspace.rootPath)}
+            {...getEditConfig('edit-views', activeWorkspace.rootPath, t)}
           />
           {/* Add Source EditPopovers - one for each variant (generic + filter-specific)
            * editPopoverOpen can be: 'add-source', 'add-source-api', 'add-source-mcp', 'add-source-local'
@@ -3388,7 +3328,7 @@ function AppShellContent({
               }
               side="bottom"
               align="start"
-              {...getEditConfig(variant, activeWorkspace.rootPath)}
+              {...getEditConfig(variant, activeWorkspace.rootPath, t)}
             />
           ))}
           {/* Add Skill EditPopover */}
@@ -3405,7 +3345,7 @@ function AppShellContent({
             }
             side="bottom"
             align="start"
-            {...getEditConfig('add-skill', activeWorkspace.rootPath)}
+            {...getEditConfig('add-skill', activeWorkspace.rootPath, t)}
           />
           {/* Add Automation EditPopover - triggered from "Add Automation" context menu in automations */}
           <EditPopover
@@ -3421,7 +3361,7 @@ function AppShellContent({
             }
             side="bottom"
             align="start"
-            {...getEditConfig('automation-config', activeWorkspace.rootPath)}
+            {...getEditConfig('automation-config', activeWorkspace.rootPath, t)}
           />
           {/* Add Label EditPopover - triggered from "Add New Label" context menu on labels */}
           <EditPopover
@@ -3443,7 +3383,7 @@ function AppShellContent({
             }}
             {...(() => {
               // Spread base config, override context to include which label was right-clicked
-              const config = getEditConfig('add-label', activeWorkspace.rootPath)
+              const config = getEditConfig('add-label', activeWorkspace.rootPath, t)
               const targetLabel = editLabelTargetId.current
                 ? findLabelById(labelConfigs, editLabelTargetId.current)
                 : undefined

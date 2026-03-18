@@ -24,6 +24,7 @@ import { useFocusZone } from "@/hooks/keyboard"
 import { useEscapeInterrupt } from "@/context/EscapeInterruptContext"
 import { useNavigation, useNavigationState, routes, isSessionsNavigation } from "@/contexts/NavigationContext"
 import { useFocusContext } from "@/context/FocusContext"
+import { useI18n } from "@/context/I18nContext"
 import type { SessionMeta } from "@/atoms/sessions"
 import type { ViewConfig } from "@craft-agent/shared/views"
 import type { SessionStatusId, SessionStatus } from "@/config/session-status-config"
@@ -135,6 +136,7 @@ export function SessionList({
   onNavigateToSession,
   hasPendingPrompt,
 }: SessionListProps) {
+  const { t } = useI18n()
   // --- Selection (atom-backed, shared with ChatDisplay + BatchActionPanel) ---
   const {
     select: selectSession,
@@ -593,8 +595,8 @@ export function SessionList({
       return (
         <EntityListEmptyScreen
           icon={<Archive />}
-          title="No archived sessions"
-          description="Sessions you archive will appear here. Archive sessions to keep your list tidy while preserving conversations."
+          title={t('settings.lists.sessions.noArchivedTitle')}
+          description={t('settings.lists.sessions.noArchivedDescription')}
           className="h-full"
         />
       )
@@ -603,8 +605,8 @@ export function SessionList({
     return (
       <EntityListEmptyScreen
         icon={<Inbox />}
-        title="No sessions yet"
-        description="Sessions with your agent appear here. Start one to get going."
+        title={t('settings.lists.sessions.noSessionsTitle')}
+        description={t('settings.lists.sessions.noSessionsDescription')}
         className="h-full"
       >
         <button
@@ -616,7 +618,7 @@ export function SessionList({
           }}
           className="inline-flex items-center h-7 px-3 text-xs font-medium rounded-[8px] bg-background shadow-minimal hover:bg-foreground/[0.03] transition-colors"
         >
-          New Session
+          {t('settings.lists.sessions.newSession')}
         </button>
       </EntityListEmptyScreen>
     )
@@ -664,7 +666,7 @@ export function SessionList({
             )}
             {isSearchMode && matchingFilterItems.length === 0 && otherResultItems.length > 0 && (
               <div className="px-4 py-3 text-sm text-muted-foreground">
-                No results in current filter
+                {t('settings.lists.sessions.noResultsCurrentFilter')}
               </div>
             )}
           </>
@@ -672,15 +674,15 @@ export function SessionList({
         emptyState={
           isSearchMode && !isSearchingContent ? (
             <div className="flex flex-col items-center justify-center py-12 px-4">
-              <p className="text-sm text-muted-foreground">No sessions found</p>
+              <p className="text-sm text-muted-foreground">{t('settings.lists.sessions.noSessionsFound')}</p>
               <p className="text-xs text-muted-foreground/60 mt-0.5">
-                Searched titles and message content
+                {t('settings.lists.sessions.searchDescription')}
               </p>
               <button
                 onClick={() => onSearchChange?.('')}
                 className="text-xs text-foreground hover:underline mt-2"
               >
-                Clear search
+                {t('settings.lists.sessions.clearSearch')}
               </button>
             </div>
           ) : undefined
@@ -697,7 +699,7 @@ export function SessionList({
         containerProps={{
           'data-focus-zone': 'navigator',
           role: 'listbox',
-          'aria-label': 'Sessions',
+          'aria-label': t('settings.lists.sessions.ariaLabel'),
         }}
         scrollAreaClassName="select-none mask-fade-top-short"
         collapsedGroups={collapsedGroups}
@@ -711,11 +713,11 @@ export function SessionList({
       <RenameDialog
         open={renameDialogOpen}
         onOpenChange={setRenameDialogOpen}
-        title="Rename Session"
+        title={t('settings.lists.sessions.renameTitle')}
         value={renameName}
         onValueChange={setRenameName}
         onSubmit={handleRenameSubmit}
-        placeholder="Enter session name..."
+        placeholder={t('settings.lists.sessions.renamePlaceholder')}
       />
     </div>
   )

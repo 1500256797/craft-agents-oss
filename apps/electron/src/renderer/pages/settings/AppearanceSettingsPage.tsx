@@ -12,6 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { HeaderMenu } from '@/components/ui/HeaderMenu'
 import { EditPopover, EditButton, getEditConfig } from '@/components/ui/EditPopover'
 import { useTheme } from '@/context/ThemeContext'
+import { useI18n } from '@/context/I18nContext'
 import { useAppShellContext } from '@/context/AppShellContext'
 import { routes } from '@/lib/navigate'
 import { Monitor, Sun, Moon } from 'lucide-react'
@@ -31,68 +32,15 @@ import { useWorkspaceIcons } from '@/hooks/useWorkspaceIcon'
 import { Info_DataTable, SortableHeader } from '@/components/info/Info_DataTable'
 import { Info_Badge } from '@/components/info/Info_Badge'
 import type { PresetTheme } from '@config/theme'
+import { UI_LANGUAGE_OPTIONS } from '../../../shared/i18n'
 
 export const meta: DetailsPageMeta = {
   navigator: 'settings',
   slug: 'appearance',
 }
 
-// ============================================
-// Tool Icons Table
-// ============================================
-
-/**
- * Column definitions for the tool icon mappings table.
- * Shows a preview icon, tool name, and the CLI commands that trigger it.
- */
-const toolIconColumns: ColumnDef<ToolIconMapping>[] = [
-  {
-    accessorKey: 'iconDataUrl',
-    header: () => <span className="p-1.5 pl-2.5">Icon</span>,
-    cell: ({ row }) => (
-      <div className="p-1.5 pl-2.5">
-        <img
-          src={row.original.iconDataUrl}
-          alt={row.original.displayName}
-          className="w-5 h-5 object-contain"
-        />
-      </div>
-    ),
-    size: 60,
-    enableSorting: false,
-  },
-  {
-    accessorKey: 'displayName',
-    header: ({ column }) => <SortableHeader column={column} title="Tool" />,
-    cell: ({ row }) => (
-      <div className="p-1.5 pl-2.5 font-medium">
-        {row.original.displayName}
-      </div>
-    ),
-    size: 150,
-  },
-  {
-    accessorKey: 'commands',
-    header: () => <span className="p-1.5 pl-2.5">Commands</span>,
-    cell: ({ row }) => (
-      <div className="p-1.5 pl-2.5 flex flex-wrap gap-1">
-        {row.original.commands.map(cmd => (
-          <Info_Badge key={cmd} color="muted" className="font-mono">
-            {cmd}
-          </Info_Badge>
-        ))}
-      </div>
-    ),
-    meta: { fillWidth: true },
-    enableSorting: false,
-  },
-]
-
-// ============================================
-// Main Component
-// ============================================
-
 export default function AppearanceSettingsPage() {
+  const { t, uiLanguage, setUiLanguage } = useI18n()
   const {
     mode,
     setMode,
@@ -217,14 +165,36 @@ export default function AppearanceSettingsPage() {
 
   // Theme options for dropdowns
   const themeOptions = useMemo(() => [
-    { value: 'default', label: 'Default' },
+    { value: 'default', label: t('settings.appearance.options.useDefault') },
     ...presetThemes
       .filter(t => t.id !== 'default')
       .map(t => ({
         value: t.id,
         label: t.theme.name || t.id,
       })),
-  ], [presetThemes])
+  ], [presetThemes, t])
+
+  const languageOptions = useMemo(() => UI_LANGUAGE_OPTIONS.map((value) => {
+    if (value === 'system') {
+      return {
+        value,
+        label: t('common.language.system'),
+        description: t('common.language.systemDescription'),
+      }
+    }
+    if (value === 'zh-CN') {
+      return {
+        value,
+        label: t('common.language.zhCN'),
+        description: t('common.language.zhCNDescription'),
+      }
+    }
+    return {
+      value,
+      label: t('common.language.en'),
+      description: t('common.language.enDescription'),
+    }
+  }), [t])
 
   // Get current app default theme label for display (null when using 'default' to avoid redundant "Use Default (Default)")
   const appDefaultLabel = useMemo(() => {
@@ -233,10 +203,53 @@ export default function AppearanceSettingsPage() {
     return preset?.theme.name || colorTheme
   }, [colorTheme, presetThemes])
 
+  const toolIconColumns = useMemo<ColumnDef<ToolIconMapping>[]>(() => [
+    {
+      accessorKey: 'iconDataUrl',
+      header: () => <span className="p-1.5 pl-2.5">{t('settings.appearance.table.icon')}</span>,
+      cell: ({ row }) => (
+        <div className="p-1.5 pl-2.5">
+          <img
+            src={row.original.iconDataUrl}
+            alt={row.original.displayName}
+            className="w-5 h-5 object-contain"
+          />
+        </div>
+      ),
+      size: 60,
+      enableSorting: false,
+    },
+    {
+      accessorKey: 'displayName',
+      header: ({ column }) => <SortableHeader column={column} title={t('settings.appearance.table.tool')} />,
+      cell: ({ row }) => (
+        <div className="p-1.5 pl-2.5 font-medium">
+          {row.original.displayName}
+        </div>
+      ),
+      size: 150,
+    },
+    {
+      accessorKey: 'commands',
+      header: () => <span className="p-1.5 pl-2.5">{t('settings.appearance.table.commands')}</span>,
+      cell: ({ row }) => (
+        <div className="p-1.5 pl-2.5 flex flex-wrap gap-1">
+          {row.original.commands.map(cmd => (
+            <Info_Badge key={cmd} color="muted" className="font-mono">
+              {cmd}
+            </Info_Badge>
+          ))}
+        </div>
+      ),
+      meta: { fillWidth: true },
+      enableSorting: false,
+    },
+  ], [t])
+
   return (
     <div className="h-full flex flex-col">
       <PanelHeader
-        title="Appearance"
+        title={t('settings.pages.appearance.title')}
         actions={<HeaderMenu route={routes.view.settings('appearance')} helpFeature="themes" />}
       />
       <div className="flex-1 min-h-0 mask-fade-y">
@@ -245,40 +258,45 @@ export default function AppearanceSettingsPage() {
             <div className="space-y-8">
 
               {/* Default Theme */}
-              <SettingsSection title="Default Theme">
+              <SettingsSection title={t('settings.appearance.sections.defaultTheme')}>
                 <SettingsCard>
-                  <SettingsRow label="Mode">
+                  <SettingsRow label={t('settings.appearance.rows.mode')}>
                     <SettingsSegmentedControl
                       value={mode}
                       onValueChange={setMode}
                       options={[
-                        { value: 'system', label: 'System', icon: <Monitor className="w-4 h-4" /> },
-                        { value: 'light', label: 'Light', icon: <Sun className="w-4 h-4" /> },
-                        { value: 'dark', label: 'Dark', icon: <Moon className="w-4 h-4" /> },
+                        { value: 'system', label: t('settings.appearance.options.modeSystem'), icon: <Monitor className="w-4 h-4" /> },
+                        { value: 'light', label: t('settings.appearance.options.modeLight'), icon: <Sun className="w-4 h-4" /> },
+                        { value: 'dark', label: t('settings.appearance.options.modeDark'), icon: <Moon className="w-4 h-4" /> },
                       ]}
                     />
                   </SettingsRow>
-                  <SettingsRow label="Color theme">
+                  <SettingsRow label={t('settings.appearance.rows.colorTheme')}>
                     <SettingsMenuSelect
                       value={colorTheme}
                       onValueChange={setColorTheme}
                       options={themeOptions}
                     />
                   </SettingsRow>
-                  <SettingsRow label="Font">
+                  <SettingsRow label={t('settings.appearance.rows.font')}>
                     <SettingsSegmentedControl
                       value={font}
                       onValueChange={setFont}
                       options={[
-                        { value: 'inter', label: 'Inter' },
-                        { value: 'system', label: 'System' },
+                        { value: 'inter', label: t('settings.appearance.options.fontInter') },
+                        { value: 'system', label: t('settings.appearance.options.fontSystem') },
                       ]}
                     />
                   </SettingsRow>
                 </SettingsCard>
                 {themeLoadError && (
                   <p className="mt-2 text-xs text-info">
-                    Theme warning: {themeLoadError} ({themeResolvedFrom === 'fallback' ? 'using bundled fallback' : 'using default theme'})
+                    {t('settings.appearance.rows.themeWarning', {
+                      message: themeLoadError,
+                      fallback: themeResolvedFrom === 'fallback'
+                        ? t('settings.appearance.rows.fallbackBundled')
+                        : t('settings.appearance.rows.fallbackDefault'),
+                    })}
                   </p>
                 )}
               </SettingsSection>
@@ -286,8 +304,8 @@ export default function AppearanceSettingsPage() {
               {/* Workspace Themes */}
               {workspaces.length > 0 && (
                 <SettingsSection
-                  title="Workspace Themes"
-                  description="Override theme settings per workspace"
+                  title={t('settings.appearance.sections.workspaceThemes')}
+                  description={t('settings.appearance.descriptions.workspaceThemes')}
                 >
                   <SettingsCard>
                     {workspaces.map((workspace) => {
@@ -315,7 +333,12 @@ export default function AppearanceSettingsPage() {
                             value={hasCustomTheme ? wsTheme : 'default'}
                             onValueChange={(value) => handleWorkspaceThemeChange(workspace.id, value)}
                             options={[
-                              { value: 'default', label: appDefaultLabel ? `Use Default (${appDefaultLabel})` : 'Use Default' },
+                              {
+                                value: 'default',
+                                label: appDefaultLabel
+                                  ? t('settings.appearance.options.useDefaultWithName', { name: appDefaultLabel })
+                                  : t('settings.appearance.options.useDefault'),
+                              },
                               ...presetThemes
                                 .filter(t => t.id !== 'default')
                                 .map(t => ({
@@ -332,17 +355,28 @@ export default function AppearanceSettingsPage() {
               )}
 
               {/* Interface */}
-              <SettingsSection title="Interface">
+              <SettingsSection title={t('settings.appearance.sections.interface')}>
                 <SettingsCard>
+                  <SettingsRow
+                    label={t('common.language.selectorLabel')}
+                    description={t('common.language.selectorDescription')}
+                  >
+                    <SettingsMenuSelect
+                      value={uiLanguage}
+                      onValueChange={(value) => void setUiLanguage(value as typeof uiLanguage)}
+                      options={languageOptions}
+                      searchable={false}
+                    />
+                  </SettingsRow>
                   <SettingsToggle
-                    label="Connection icons"
-                    description="Show provider icons in the session list and model selector"
+                    label={t('settings.appearance.rows.connectionIcons')}
+                    description={t('settings.appearance.descriptions.connectionIcons')}
                     checked={showConnectionIcons}
                     onCheckedChange={handleConnectionIconsChange}
                   />
                   <SettingsToggle
-                    label="Rich tool descriptions"
-                    description="Add action names and intent descriptions to all tool calls. Provides richer activity context in sessions."
+                    label={t('settings.appearance.rows.richToolDescriptions')}
+                    description={t('settings.appearance.descriptions.richToolDescriptions')}
                     checked={richToolDescriptions}
                     onCheckedChange={handleRichToolDescriptionsChange}
                   />
@@ -351,15 +385,15 @@ export default function AppearanceSettingsPage() {
 
               {/* Tool Icons — shows the command → icon mapping used in turn cards */}
               <SettingsSection
-                title="Tool Icons"
-                description="Icons shown next to CLI commands in chat activity. Stored in ~/.craft-agent/tool-icons/."
+                title={t('settings.appearance.sections.toolIcons')}
+                description={t('settings.appearance.descriptions.toolIcons')}
                 action={
                   toolIconsJsonPath ? (
                     <EditPopover
                       trigger={<EditButton />}
-                      {...getEditConfig('edit-tool-icons', toolIconsJsonPath)}
+                      {...getEditConfig('edit-tool-icons', toolIconsJsonPath, t)}
                       secondaryAction={{
-                        label: 'Edit File',
+                        label: t('settings.appearance.rows.editFile'),
                         filePath: toolIconsJsonPath,
                       }}
                     />
@@ -370,9 +404,9 @@ export default function AppearanceSettingsPage() {
                   <Info_DataTable
                     columns={toolIconColumns}
                     data={toolIcons}
-                    searchable={{ placeholder: 'Search tools...' }}
+                    searchable={{ placeholder: t('settings.appearance.rows.searchTools') }}
                     maxHeight={480}
-                    emptyContent="No tool icon mappings found"
+                    emptyContent={t('settings.appearance.rows.emptyToolIcons')}
                   />
                 </SettingsCard>
               </SettingsSection>

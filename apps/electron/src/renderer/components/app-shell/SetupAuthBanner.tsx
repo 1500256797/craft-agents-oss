@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { useI18n } from '@/context/I18nContext'
 
 export type BannerState =
   | 'hidden'
@@ -29,17 +30,19 @@ export function SetupAuthBanner({
   onAction,
   variant = 'banner'
 }: SetupAuthBannerProps) {
+  const { t } = useI18n()
+
   if (state === 'hidden') return null
 
   // Get title based on state
   const getTitle = () => {
     switch (state) {
       case 'mcp_auth':
-        return 'Connection required'
+        return t('common.banners.connectionRequired')
       case 'api_auth':
-        return 'API credentials required'
+        return t('common.banners.apiCredentialsRequired')
       case 'error':
-        return 'Something went wrong'
+        return t('common.banners.somethingWentWrong')
       default:
         return ''
     }
@@ -50,11 +53,11 @@ export function SetupAuthBanner({
     if (reason) return reason
     switch (state) {
       case 'mcp_auth':
-        return 'Connect to required services to continue.'
+        return t('common.banners.connectToServices')
       case 'api_auth':
-        return 'Enter API credentials to continue.'
+        return t('common.banners.enterApiCredentials')
       case 'error':
-        return 'Something went wrong. Tap to retry.'
+        return t('common.banners.tapToRetry')
       default:
         return ''
     }
@@ -64,13 +67,13 @@ export function SetupAuthBanner({
   const getButtonText = () => {
     switch (state) {
       case 'mcp_auth':
-        return 'Connect'
+        return t('common.actions.connect')
       case 'api_auth':
-        return 'Add Credentials'
+        return t('common.actions.addCredentials')
       case 'error':
-        return 'Retry'
+        return t('common.actions.retry')
       default:
-        return 'Continue'
+        return t('common.actions.cancel')
     }
   }
 

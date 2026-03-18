@@ -41,6 +41,7 @@ export const GUI_HANDLED_CHANNELS = [
   RPC_CHANNELS.badge.REFRESH,
   RPC_CHANNELS.badge.SET_ICON,
   RPC_CHANNELS.window.GET_FOCUS_STATE,
+  RPC_CHANNELS.window.GET_FULLSCREEN_STATE,
   RPC_CHANNELS.notification.SHOW,
   RPC_CHANNELS.notification.GET_ENABLED,
   RPC_CHANNELS.notification.SET_ENABLED,
@@ -426,6 +427,11 @@ export function registerSystemGuiHandlers(server: RpcServer, deps: HandlerDeps):
   server.handle(RPC_CHANNELS.window.GET_FOCUS_STATE, async () => {
     const { isAnyWindowFocused } = require('../notifications')
     return isAnyWindowFocused()
+  })
+
+  server.handle(RPC_CHANNELS.window.GET_FULLSCREEN_STATE, async (ctx) => {
+    if (!windowManager) return false
+    return windowManager.getWindowFullscreenState(ctx.webContentsId!)
   })
 }
 

@@ -37,6 +37,7 @@ export type {
 
 // Import for local use
 import type { Workspace, AuthType } from '@craft-agent/core/types';
+import type { UiLanguage } from './types.ts';
 
 // Import LLM connection types and constants
 import type { LlmConnection } from './llm-connections.ts';
@@ -59,6 +60,7 @@ export interface StoredConfig {
   notificationsEnabled?: boolean;  // Desktop notifications for task completion (default: true)
   // Appearance
   colorTheme?: string;  // ID of selected preset theme (e.g., 'dracula', 'nord'). Default: 'default'
+  uiLanguage?: UiLanguage;  // UI language selection ('system', 'en', 'zh-CN'). Default: 'system'
   // Auto-update
   dismissedUpdateVersion?: string;  // Version that user dismissed (skip notifications for this version)
   // Input settings
@@ -1205,6 +1207,29 @@ export function setColorTheme(themeId: string): void {
   const config = loadStoredConfig();
   if (!config) return;
   config.colorTheme = themeId;
+  saveConfig(config);
+}
+
+/**
+ * Get the selected UI language.
+ * Returns 'system' if not set.
+ */
+export function getUiLanguage(): UiLanguage {
+  const config = loadStoredConfig();
+  if (config?.uiLanguage !== undefined) {
+    return config.uiLanguage;
+  }
+  const defaults = loadConfigDefaults();
+  return defaults.defaults.uiLanguage;
+}
+
+/**
+ * Set the selected UI language.
+ */
+export function setUiLanguage(language: UiLanguage): void {
+  const config = loadStoredConfig();
+  if (!config) return;
+  config.uiLanguage = language;
   saveConfig(config);
 }
 

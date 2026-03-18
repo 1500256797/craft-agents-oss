@@ -6,6 +6,7 @@ import { EntityListEmptyScreen } from '@/components/ui/entity-list-empty'
 import { skillSelection } from '@/hooks/useEntitySelection'
 import { SkillMenu } from './SkillMenu'
 import { EditPopover, getEditConfig } from '@/components/ui/EditPopover'
+import { useI18n } from '@/context/I18nContext'
 import type { LoadedSkill } from '../../../shared/types'
 
 export interface SkillsListPanelProps {
@@ -27,6 +28,7 @@ export function SkillsListPanel({
   workspaceRootPath,
   className,
 }: SkillsListPanelProps) {
+  const { t } = useI18n()
   return (
     <EntityPanel<LoadedSkill>
       items={skills}
@@ -38,8 +40,8 @@ export function SkillsListPanel({
       emptyState={
         <EntityListEmptyScreen
           icon={<Zap />}
-          title="No skills configured"
-          description="Skills are reusable instructions that teach your agent specialized behaviors."
+          title={t('settings.lists.skills.emptyTitle')}
+          description={t('settings.lists.skills.emptyDescription')}
           docKey="skills"
         >
           {workspaceRootPath && (
@@ -47,10 +49,10 @@ export function SkillsListPanel({
               align="center"
               trigger={
                 <button className="inline-flex items-center h-7 px-3 text-xs font-medium rounded-[8px] bg-background shadow-minimal hover:bg-foreground/[0.03] transition-colors">
-                  Add Skill
+                  {t('settings.lists.skills.addSkill')}
                 </button>
               }
-              {...getEditConfig('add-skill', workspaceRootPath)}
+              {...getEditConfig('add-skill', workspaceRootPath, t)}
             />
           )}
         </EntityListEmptyScreen>

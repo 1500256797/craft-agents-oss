@@ -34,11 +34,12 @@ export interface SettingsPageDefinition {
 export const SETTINGS_PAGES = [
   { id: 'app', label: 'App', description: 'Notifications and updates' },
   { id: 'ai', label: 'AI', description: 'Model, thinking, connections' },
+  { id: 'models', label: 'Models', description: 'Provider catalog and model availability' },
+  { id: 'channels', label: 'Channels', description: 'Channel connections and account status' },
   { id: 'appearance', label: 'Appearance', description: 'Theme, font, tool icons' },
   { id: 'input', label: 'Input', description: 'Send key, spell check' },
-  { id: 'workspace', label: 'Workspace', description: 'Name, icon, working directory' },
+  { id: 'workspace', label: 'Agent', description: 'Name, icon, working directory' },
   { id: 'permissions', label: 'Permissions', description: 'Explore mode rules' },
-  { id: 'labels', label: 'Labels', description: 'Manage session labels' },
   { id: 'shortcuts', label: 'Shortcuts', description: 'Keyboard shortcuts' },
   { id: 'preferences', label: 'Preferences', description: 'User preferences' },
 ] as const satisfies readonly SettingsPageDefinition[]

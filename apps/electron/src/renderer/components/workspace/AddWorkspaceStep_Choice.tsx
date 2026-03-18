@@ -60,15 +60,15 @@ export function AddWorkspaceStep_Choice({
     <AddWorkspaceContainer>
       <div className="mt-2" />
       <AddWorkspaceStepHeader
-        title="Add Workspace"
-        description="Where your ideas meet the tools to make them happen."
+        title="Add Local Agent"
+        description="Choose how to create a local agent on this device."
       />
 
       <div className="mt-8 w-full space-y-3">
         <ChoiceCard
           icon={<FolderPlus className="h-5 w-5" />}
           title="Create new"
-          description="Start fresh with an empty workspace."
+          description="Start fresh with a new local agent."
           onClick={onCreateNew}
           variant="primary"
         />
@@ -76,7 +76,7 @@ export function AddWorkspaceStep_Choice({
         <ChoiceCard
           icon={<FolderOpen className="h-5 w-5" />}
           title="Open folder"
-          description="Choose an existing folder as workspace."
+          description="Use an existing folder for a local agent."
           onClick={onOpenFolder}
         />
       </div>

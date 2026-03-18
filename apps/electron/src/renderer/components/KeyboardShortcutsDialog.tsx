@@ -7,6 +7,7 @@ import {
 import { useRegisterModal } from "@/context/ModalContext"
 import { isMac } from "@/lib/platform"
 import { actionsByCategory, useActionLabel, type ActionId } from "@/actions"
+import { useI18n } from '@/context/I18nContext'
 
 interface KeyboardShortcutsDialogProps {
   open: boolean
@@ -25,41 +26,43 @@ interface ShortcutSection {
 
 // Component-specific shortcuts that aren't in the centralized registry
 // These are context-sensitive behaviors, not global actions
-const componentSpecificSections: ShortcutSection[] = [
-  {
-    title: 'List Navigation',
-    shortcuts: [
-      { keys: ['↑', '↓'], description: 'Navigate items in list' },
-      { keys: ['Home'], description: 'Go to first item' },
-      { keys: ['End'], description: 'Go to last item' },
-    ],
-  },
-  {
-    title: 'Session List',
-    shortcuts: [
-      { keys: ['Enter'], description: 'Focus chat input' },
-      { keys: ['Delete'], description: 'Delete session' },
-      { keys: ['R'], description: 'Rename session' },
-      { keys: ['Right-click'], description: 'Open context menu' },
-      { keys: [isMac ? '⌥' : 'Alt', 'Click'], description: 'Add filter as excluded' },
-    ],
-  },
-  {
-    title: 'Agent Tree',
-    shortcuts: [
-      { keys: ['←'], description: 'Collapse folder' },
-      { keys: ['→'], description: 'Expand folder' },
-    ],
-  },
-  {
-    title: 'Chat Input',
-    shortcuts: [
-      { keys: ['Enter'], description: 'Send message' },
-      { keys: ['Shift', 'Enter'], description: 'New line' },
-      { keys: ['Esc'], description: 'Close dialog / blur input' },
-    ],
-  },
-]
+function getComponentSpecificSections(t: (key: string) => string): ShortcutSection[] {
+  return [
+    {
+      title: t('common.keyboardShortcuts.listNavigation'),
+      shortcuts: [
+        { keys: ['↑', '↓'], description: t('common.keyboardShortcuts.navigateItems') },
+        { keys: ['Home'], description: t('common.keyboardShortcuts.goToFirst') },
+        { keys: ['End'], description: t('common.keyboardShortcuts.goToLast') },
+      ],
+    },
+    {
+      title: t('common.keyboardShortcuts.sessionList'),
+      shortcuts: [
+        { keys: ['Enter'], description: t('common.keyboardShortcuts.focusChatInput') },
+        { keys: ['Delete'], description: t('common.keyboardShortcuts.deleteSession') },
+        { keys: ['R'], description: t('common.keyboardShortcuts.renameSession') },
+        { keys: ['Right-click'], description: t('common.keyboardShortcuts.openContextMenu') },
+        { keys: [isMac ? '⌥' : 'Alt', 'Click'], description: t('common.keyboardShortcuts.addFilterExcluded') },
+      ],
+    },
+    {
+      title: t('common.keyboardShortcuts.agentTree'),
+      shortcuts: [
+        { keys: ['←'], description: t('common.keyboardShortcuts.collapseFolder') },
+        { keys: ['→'], description: t('common.keyboardShortcuts.expandFolder') },
+      ],
+    },
+    {
+      title: t('common.keyboardShortcuts.chatInput'),
+      shortcuts: [
+        { keys: ['Enter'], description: t('common.keyboardShortcuts.sendMessage') },
+        { keys: ['Shift', 'Enter'], description: t('common.keyboardShortcuts.newLine') },
+        { keys: ['Esc'], description: t('common.keyboardShortcuts.closeDialogBlur') },
+      ],
+    },
+  ]
+}
 
 function Kbd({ children }: { children: React.ReactNode }) {
   return (
@@ -142,12 +145,14 @@ function StaticSection({ section }: { section: ShortcutSection }) {
 export function KeyboardShortcutsDialog({ open, onOpenChange }: KeyboardShortcutsDialogProps) {
   // Register with modal context so X button / Cmd+W closes this dialog first
   useRegisterModal(open, () => onOpenChange(false))
+  const { t } = useI18n()
+  const componentSpecificSections = getComponentSpecificSections(t)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Keyboard Shortcuts</DialogTitle>
+          <DialogTitle>{t('common.keyboardShortcuts.title')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-2">
           {/* Registry-driven sections */}

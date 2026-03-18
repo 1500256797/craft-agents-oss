@@ -25,6 +25,7 @@ import { AutomationEventTimeline } from './AutomationEventTimeline'
 import { PhaseBadge } from './PhaseBadge'
 import { getEventDisplayName, getPermissionDisplayName, type AutomationListItem, type ExecutionEntry, type TestResult } from './types'
 import { describeCron, computeNextRuns } from './utils'
+import { useI18n } from '@/context/I18nContext'
 
 // ============================================================================
 // Component
@@ -53,14 +54,15 @@ export function AutomationInfoPage({
   onReplay,
   className,
 }: AutomationInfoPageProps) {
+  const { t } = useI18n()
   const workspace = useActiveWorkspace()
   const nextRuns = automation.cron ? computeNextRuns(automation.cron) : []
 
   const editActions = workspace?.rootPath ? (
     <EditPopover
       trigger={<EditButton />}
-      {...getEditConfig('automation-config', workspace.rootPath)}
-      secondaryAction={{ label: 'Edit File', filePath: `${workspace.rootPath}/automations.json` }}
+      {...getEditConfig('automation-config', workspace.rootPath, t)}
+      secondaryAction={{ label: t('common.automationInfo.editFile'), filePath: `${workspace.rootPath}/automations.json` }}
     />
   ) : undefined
 
@@ -95,28 +97,28 @@ export function AutomationInfoPage({
         {/* Disabled warning */}
         {!automation.enabled && (
           <Info_Alert variant="warning" icon={<PauseCircle className="h-4 w-4" />}>
-            <Info_Alert.Title>Paused</Info_Alert.Title>
+            <Info_Alert.Title>{t('common.automationInfo.paused')}</Info_Alert.Title>
             <Info_Alert.Description>
-              This automation is turned off. Enable it to start running again.
+              {t('common.automationInfo.pausedDescription')}
             </Info_Alert.Description>
           </Info_Alert>
         )}
 
         {/* Section: When */}
         <Info_Section
-          title="When"
-          description="What causes this automation to run"
+          title={t('common.automationInfo.when')}
+          description={t('common.automationInfo.whenDescription')}
           actions={editActions}
         >
           <Info_Table>
-            <Info_Table.Row label="Event">
+            <Info_Table.Row label={t('common.automationInfo.event')}>
               <Info_Badge color="default">{getEventDisplayName(automation.event)}</Info_Badge>
             </Info_Table.Row>
-            <Info_Table.Row label="Timing">
+            <Info_Table.Row label={t('common.automationInfo.timing')}>
               <PhaseBadge event={automation.event} />
             </Info_Table.Row>
             {automation.matcher && (
-              <Info_Table.Row label="Only when matching">
+              <Info_Table.Row label={t('common.automationInfo.onlyWhenMatching')}>
                 <code className="text-xs font-mono bg-foreground/5 px-1.5 py-0.5 rounded">
                   {automation.matcher}
                 </code>
@@ -124,14 +126,14 @@ export function AutomationInfoPage({
             )}
             {automation.cron && (
               <>
-                <Info_Table.Row label="Repeats" value={describeCron(automation.cron)} />
-                <Info_Table.Row label="Schedule expression">
+                <Info_Table.Row label={t('common.automationInfo.repeats')} value={describeCron(automation.cron)} />
+                <Info_Table.Row label={t('common.automationInfo.scheduleExpression')}>
                   <code className="text-xs font-mono bg-foreground/5 px-1.5 py-0.5 rounded">
                     {automation.cron}
                   </code>
                 </Info_Table.Row>
                 {nextRuns.length > 0 && (
-                  <Info_Table.Row label="Next runs">
+                  <Info_Table.Row label={t('common.automationInfo.nextRuns')}>
                     <div className="flex flex-col gap-0.5">
                       {(() => {
                         const spansYears = nextRuns.length > 1 && nextRuns[0].getFullYear() !== nextRuns[nextRuns.length - 1].getFullYear()
@@ -145,7 +147,7 @@ export function AutomationInfoPage({
                     </div>
                   </Info_Table.Row>
                 )}
-                <Info_Table.Row label="Timezone" value={automation.timezone || 'System default'} />
+                <Info_Table.Row label={t('common.automationInfo.timezone')} value={automation.timezone || t('common.automationInfo.systemDefault')} />
               </>
             )}
           </Info_Table>
@@ -153,8 +155,10 @@ export function AutomationInfoPage({
 
         {/* Section: Then */}
         <Info_Section
-          title="Then"
-          description={`${automation.actions.length} action${automation.actions.length !== 1 ? 's' : ''} to perform`}
+          title={t('common.automationInfo.then')}
+          description={automation.actions.length === 1
+            ? t('common.automationInfo.thenDescription', { count: automation.actions.length })
+            : t('common.automationInfo.thenDescriptionPlural', { count: automation.actions.length })}
           actions={editActions}
         >
           <div className="divide-y divide-border/30">
@@ -170,16 +174,16 @@ export function AutomationInfoPage({
         )}
 
         {/* Section: Settings */}
-        <Info_Section title="Settings" actions={editActions}>
+        <Info_Section title={t('common.automationInfo.settings')} actions={editActions}>
           <Info_Table>
-            <Info_Table.Row label="Access Level" value={getPermissionDisplayName(automation.permissionMode)} />
-            <Info_Table.Row label="Status">
+            <Info_Table.Row label={t('common.automationInfo.accessLevel')} value={getPermissionDisplayName(automation.permissionMode)} />
+            <Info_Table.Row label={t('common.automationInfo.status')}>
               <Info_Badge color={automation.enabled ? 'success' : 'muted'}>
-                {automation.enabled ? 'Active' : 'Disabled'}
+                {automation.enabled ? t('common.automationInfo.active') : t('common.automationInfo.disabled')}
               </Info_Badge>
             </Info_Table.Row>
             {automation.labels && automation.labels.length > 0 && (
-              <Info_Table.Row label="Labels">
+              <Info_Table.Row label={t('common.automationInfo.labels')}>
                 <div className="flex gap-1.5 flex-wrap">
                   {automation.labels.map((l) => (
                     <Info_Badge key={l} color="muted">{l}</Info_Badge>
@@ -192,14 +196,14 @@ export function AutomationInfoPage({
 
         {/* Section: Recent Activity */}
         <Info_Section
-          title="Recent Activity"
-          description={executions.length > 0 ? `Last ${executions.length} runs` : undefined}
+          title={t('common.automationInfo.recentActivity')}
+          description={executions.length > 0 ? t('common.automationInfo.lastRuns', { count: executions.length }) : undefined}
         >
           <AutomationEventTimeline entries={executions} onReplay={onReplay} />
         </Info_Section>
 
         {/* Section: Raw config (JSON) */}
-        <Info_Section title="Raw config">
+        <Info_Section title={t('common.automationInfo.rawConfig')}>
           <div className="rounded-[8px] shadow-minimal overflow-hidden [&_pre]:!bg-transparent [&_.relative]:!bg-transparent [&_.relative]:!border-0 [&_.relative>div:first-child]:!bg-transparent [&_.relative>div:first-child]:!border-0">
             <Info_Markdown maxHeight={300} fullscreen>
               {`\`\`\`json\n${JSON.stringify({
