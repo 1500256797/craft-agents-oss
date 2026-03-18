@@ -23,8 +23,19 @@
     "paths": {
       "@/*": ["src/renderer/*"],
       "@config/*": ["../../packages/shared/src/config/*"],
-      "@craft-agent/shared": ["../../packages/shared/src/index.ts"],
-      "@craft-agent/shared/*": ["../../packages/shared/src/*"]
+      "@zhangyuge-agent/core": ["../../packages/core/src/index.ts"],
+      "@zhangyuge-agent/core/*": ["../../packages/core/src/*"],
+      "@zhangyuge-agent/server-core": ["../../packages/server-core/src/index.ts"],
+      "@zhangyuge-agent/server-core/*": ["../../packages/server-core/src/*"],
+      "@zhangyuge-agent/session-tools-core": ["../../packages/session-tools-core/src/index.ts"],
+      "@zhangyuge-agent/session-tools-core/*": ["../../packages/session-tools-core/src/*"],
+      "@zhangyuge-agent/shared": ["../../packages/shared/src/index.ts"],
+      "@zhangyuge-agent/shared/agent/modes": ["../../packages/shared/src/agent/mode-types.ts"],
+      "@zhangyuge-agent/shared/interceptor": ["../../packages/shared/src/interceptor-common.ts"],
+      "@zhangyuge-agent/shared/*": ["../../packages/shared/src/*"],
+      "@zhangyuge-agent/ui": ["../../packages/ui/src/index.ts"],
+      "@zhangyuge-agent/ui/chat/turn-utils": ["../../packages/ui/src/components/chat/turn-utils.ts"],
+      "@zhangyuge-agent/ui/*": ["../../packages/ui/src/*"]
     }
   },
   "include": ["src/**/*", "../../packages/shared/src/**/*.d.ts"],

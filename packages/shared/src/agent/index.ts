@@ -1,4 +1,4 @@
-// Export ClaudeAgent (renamed from CraftAgent) and backward-compatible aliases
+// Export ClaudeAgent and project-facing aliases
 export * from './claude-agent.ts';
 
 // Export PiAgent for direct use
@@ -100,7 +100,7 @@ export {
   loadRawSourcePermissions,
   saveWorkspacePermissions,
   saveSourcePermissions,
-  // App-level default permissions (at ~/.craft-agent/permissions/)
+  // App-level default permissions (at ~/.zhangyuge-agent/permissions/)
   getAppPermissionsDir,
   ensureDefaultPermissions,
   loadDefaultPermissions,

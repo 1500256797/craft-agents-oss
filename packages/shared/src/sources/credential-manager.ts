@@ -24,7 +24,7 @@ import {
 } from './types.ts';
 import type { CredentialId, StoredCredential } from '../credentials/types.ts';
 import { getCredentialManager } from '../credentials/index.ts';
-import { CraftOAuth, getMcpBaseUrl, prepareMcpOAuth, exchangeMcpOAuth, type OAuthCallbacks, type OAuthTokens } from '../auth/oauth.ts';
+import { 章鱼哥AIOAuth, getMcpBaseUrl, prepareMcpOAuth, exchangeMcpOAuth, type OAuthCallbacks, type OAuthTokens } from '../auth/oauth.ts';
 import { type OAuthSessionContext } from '../auth/types.ts';
 import type { PreparedOAuthFlow, OAuthExchangeParams, OAuthExchangeResult, OAuthProvider } from '../auth/oauth-flow-types.ts';
 import {
@@ -563,7 +563,7 @@ export class SourceCredentialManager {
     }
 
     try {
-      const oauth = new CraftOAuth(
+      const oauth = new 章鱼哥AIOAuth(
         { mcpUrl: source.config.mcp.url },
         callbacks,
         sessionContext
@@ -975,7 +975,7 @@ export class SourceCredentialManager {
         return null;
       }
 
-      const oauth = new CraftOAuth(
+      const oauth = new 章鱼哥AIOAuth(
         { mcpUrl: source.config.mcp.url },
         {
           onStatus: () => {},

@@ -1,20 +1,20 @@
 {
-  "name": "@craft-agent/server",
+  "name": "@zhangyuge-agent/server",
   "version": "0.7.6",
-  "description": "Standalone headless Craft Agent server (Bun runtime)",
+  "description": "Standalone headless 章鱼哥AI server (Bun runtime)",
   "type": "module",
   "main": "src/index.ts",
   "bin": {
-    "craft-server": "src/index.ts"
+    "zhangyuge-agent-server": "src/index.ts"
   },
   "scripts": {
     "start": "bun run src/index.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@craft-agent/core": "workspace:*",
-    "@craft-agent/server-core": "workspace:*",
-    "@craft-agent/shared": "workspace:*"
+    "@zhangyuge-agent/core": "workspace:*",
+    "@zhangyuge-agent/server-core": "workspace:*",
+    "@zhangyuge-agent/shared": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.8.2",

@@ -17,8 +17,8 @@ import { contextBridge, ipcRenderer, shell } from 'electron'
 import { WsRpcClient, type TransportConnectionState } from '../transport/client'
 import { buildClientApi } from '../transport/build-api'
 import { CHANNEL_MAP } from '../transport/channel-map'
-import { createCallbackServer } from '@craft-agent/shared/auth/callback-server'
-import { CHATGPT_OAUTH_CONFIG } from '@craft-agent/shared/auth/chatgpt-oauth-config'
+import { createCallbackServer } from '@zhangyuge-agent/shared/auth/callback-server'
+import { CHATGPT_OAUTH_CONFIG } from '@zhangyuge-agent/shared/auth/chatgpt-oauth-config'
 import {
   CLIENT_OPEN_EXTERNAL,
   CLIENT_OPEN_PATH,
@@ -26,8 +26,8 @@ import {
   CLIENT_CONFIRM_DIALOG,
   CLIENT_OPEN_FILE_DIALOG,
   LOCAL_CLIENT_CAPABILITIES,
-} from '@craft-agent/server-core/transport'
-import type { ConfirmDialogSpec, FileDialogSpec } from '@craft-agent/server-core/transport'
+} from '@zhangyuge-agent/server-core/transport'
+import type { ConfirmDialogSpec, FileDialogSpec } from '@zhangyuge-agent/server-core/transport'
 
 // Connection details — from env (remote server) or main process (local)
 let wsUrl: string
@@ -36,11 +36,11 @@ let webContentsId: number
 let workspaceId: string
 let wsMode: 'local' | 'remote'
 
-if (process.env.CRAFT_SERVER_URL) {
+if (process.env.ZHANGYUGE_AGENT_SERVER_URL) {
   // Remote mode — connect to an external server
   wsMode = 'remote'
-  wsUrl = process.env.CRAFT_SERVER_URL
-  wsToken = process.env.CRAFT_SERVER_TOKEN ?? ''
+  wsUrl = process.env.ZHANGYUGE_AGENT_SERVER_URL
+  wsToken = process.env.ZHANGYUGE_AGENT_SERVER_TOKEN ?? ''
 
   // Block unencrypted ws:// to non-localhost servers — tokens would be sent in cleartext
   const parsed = new URL(wsUrl)
@@ -49,11 +49,11 @@ if (process.env.CRAFT_SERVER_URL) {
     throw new Error(
       `Refusing to connect to remote server over unencrypted ws://. ` +
       `Use wss:// (TLS) for non-localhost connections. ` +
-      `Set CRAFT_RPC_TLS_CERT/KEY on the server to enable TLS.`
+      `Set ZHANGYUGE_AGENT_RPC_TLS_CERT/KEY on the server to enable TLS.`
     )
   }
   webContentsId = ipcRenderer.sendSync('__get-web-contents-id')
-  workspaceId = process.env.CRAFT_WORKSPACE_ID ?? ipcRenderer.sendSync('__get-workspace-id')
+  workspaceId = process.env.ZHANGYUGE_AGENT_WORKSPACE_ID ?? ipcRenderer.sendSync('__get-workspace-id')
 } else {
   // Local mode — get connection details from main process (synchronous, runs during preload eval)
   wsMode = 'local'

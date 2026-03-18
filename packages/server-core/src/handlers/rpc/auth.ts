@@ -1,8 +1,8 @@
 import { unlink } from 'fs/promises'
 import { join } from 'path'
 import { homedir } from 'os'
-import { RPC_CHANNELS } from '@craft-agent/shared/protocol'
-import { getCredentialManager } from '@craft-agent/shared/credentials'
+import { RPC_CHANNELS } from '@zhangyuge-agent/shared/protocol'
+import { getCredentialManager } from '@zhangyuge-agent/shared/credentials'
 import {
   clearAccountSession,
   getAccountSessionState,
@@ -11,10 +11,10 @@ import {
   getCurrentAccountUser,
   loginAccount,
   type AccountLoginInput,
-} from '@craft-agent/shared/account-auth'
-import type { RpcServer } from '@craft-agent/server-core/transport'
+} from '@zhangyuge-agent/shared/account-auth'
+import type { RpcServer } from '@zhangyuge-agent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
-import { requestClientConfirmDialog } from '@craft-agent/server-core/transport'
+import { requestClientConfirmDialog } from '@zhangyuge-agent/server-core/transport'
 
 export const HANDLED_CHANNELS = [
   RPC_CHANNELS.auth.LOGIN,
@@ -114,7 +114,7 @@ export function registerAuthHandlers(server: RpcServer, deps: HandlerDeps): void
       }
 
       // Delete the config file
-      const configPath = join(homedir(), '.craft-agent', 'config.json')
+      const configPath = join(homedir(), '.zhangyuge-agent', 'config.json')
       await unlink(configPath).catch(() => {
         // Ignore if file doesn't exist
       })

@@ -1,12 +1,12 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { dirname } from 'path'
-import { RPC_CHANNELS } from '@craft-agent/shared/protocol'
-import { getPreferencesPath, getSessionDraft, setSessionDraft, deleteSessionDraft, getAllSessionDrafts, getWorkspaceByNameOrId, getDefaultThinkingLevel, setDefaultThinkingLevel } from '@craft-agent/shared/config'
-import { isValidThinkingLevel } from '@craft-agent/shared/agent/thinking-levels'
-import { getWorkspaceOrThrow } from '@craft-agent/server-core/handlers'
-import type { RpcServer } from '@craft-agent/server-core/transport'
+import { RPC_CHANNELS } from '@zhangyuge-agent/shared/protocol'
+import { getPreferencesPath, getSessionDraft, setSessionDraft, deleteSessionDraft, getAllSessionDrafts, getWorkspaceByNameOrId, getDefaultThinkingLevel, setDefaultThinkingLevel } from '@zhangyuge-agent/shared/config'
+import { isValidThinkingLevel } from '@zhangyuge-agent/shared/agent/thinking-levels'
+import { getWorkspaceOrThrow } from '@zhangyuge-agent/server-core/handlers'
+import type { RpcServer } from '@zhangyuge-agent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
-import { requestClientOpenFileDialog } from '@craft-agent/server-core/transport'
+import { requestClientOpenFileDialog } from '@zhangyuge-agent/server-core/transport'
 
 export const HANDLED_CHANNELS = [
   RPC_CHANNELS.workspace.SETTINGS_GET,
@@ -90,7 +90,7 @@ export function registerSettingsHandlers(server: RpcServer, deps: HandlerDeps): 
     }
 
     // Load workspace config
-    const { loadWorkspaceConfig } = await import('@craft-agent/shared/workspaces')
+    const { loadWorkspaceConfig } = await import('@zhangyuge-agent/shared/workspaces')
     const config = loadWorkspaceConfig(workspace.rootPath)
 
     return {
@@ -118,13 +118,13 @@ export function registerSettingsHandlers(server: RpcServer, deps: HandlerDeps): 
 
     // Validate defaultLlmConnection exists before saving
     if (key === 'defaultLlmConnection' && value !== undefined && value !== null) {
-      const { getLlmConnection } = await import('@craft-agent/shared/config/storage')
+      const { getLlmConnection } = await import('@zhangyuge-agent/shared/config/storage')
       if (!getLlmConnection(value as string)) {
         throw new Error(`LLM connection "${value}" not found`)
       }
     }
 
-    const { loadWorkspaceConfig, saveWorkspaceConfig } = await import('@craft-agent/shared/workspaces')
+    const { loadWorkspaceConfig, saveWorkspaceConfig } = await import('@zhangyuge-agent/shared/workspaces')
     const config = loadWorkspaceConfig(workspace.rootPath)
     if (!config) {
       throw new Error(`Failed to load workspace config: ${workspaceId}`)
@@ -204,37 +204,37 @@ export function registerSettingsHandlers(server: RpcServer, deps: HandlerDeps): 
 
   // Get auto-capitalisation setting
   server.handle(RPC_CHANNELS.input.GET_AUTO_CAPITALISATION, async () => {
-    const { getAutoCapitalisation } = await import('@craft-agent/shared/config/storage')
+    const { getAutoCapitalisation } = await import('@zhangyuge-agent/shared/config/storage')
     return getAutoCapitalisation()
   })
 
   // Set auto-capitalisation setting
   server.handle(RPC_CHANNELS.input.SET_AUTO_CAPITALISATION, async (_ctx, enabled: boolean) => {
-    const { setAutoCapitalisation } = await import('@craft-agent/shared/config/storage')
+    const { setAutoCapitalisation } = await import('@zhangyuge-agent/shared/config/storage')
     setAutoCapitalisation(enabled)
   })
 
   // Get send message key setting
   server.handle(RPC_CHANNELS.input.GET_SEND_MESSAGE_KEY, async () => {
-    const { getSendMessageKey } = await import('@craft-agent/shared/config/storage')
+    const { getSendMessageKey } = await import('@zhangyuge-agent/shared/config/storage')
     return getSendMessageKey()
   })
 
   // Set send message key setting
   server.handle(RPC_CHANNELS.input.SET_SEND_MESSAGE_KEY, async (_ctx, key: 'enter' | 'cmd-enter') => {
-    const { setSendMessageKey } = await import('@craft-agent/shared/config/storage')
+    const { setSendMessageKey } = await import('@zhangyuge-agent/shared/config/storage')
     setSendMessageKey(key)
   })
 
   // Get spell check setting
   server.handle(RPC_CHANNELS.input.GET_SPELL_CHECK, async () => {
-    const { getSpellCheck } = await import('@craft-agent/shared/config/storage')
+    const { getSpellCheck } = await import('@zhangyuge-agent/shared/config/storage')
     return getSpellCheck()
   })
 
   // Set spell check setting
   server.handle(RPC_CHANNELS.input.SET_SPELL_CHECK, async (_ctx, enabled: boolean) => {
-    const { setSpellCheck } = await import('@craft-agent/shared/config/storage')
+    const { setSpellCheck } = await import('@zhangyuge-agent/shared/config/storage')
     setSpellCheck(enabled)
   })
 
@@ -244,7 +244,7 @@ export function registerSettingsHandlers(server: RpcServer, deps: HandlerDeps): 
 
   // Get keep awake while running setting
   server.handle(RPC_CHANNELS.power.GET_KEEP_AWAKE, async () => {
-    const { getKeepAwakeWhileRunning } = await import('@craft-agent/shared/config/storage')
+    const { getKeepAwakeWhileRunning } = await import('@zhangyuge-agent/shared/config/storage')
     return getKeepAwakeWhileRunning()
   })
 
@@ -254,13 +254,13 @@ export function registerSettingsHandlers(server: RpcServer, deps: HandlerDeps): 
 
   // Get rich tool descriptions setting
   server.handle(RPC_CHANNELS.appearance.GET_RICH_TOOL_DESCRIPTIONS, async () => {
-    const { getRichToolDescriptions } = await import('@craft-agent/shared/config/storage')
+    const { getRichToolDescriptions } = await import('@zhangyuge-agent/shared/config/storage')
     return getRichToolDescriptions()
   })
 
   // Set rich tool descriptions setting
   server.handle(RPC_CHANNELS.appearance.SET_RICH_TOOL_DESCRIPTIONS, async (_ctx, enabled: boolean) => {
-    const { setRichToolDescriptions } = await import('@craft-agent/shared/config/storage')
+    const { setRichToolDescriptions } = await import('@zhangyuge-agent/shared/config/storage')
     setRichToolDescriptions(enabled)
   })
 }

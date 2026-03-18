@@ -312,18 +312,18 @@ function shouldPreferCustomEndpoint(): boolean {
  */
 function setInterceptorApiHints(model: { api?: string; provider?: string; baseUrl?: string } | undefined): void {
   if (!model) {
-    delete process.env.CRAFT_PI_MODEL_API;
-    delete process.env.CRAFT_PI_MODEL_PROVIDER;
-    delete process.env.CRAFT_PI_MODEL_BASE_URL;
+    delete process.env.ZHANGYUGE_AGENT_PI_MODEL_API;
+    delete process.env.ZHANGYUGE_AGENT_PI_MODEL_PROVIDER;
+    delete process.env.ZHANGYUGE_AGENT_PI_MODEL_BASE_URL;
     return;
   }
 
-  process.env.CRAFT_PI_MODEL_API = model.api || '';
-  process.env.CRAFT_PI_MODEL_PROVIDER = model.provider || '';
-  process.env.CRAFT_PI_MODEL_BASE_URL = model.baseUrl || '';
+  process.env.ZHANGYUGE_AGENT_PI_MODEL_API = model.api || '';
+  process.env.ZHANGYUGE_AGENT_PI_MODEL_PROVIDER = model.provider || '';
+  process.env.ZHANGYUGE_AGENT_PI_MODEL_BASE_URL = model.baseUrl || '';
 
   debugLog(
-    `[interceptor-hint] api=${process.env.CRAFT_PI_MODEL_API || '-'} provider=${process.env.CRAFT_PI_MODEL_PROVIDER || '-'} baseUrl=${process.env.CRAFT_PI_MODEL_BASE_URL || '-'}`,
+    `[interceptor-hint] api=${process.env.ZHANGYUGE_AGENT_PI_MODEL_API || '-'} provider=${process.env.ZHANGYUGE_AGENT_PI_MODEL_PROVIDER || '-'} baseUrl=${process.env.ZHANGYUGE_AGENT_PI_MODEL_BASE_URL || '-'}`,
   );
 }
 
@@ -500,7 +500,7 @@ async function ensureSession(): Promise<AgentSession> {
     mkdirSync(agentDir, { recursive: true });
     sessionOptions.agentDir = agentDir;
 
-    // Session resume: use a per-Craft-session directory so the Pi SDK can
+    // Session resume: use a per-章鱼哥AI-session directory so the Pi SDK can
     // persist and resume its own session across subprocess restarts.
     // continueRecent() loads the existing session if one exists, otherwise
     // creates a new one — so this handles both first-run and resume.

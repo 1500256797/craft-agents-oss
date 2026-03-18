@@ -1,11 +1,11 @@
 {
-  "name": "@craft-agent/cli",
+  "name": "@zhangyuge-agent/cli",
   "version": "0.7.6",
-  "description": "Terminal client for Craft Agent server",
+  "description": "Terminal client for 章鱼哥AI server",
   "type": "module",
   "main": "src/index.ts",
   "bin": {
-    "craft-cli": "src/index.ts"
+    "zhangyuge-agent-cli": "src/index.ts"
   },
   "scripts": {
     "start": "bun run src/index.ts",
@@ -13,8 +13,8 @@
     "test": "bun test src/"
   },
   "dependencies": {
-    "@craft-agent/shared": "workspace:*",
-    "@craft-agent/server-core": "workspace:*"
+    "@zhangyuge-agent/shared": "workspace:*",
+    "@zhangyuge-agent/server-core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.8.2",

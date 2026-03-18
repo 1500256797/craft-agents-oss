@@ -139,7 +139,7 @@ function getProviderLabelFromType(providerType?: LlmProviderType, baseUrl?: stri
       case 'bedrock': return 'AWS Bedrock';
       case 'vertex': return 'Google Vertex AI';
       case 'pi':
-      case 'pi_compat': return 'Craft Agents Backend';
+      case 'pi_compat': return '章鱼哥AI Backend';
     }
   }
   // Fallback: derive from base URL or default
@@ -365,7 +365,7 @@ async function checkMcpConnectivity(mcpUrl: string): Promise<CheckResult> {
           detail: '✗ MCP server: Timeout',
           failCode: 'mcp_unreachable',
           failTitle: 'MCP Server Unreachable',
-          failMessage: 'Cannot connect to the Craft MCP server (timeout). Check your network connection.',
+          failMessage: 'Cannot connect to the 章鱼哥AI MCP server (timeout). Check your network connection.',
         };
       }
       const msg = fetchError instanceof Error ? fetchError.message : String(fetchError);
@@ -376,7 +376,7 @@ async function checkMcpConnectivity(mcpUrl: string): Promise<CheckResult> {
           detail: `✗ MCP server: Unreachable (${msg})`,
           failCode: 'mcp_unreachable',
           failTitle: 'MCP Server Unreachable',
-          failMessage: 'Cannot connect to the Craft MCP server. Check your network connection.',
+          failMessage: 'Cannot connect to the 章鱼哥AI MCP server. Check your network connection.',
         };
       }
       return { ok: true, detail: `✓ MCP server: Unknown (${msg})` };

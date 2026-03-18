@@ -1,8 +1,8 @@
 import type { HandlerDeps } from './handler-deps'
-import type { RpcServer } from '@craft-agent/server-core/transport'
+import type { RpcServer } from '@zhangyuge-agent/server-core/transport'
 
 // Core handlers are now in server-core
-import { registerCoreRpcHandlers } from '@craft-agent/server-core/handlers/rpc'
+import { registerCoreRpcHandlers } from '@zhangyuge-agent/server-core/handlers/rpc'
 export { registerCoreRpcHandlers }
 
 // GUI-only handlers remain local (Electron-specific imports)

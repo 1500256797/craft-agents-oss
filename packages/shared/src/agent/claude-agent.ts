@@ -10,7 +10,7 @@ import { z } from 'zod';
 import { getSystemPrompt } from '../prompts/system.ts';
 import { BaseAgent, type MiniAgentConfig, MINI_AGENT_TOOLS, MINI_AGENT_MCP_KEYS } from './base-agent.ts';
 import type { BackendConfig, PostInitResult, PermissionRequestType, SdkMcpServerConfig } from './backend/types.ts';
-// Plan types are used by UI components; not needed in craft-agent.ts since Safe Mode is user-controlled
+// Plan types are used by UI components; not needed in zhangyuge-agent.ts since Safe Mode is user-controlled
 import { parseError, type AgentError } from './errors.ts';
 import { runErrorDiagnostics } from './diagnostics.ts';
 import { loadStoredConfig, loadConfigDefaults, type Workspace, type AuthType, getDefaultLlmConnection, getLlmConnection } from '../config/storage.ts';
@@ -90,10 +90,10 @@ export {
   PERMISSION_MODE_ORDER,
   PERMISSION_MODE_CONFIG,
 } from './mode-manager.ts';
-// Documentation is served via local files at ~/.craft-agent/docs/
+// Documentation is served via local files at ~/.zhangyuge-agent/docs/
 
 // Import and re-export AgentEvent from core (single source of truth)
-import type { AgentEvent } from '@craft-agent/core/types';
+import type { AgentEvent } from '@zhangyuge-agent/core/types';
 export type { AgentEvent };
 
 // Stateless tool matching — pure functions for SDK message → AgentEvent conversion
@@ -774,11 +774,11 @@ export class ClaudeAgent extends BaseAgent {
       const fullMcpServers: Options['mcpServers'] = {
         // Session-scoped tools (SubmitPlan, source_test, update_user_preferences, transform_data, etc.)
         session: getSessionScopedTools(sessionId, this.workspaceRootPath),
-        // Craft Agents documentation - always available for searching setup guides
+        // 章鱼哥AI documentation - always available for searching setup guides
         // This is a public Mintlify MCP server, no auth needed
-        'craft-agents-docs': {
+        'zhangyuge-agent-docs': {
           type: 'http',
-          url: 'https://agents.craft.do/docs/mcp',
+          url: 'https://agents.zhangyuge-agent.local/docs/mcp',
         },
         // Per-source proxy servers from centralized MCP pool (MCP + API sources)
         // Each source gets its own SDK server keyed by slug (e.g., 'linear', 'github', 'gmail')
@@ -894,7 +894,7 @@ export class ClaudeAgent extends BaseAgent {
           // Build user-defined hooks from automations.json using the workspace-level AutomationSystem
           const userHooks: Partial<Record<string, SdkAutomationCallbackMatcher[]>> = this.automationSystem?.buildSdkHooks() ?? {};
           if (Object.keys(userHooks).length > 0) {
-            debug('[CraftAgent] User SDK hooks loaded:', Object.keys(userHooks).join(', '));
+            debug('[ZhangyugeAgent] User SDK hooks loaded:', Object.keys(userHooks).join(', '));
           }
 
           // Internal hooks for permission handling and logging
@@ -2582,13 +2582,12 @@ This is a branched conversation. All prior messages in this conversation are par
 }
 
 // ============================================================
-// Backward Compatibility Exports
+// Public Alias Exports
 // ============================================================
-// These aliases allow gradual migration from CraftAgent to ClaudeAgent.
-// Once all consumers are updated, these can be removed.
+// Expose project-facing aliases while keeping ClaudeAgent as the implementation.
 
 /** @deprecated Use ClaudeAgent instead */
-export { ClaudeAgent as CraftAgent };
+export { ClaudeAgent as ZhangyugeAgent };
 
 /** @deprecated Use ClaudeAgentConfig instead */
-export type { ClaudeAgentConfig as CraftAgentConfig };
+export type { ClaudeAgentConfig as ZhangyugeAgentConfig };

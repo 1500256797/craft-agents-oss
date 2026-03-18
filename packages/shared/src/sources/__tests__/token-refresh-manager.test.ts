@@ -373,16 +373,16 @@ describe('TokenRefreshManager', () => {
 
       const manager = new TokenRefreshManager(credManager);
       const source = createMockSource({
-        slug: 'craft-mcp',
+        slug: 'zhangyuge-mcp',
         type: 'mcp',
-        provider: 'craft',
-        mcp: { url: 'https://mcp.craft.do/my/mcp', authType: 'oauth' },
+        provider: 'zhangyuge',
+        mcp: { url: 'https://mcp.zhangyuge-agent.local/my/mcp', authType: 'oauth' },
         isAuthenticated: false,
       });
 
       const result = await manager.getSourcesNeedingRefresh([source]);
       expect(result.length).toBe(1);
-      expect(result[0]!.config.slug).toBe('craft-mcp');
+      expect(result[0]!.config.slug).toBe('zhangyuge-mcp');
     });
 
     test('excludes source without refresh token', async () => {
@@ -397,10 +397,10 @@ describe('TokenRefreshManager', () => {
 
       const manager = new TokenRefreshManager(credManager);
       const source = createMockSource({
-        slug: 'craft-mcp',
+        slug: 'zhangyuge-mcp',
         type: 'mcp',
-        provider: 'craft',
-        mcp: { url: 'https://mcp.craft.do/my/mcp', authType: 'oauth' },
+        provider: 'zhangyuge',
+        mcp: { url: 'https://mcp.zhangyuge-agent.local/my/mcp', authType: 'oauth' },
         isAuthenticated: false,
       });
 
@@ -423,10 +423,10 @@ describe('TokenRefreshManager', () => {
 
       const manager = new TokenRefreshManager(credManager);
       const source = createMockSource({
-        slug: 'craft-mcp',
+        slug: 'zhangyuge-mcp',
         type: 'mcp',
-        provider: 'craft',
-        mcp: { url: 'https://mcp.craft.do/my/mcp', authType: 'oauth' },
+        provider: 'zhangyuge',
+        mcp: { url: 'https://mcp.zhangyuge-agent.local/my/mcp', authType: 'oauth' },
         isAuthenticated: false,
         connectionStatus: 'needs_auth',
         connectionError: 'Token expired',
@@ -439,7 +439,7 @@ describe('TokenRefreshManager', () => {
       expect(isSourceUsable(source)).toBe(true);
       expect(source.config.connectionStatus).toBe('connected');
       expect(source.config.connectionError).toBeUndefined();
-      expect(mockMarkSourceAuthenticated).toHaveBeenCalledWith('/mock/workspace', 'craft-mcp');
+      expect(mockMarkSourceAuthenticated).toHaveBeenCalledWith('/mock/workspace', 'zhangyuge-mcp');
     });
 
     test('does NOT restore auth on failed refresh', async () => {
@@ -455,10 +455,10 @@ describe('TokenRefreshManager', () => {
 
       const manager = new TokenRefreshManager(credManager);
       const source = createMockSource({
-        slug: 'craft-mcp',
+        slug: 'zhangyuge-mcp',
         type: 'mcp',
-        provider: 'craft',
-        mcp: { url: 'https://mcp.craft.do/my/mcp', authType: 'oauth' },
+        provider: 'zhangyuge',
+        mcp: { url: 'https://mcp.zhangyuge-agent.local/my/mcp', authType: 'oauth' },
         isAuthenticated: false,
         connectionStatus: 'needs_auth',
       });
@@ -486,10 +486,10 @@ describe('TokenRefreshManager', () => {
 
       const manager = new TokenRefreshManager(credManager);
       const source = createMockSource({
-        slug: 'craft-mcp',
+        slug: 'zhangyuge-mcp',
         type: 'mcp',
-        provider: 'craft',
-        mcp: { url: 'https://mcp.craft.do/my/mcp', authType: 'oauth' },
+        provider: 'zhangyuge',
+        mcp: { url: 'https://mcp.zhangyuge-agent.local/my/mcp', authType: 'oauth' },
         isAuthenticated: false,
         connectionStatus: 'needs_auth',
         connectionError: 'Token expired',
@@ -508,7 +508,7 @@ describe('TokenRefreshManager', () => {
       expect(isSourceUsable(source)).toBe(true);
       expect(source.config.connectionStatus).toBe('connected');
       expect(source.config.connectionError).toBeUndefined();
-      expect(mockMarkSourceAuthenticated).toHaveBeenCalledWith('/mock/workspace', 'craft-mcp');
+      expect(mockMarkSourceAuthenticated).toHaveBeenCalledWith('/mock/workspace', 'zhangyuge-mcp');
     });
   });
 });

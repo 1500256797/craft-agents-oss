@@ -209,7 +209,7 @@ export function validateAutomationsContent(jsonString: string, fileName?: string
               path: `automations.${event}[${i}].actions[${j}].url`,
               message: 'Webhook URL contains variable templates — will be validated at runtime after expansion',
               severity: 'warning',
-              suggestion: 'Ensure the referenced CRAFT_WH_* variables are set in your shell profile',
+              suggestion: 'Ensure the referenced ZHANGYUGE_AGENT_WH_* variables are set in your shell profile',
             });
           }
         }

@@ -31813,7 +31813,7 @@ var import_node_path2 = require("node:path");
 var import_node_os = require("node:os");
 async function handleConfigValidate(ctx, args) {
   const { target, sourceSlug } = args;
-  const craftAgentRoot = import_node_path2.join(import_node_os.homedir(), ".craft-agent");
+  const zhangyugeAgentRoot = import_node_path2.join(import_node_os.homedir(), ".zhangyuge-agent");
   if (ctx.validators) {
     try {
       let result;
@@ -31851,7 +31851,7 @@ async function handleConfigValidate(ctx, args) {
   }
   switch (target) {
     case "config": {
-      const result = validateJsonFileHasFields(import_node_path2.join(craftAgentRoot, "config.json"), ["workspaces"]);
+      const result = validateJsonFileHasFields(import_node_path2.join(zhangyugeAgentRoot, "config.json"), ["workspaces"]);
       return successResponse(formatValidationResult(result));
     }
     case "sources": {
@@ -31888,7 +31888,7 @@ async function handleConfigValidate(ctx, args) {
       return successResponse(formatValidationResult(result));
     }
     case "preferences": {
-      const result = validateJsonFileHasFields(import_node_path2.join(craftAgentRoot, "preferences.json"), []);
+      const result = validateJsonFileHasFields(import_node_path2.join(zhangyugeAgentRoot, "preferences.json"), []);
       return successResponse(formatValidationResult(result));
     }
     case "permissions": {
@@ -31900,12 +31900,12 @@ async function handleConfigValidate(ctx, args) {
       return successResponse(formatValidationResult(result));
     }
     case "tool-icons": {
-      const result = validateJsonFileHasFields(import_node_path2.join(craftAgentRoot, "tool-icons", "tool-icons.json"), ["version", "tools"]);
+      const result = validateJsonFileHasFields(import_node_path2.join(zhangyugeAgentRoot, "tool-icons", "tool-icons.json"), ["version", "tools"]);
       return successResponse(formatValidationResult(result));
     }
     case "all": {
-      const configResult = validateJsonFileHasFields(import_node_path2.join(craftAgentRoot, "config.json"), ["workspaces"]);
-      const prefsResult = validateJsonFileHasFields(import_node_path2.join(craftAgentRoot, "preferences.json"), []);
+      const configResult = validateJsonFileHasFields(import_node_path2.join(zhangyugeAgentRoot, "config.json"), ["workspaces"]);
+      const prefsResult = validateJsonFileHasFields(import_node_path2.join(zhangyugeAgentRoot, "preferences.json"), []);
       const merged = mergeResults(configResult, prefsResult);
       return successResponse(formatValidationResult(merged));
     }
@@ -32346,7 +32346,7 @@ async function handleMermaidValidate(_ctx, args) {
         text: JSON.stringify({
           valid: false,
           error: errorMessage,
-          suggestion: "Check the syntax against ~/.craft-agent/docs/mermaid.md"
+          suggestion: "Check the syntax against ~/.zhangyuge-agent/docs/mermaid.md"
         }, null, 2)
       }],
       isError: true
@@ -33357,10 +33357,10 @@ The plan will be displayed to the user in a special formatted view.
     },
     {
       name: "config_validate",
-      description: `Validate Craft Agent configuration files.
+      description: `Validate 章鱼哥AI configuration files.
 
 **Targets:**
-- config: Validates ~/.craft-agent/config.json
+- config: Validates ~/.zhangyuge-agent/config.json
 - sources: Validates source config.json files
 - statuses: Validates statuses config
 - preferences: Validates preferences.json
@@ -33404,7 +33404,7 @@ Checks slug format, SKILL.md existence, YAML frontmatter, and required fields.`,
       description: `Validate Mermaid diagram syntax before outputting.
 
 Use this when creating complex diagrams or debugging syntax issues.
-Uses @craft-agent/mermaid parser for accurate validation.`,
+Uses @zhangyuge-agent/mermaid parser for accurate validation.`,
       inputSchema: {
         type: "object",
         properties: {
@@ -33672,7 +33672,7 @@ async function main() {
   };
   const ctx = createCodexContext(config2);
   const server = new Server({
-    name: "craft-agent-session",
+    name: "zhangyuge-agent-session",
     version: "0.3.1"
   }, {
     capabilities: {

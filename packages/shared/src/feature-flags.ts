@@ -18,7 +18,7 @@ function parseBooleanEnv(value: string | undefined): boolean | undefined {
  */
 export function isDevRuntime(): boolean {
   const nodeEnv = (process.env.NODE_ENV || '').toLowerCase();
-  return nodeEnv === 'development' || nodeEnv === 'dev' || process.env.CRAFT_DEBUG === '1';
+  return nodeEnv === 'development' || nodeEnv === 'dev' || process.env.ZHANGYUGE_AGENT_DEBUG === '1';
 }
 
 /**
@@ -26,18 +26,18 @@ export function isDevRuntime(): boolean {
  * Explicit env override has precedence over dev-runtime defaults.
  */
 export function isDeveloperFeedbackEnabled(): boolean {
-  const override = parseBooleanEnv(process.env.CRAFT_FEATURE_DEVELOPER_FEEDBACK);
+  const override = parseBooleanEnv(process.env.ZHANGYUGE_AGENT_FEATURE_DEVELOPER_FEEDBACK);
   if (override !== undefined) return override;
   return isDevRuntime();
 }
 
 /**
- * Runtime-evaluated check for craft-agents-cli integration.
+ * Runtime-evaluated check for zhangyuge-agent-cli integration.
  *
- * Defaults to disabled. Override with CRAFT_FEATURE_CRAFT_AGENTS_CLI=1|0.
+ * Defaults to disabled. Override with ZHANGYUGE_AGENT_FEATURE_CLI=1|0.
  */
-export function isCraftAgentsCliEnabled(): boolean {
-  const override = parseBooleanEnv(process.env.CRAFT_FEATURE_CRAFT_AGENTS_CLI);
+export function isZhangyugeAgentCliEnabled(): boolean {
+  const override = parseBooleanEnv(process.env.ZHANGYUGE_AGENT_FEATURE_CLI);
   if (override !== undefined) return override;
   return false;
 }
@@ -49,17 +49,17 @@ export const FEATURE_FLAGS = {
    * Enable agent developer feedback tool.
    *
    * Defaults to enabled in explicit development runtimes; disabled otherwise.
-   * Override with CRAFT_FEATURE_DEVELOPER_FEEDBACK=1|0.
+   * Override with ZHANGYUGE_AGENT_FEATURE_DEVELOPER_FEEDBACK=1|0.
    */
   get developerFeedback(): boolean {
     return isDeveloperFeedbackEnabled();
   },
   /**
-   * Enable craft-agent CLI guidance and guardrails.
+   * Enable zhangyuge-agent CLI guidance and guardrails.
    *
-   * Defaults to disabled. Override with CRAFT_FEATURE_CRAFT_AGENTS_CLI=1|0.
+   * Defaults to disabled. Override with ZHANGYUGE_AGENT_FEATURE_CLI=1|0.
    */
-  get craftAgentsCli(): boolean {
-    return isCraftAgentsCliEnabled();
+  get zhangyugeAgentCli(): boolean {
+    return isZhangyugeAgentCliEnabled();
   },
 } as const;

@@ -1,20 +1,20 @@
 import { readFile, writeFile, unlink, mkdir, readdir } from 'fs/promises'
 import { join } from 'path'
 import { randomUUID } from 'crypto'
-import { RPC_CHANNELS, type FileAttachment } from '@craft-agent/shared/protocol'
-import type { StoredAttachment } from '@craft-agent/core/types'
-import { readFileAttachment, validateImageForClaudeAPI, IMAGE_LIMITS } from '@craft-agent/shared/utils'
-import { getSessionAttachmentsPath, validateSessionId } from '@craft-agent/shared/sessions'
-import { getWorkspaceByNameOrId } from '@craft-agent/shared/config'
-import { resizeImageForAPI, getImageSize } from '@craft-agent/server-core/services'
-import { sanitizeFilename, validateFilePath } from '@craft-agent/server-core/handlers'
+import { RPC_CHANNELS, type FileAttachment } from '@zhangyuge-agent/shared/protocol'
+import type { StoredAttachment } from '@zhangyuge-agent/core/types'
+import { readFileAttachment, validateImageForClaudeAPI, IMAGE_LIMITS } from '@zhangyuge-agent/shared/utils'
+import { getSessionAttachmentsPath, validateSessionId } from '@zhangyuge-agent/shared/sessions'
+import { getWorkspaceByNameOrId } from '@zhangyuge-agent/shared/config'
+import { resizeImageForAPI, getImageSize } from '@zhangyuge-agent/server-core/services'
+import { sanitizeFilename, validateFilePath } from '@zhangyuge-agent/server-core/handlers'
 import { MarkItDown } from 'markitdown-js'
-import type { RpcServer } from '@craft-agent/server-core/transport'
+import type { RpcServer } from '@zhangyuge-agent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
-import { requestClientOpenFileDialog } from '@craft-agent/server-core/transport'
+import { requestClientOpenFileDialog } from '@zhangyuge-agent/server-core/transport'
 
 // Re-export from server-core for backward compatibility
-export { sanitizeFilename, validateFilePath } from '@craft-agent/server-core/handlers'
+export { sanitizeFilename, validateFilePath } from '@zhangyuge-agent/server-core/handlers'
 
 export const HANDLED_CHANNELS = [
   RPC_CHANNELS.file.READ,

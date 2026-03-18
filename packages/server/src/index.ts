@@ -1,54 +1,54 @@
 #!/usr/bin/env bun
 /**
- * @craft-agent/server — standalone headless Craft Agent server.
+ * @zhangyuge-agent/server — standalone headless 章鱼哥AI server.
  *
  * Usage:
- *   CRAFT_SERVER_TOKEN=<secret> bun run packages/server/src/index.ts
+ *   ZHANGYUGE_AGENT_SERVER_TOKEN=<secret> bun run packages/server/src/index.ts
  *
  * Environment:
- *   CRAFT_SERVER_TOKEN   — required bearer token for client auth
- *   CRAFT_RPC_HOST       — bind address (default: 127.0.0.1)
- *   CRAFT_RPC_PORT       — bind port (default: 9100)
- *   CRAFT_RPC_TLS_CERT   — path to PEM certificate file (enables TLS/wss)
- *   CRAFT_RPC_TLS_KEY    — path to PEM private key file (required with cert)
- *   CRAFT_RPC_TLS_CA     — path to PEM CA chain file (optional)
- *   CRAFT_APP_ROOT       — app root path (default: cwd)
- *   CRAFT_RESOURCES_PATH — resources path (default: cwd/resources)
- *   CRAFT_IS_PACKAGED    — 'true' for production (default: false)
- *   CRAFT_VERSION        — app version (default: 0.0.0-dev)
- *   CRAFT_DEBUG          — 'true' for debug logging
+ *   ZHANGYUGE_AGENT_SERVER_TOKEN   — required bearer token for client auth
+ *   ZHANGYUGE_AGENT_RPC_HOST       — bind address (default: 127.0.0.1)
+ *   ZHANGYUGE_AGENT_RPC_PORT       — bind port (default: 9100)
+ *   ZHANGYUGE_AGENT_RPC_TLS_CERT   — path to PEM certificate file (enables TLS/wss)
+ *   ZHANGYUGE_AGENT_RPC_TLS_KEY    — path to PEM private key file (required with cert)
+ *   ZHANGYUGE_AGENT_RPC_TLS_CA     — path to PEM CA chain file (optional)
+ *   ZHANGYUGE_AGENT_APP_ROOT       — app root path (default: cwd)
+ *   ZHANGYUGE_AGENT_RESOURCES_PATH — resources path (default: cwd/resources)
+ *   ZHANGYUGE_AGENT_IS_PACKAGED    — 'true' for production (default: false)
+ *   ZHANGYUGE_AGENT_VERSION        — app version (default: 0.0.0-dev)
+ *   ZHANGYUGE_AGENT_DEBUG          — 'true' for debug logging
  */
 
 import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
-import { startHeadlessServer } from '@craft-agent/server-core/bootstrap'
-import type { WsRpcTlsOptions } from '@craft-agent/server-core/transport'
-import { registerCoreRpcHandlers, cleanupSessionFileWatchForClient } from '@craft-agent/server-core/handlers/rpc'
-import { SessionManager, setSessionPlatform, setSessionRuntimeHooks } from '@craft-agent/server-core/sessions'
-import { initModelRefreshService, setFetcherPlatform } from '@craft-agent/server-core/model-fetchers'
-import { setSearchPlatform, setImageProcessor } from '@craft-agent/server-core/services'
-import type { HandlerDeps } from '@craft-agent/server-core/handlers'
+import { startHeadlessServer } from '@zhangyuge-agent/server-core/bootstrap'
+import type { WsRpcTlsOptions } from '@zhangyuge-agent/server-core/transport'
+import { registerCoreRpcHandlers, cleanupSessionFileWatchForClient } from '@zhangyuge-agent/server-core/handlers/rpc'
+import { SessionManager, setSessionPlatform, setSessionRuntimeHooks } from '@zhangyuge-agent/server-core/sessions'
+import { initModelRefreshService, setFetcherPlatform } from '@zhangyuge-agent/server-core/model-fetchers'
+import { setSearchPlatform, setImageProcessor } from '@zhangyuge-agent/server-core/services'
+import type { HandlerDeps } from '@zhangyuge-agent/server-core/handlers'
 
-process.env.CRAFT_IS_PACKAGED ??= 'false'
+process.env.ZHANGYUGE_AGENT_IS_PACKAGED ??= 'false'
 
 // In dev (monorepo), bundled assets root is the repo root (4 levels up from this file).
-// In packaged mode, use CRAFT_BUNDLED_ASSETS_ROOT env or cwd.
-const bundledAssetsRoot = process.env.CRAFT_BUNDLED_ASSETS_ROOT
+// In packaged mode, use ZHANGYUGE_AGENT_BUNDLED_ASSETS_ROOT env or cwd.
+const bundledAssetsRoot = process.env.ZHANGYUGE_AGENT_BUNDLED_ASSETS_ROOT
   ?? join(import.meta.dir, '..', '..', '..', '..')
 
 // TLS configuration — when cert + key paths are provided, server listens on wss://
 let tls: WsRpcTlsOptions | undefined
-const tlsCertPath = process.env.CRAFT_RPC_TLS_CERT
-const tlsKeyPath = process.env.CRAFT_RPC_TLS_KEY
+const tlsCertPath = process.env.ZHANGYUGE_AGENT_RPC_TLS_CERT
+const tlsKeyPath = process.env.ZHANGYUGE_AGENT_RPC_TLS_KEY
 if (tlsCertPath || tlsKeyPath) {
   if (!tlsCertPath || !tlsKeyPath) {
-    console.error('TLS requires both CRAFT_RPC_TLS_CERT and CRAFT_RPC_TLS_KEY.')
+    console.error('TLS requires both ZHANGYUGE_AGENT_RPC_TLS_CERT and ZHANGYUGE_AGENT_RPC_TLS_KEY.')
     process.exit(1)
   }
   tls = {
     cert: readFileSync(tlsCertPath),
     key: readFileSync(tlsKeyPath),
-    ...(process.env.CRAFT_RPC_TLS_CA ? { ca: readFileSync(process.env.CRAFT_RPC_TLS_CA) } : {}),
+    ...(process.env.ZHANGYUGE_AGENT_RPC_TLS_CA ? { ca: readFileSync(process.env.ZHANGYUGE_AGENT_RPC_TLS_CA) } : {}),
   }
 }
 
@@ -71,7 +71,7 @@ const instance = await (async () => {
         setImageProcessor(platform.imageProcessor)
       },
       initModelRefreshService: () => initModelRefreshService(async (slug: string) => {
-        const { getCredentialManager } = await import('@craft-agent/shared/credentials')
+        const { getCredentialManager } = await import('@zhangyuge-agent/shared/credentials')
         const manager = getCredentialManager()
         const [apiKey, oauth] = await Promise.all([
           manager.getLlmApiKey(slug).catch(() => null),
@@ -112,8 +112,8 @@ const instance = await (async () => {
   }
 })()
 
-console.log(`CRAFT_SERVER_URL=${instance.protocol}://${instance.host}:${instance.port}`)
-console.log(`CRAFT_SERVER_TOKEN=${instance.token}`)
+console.log(`ZHANGYUGE_AGENT_SERVER_URL=${instance.protocol}://${instance.host}:${instance.port}`)
+console.log(`ZHANGYUGE_AGENT_SERVER_TOKEN=${instance.token}`)
 
 // Warn if binding to a non-localhost address without TLS — tokens would be sent in cleartext
 const isLocalBind = instance.host === '127.0.0.1' || instance.host === 'localhost' || instance.host === '::1'
@@ -121,7 +121,7 @@ if (!isLocalBind && instance.protocol === 'ws') {
   console.warn(
     '\n⚠️  WARNING: Server is listening on a network address without TLS.\n' +
     '   Authentication tokens will be sent in cleartext.\n' +
-    '   Set CRAFT_RPC_TLS_CERT and CRAFT_RPC_TLS_KEY to enable wss://.\n'
+    '   Set ZHANGYUGE_AGENT_RPC_TLS_CERT and ZHANGYUGE_AGENT_RPC_TLS_KEY to enable wss://.\n'
   )
 }
 

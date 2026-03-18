@@ -111,7 +111,7 @@ function getOpenaiPresets(t: (key: string) => string): Preset[] {
 
 function getPiPresets(t: (key: string) => string): Preset[] {
   return [
-    { key: 'pi', label: t('common.apiKeyInput.providers.craftAgentsBackend'), url: '' },
+    { key: 'pi', label: t('common.apiKeyInput.providers.zhangyugeAgentBackend'), url: '' },
     { key: 'openrouter', label: t('common.apiKeyInput.providers.openrouter'), url: 'https://openrouter.ai/api' },
     { key: 'custom', label: t('common.apiKeyInput.providers.custom'), url: '' },
   ]
@@ -127,9 +127,54 @@ function getGooglePresets(t: (key: string) => string): Preset[] {
 const PI_ONLY_PRESET_KEYS: ReadonlySet<string> = new Set(['minimax-global', 'minimax-cn'])
 
 const COMPAT_ANTHROPIC_DEFAULTS = 'claude-opus-4-6, claude-sonnet-4-6, claude-haiku-4-5'
-const COMPAT_OPENAI_DEFAULTS = 'openai/gpt-5.2-codex, openai/gpt-5.1-codex-mini'
+const COMPAT_OPENAI_DEFAULTS = 'gpt-5.4, gpt-5.2, gpt-5.1'
+const COMPAT_OPENAI_GATEWAY_DEFAULTS = 'openai/gpt-5.4, openai/gpt-5.2, openai/gpt-5.1'
+const COMPAT_GOOGLE_DEFAULTS = 'gemini-2.5-pro, gemini-2.5-flash, gemini-2.5-flash-lite'
 const COMPAT_MINIMAX_DEFAULTS = 'MiniMax-M2.5, MiniMax-M2.5-highspeed'
 const COMPAT_KIMI_DEFAULTS = 'k2p5, kimi-k2-thinking'
+const AUTO_MODEL_DEFAULTS = new Set([
+  COMPAT_ANTHROPIC_DEFAULTS,
+  COMPAT_OPENAI_DEFAULTS,
+  COMPAT_OPENAI_GATEWAY_DEFAULTS,
+  COMPAT_GOOGLE_DEFAULTS,
+  COMPAT_MINIMAX_DEFAULTS,
+  COMPAT_KIMI_DEFAULTS,
+])
+
+function getRecommendedModelDefaults(
+  presetKey: PresetKey,
+  providerType: 'anthropic' | 'openai' | 'pi' | 'google' | 'pi_api_key',
+  customApi: CustomEndpointApi,
+): string {
+  switch (presetKey) {
+    case 'anthropic':
+      return COMPAT_ANTHROPIC_DEFAULTS
+    case 'openai':
+    case 'openai-eu':
+    case 'openai-us':
+    case 'azure-openai-responses':
+      return COMPAT_OPENAI_DEFAULTS
+    case 'google':
+      return COMPAT_GOOGLE_DEFAULTS
+    case 'openrouter':
+    case 'vercel-ai-gateway':
+      return COMPAT_OPENAI_GATEWAY_DEFAULTS
+    case 'minimax-global':
+    case 'minimax-cn':
+      return COMPAT_MINIMAX_DEFAULTS
+    case 'kimi-coding':
+      return COMPAT_KIMI_DEFAULTS
+    case 'custom':
+      return customApi === 'anthropic-messages' ? COMPAT_ANTHROPIC_DEFAULTS : COMPAT_OPENAI_DEFAULTS
+    default:
+      return providerType === 'openai' ? COMPAT_OPENAI_DEFAULTS : COMPAT_ANTHROPIC_DEFAULTS
+  }
+}
+
+function shouldReplaceAutoModelDefaults(value: string): boolean {
+  const normalized = value.trim()
+  return !normalized || AUTO_MODEL_DEFAULTS.has(normalized)
+}
 
 function getPresetsForProvider(providerType: 'anthropic' | 'openai' | 'pi' | 'google' | 'pi_api_key', t: (key: string) => string): Preset[] {
   const anthropicPresets = getAnthropicPresets(t)
@@ -213,6 +258,7 @@ export function ApiKeyInput({
     : providerType === 'pi' ? 'pi-...'
     : providerType === 'openai' ? 'sk-...'
     : t('common.apiKeyInput.pasteKeyPlaceholder'))
+  const modelPlaceholder = getRecommendedModelDefaults(activePreset, providerType, customApi)
 
   // Fetch Pi SDK models when a provider is selected in pi_api_key flow.
   // Returns all models sorted by cost (expensive-first) for the searchable tier dropdowns.
@@ -248,6 +294,16 @@ export function ApiKeyInput({
   // Whether to show 3 tier dropdowns instead of text input
   const hasPiModels = isPiApiKeyFlow && piModels.length > 0 && !isDefaultProviderPreset && activePreset !== 'custom'
 
+  useEffect(() => {
+    if (activePreset !== 'custom' || isDefaultProviderPreset || hasPiModels) return
+
+    setConnectionDefaultModel((prev) => {
+      if (!shouldReplaceAutoModelDefaults(prev)) return prev
+      const next = getRecommendedModelDefaults('custom', providerType, customApi)
+      return prev === next ? prev : next
+    })
+  }, [activePreset, customApi, hasPiModels, isDefaultProviderPreset, providerType])
+
   const handlePresetSelect = (preset: Preset) => {
     setActivePreset(preset.key)
     if (preset.key !== 'custom') {
@@ -263,14 +319,20 @@ export function ApiKeyInput({
     // (Default provider presets hide the field entirely, others default to provider model IDs when empty)
     if (preset.key === 'ollama') {
       setConnectionDefaultModel('qwen3-coder')
-    } else if (preset.key === 'openrouter' || preset.key === 'vercel-ai-gateway') {
-      setConnectionDefaultModel(providerType === 'openai' ? COMPAT_OPENAI_DEFAULTS : COMPAT_ANTHROPIC_DEFAULTS)
-    } else if (preset.key === 'minimax-global' || preset.key === 'minimax-cn') {
-      setConnectionDefaultModel(COMPAT_MINIMAX_DEFAULTS)
-    } else if (preset.key === 'kimi-coding') {
-      setConnectionDefaultModel(COMPAT_KIMI_DEFAULTS)
-    } else if (preset.key === 'custom') {
-      setConnectionDefaultModel(providerType === 'openai' ? COMPAT_OPENAI_DEFAULTS : COMPAT_ANTHROPIC_DEFAULTS)
+    } else if (preset.key === 'custom'
+      || preset.key === 'openrouter'
+      || preset.key === 'vercel-ai-gateway'
+      || preset.key === 'minimax-global'
+      || preset.key === 'minimax-cn'
+      || preset.key === 'kimi-coding'
+      || preset.key === 'openai'
+      || preset.key === 'openai-eu'
+      || preset.key === 'openai-us'
+      || preset.key === 'azure-openai-responses'
+      || preset.key === 'google'
+      || preset.key === 'anthropic'
+    ) {
+      setConnectionDefaultModel(getRecommendedModelDefaults(preset.key, providerType, customApi))
     } else {
       setConnectionDefaultModel('')
     }
@@ -292,12 +354,21 @@ export function ApiKeyInput({
     if (!connectionDefaultModel.trim()) {
       if (presetKey === 'ollama') {
         setConnectionDefaultModel('qwen3-coder')
-      } else if (presetKey === 'minimax-global' || presetKey === 'minimax-cn') {
-        setConnectionDefaultModel(COMPAT_MINIMAX_DEFAULTS)
-      } else if (presetKey === 'kimi-coding') {
-        setConnectionDefaultModel(COMPAT_KIMI_DEFAULTS)
-      } else if (presetKey === 'openrouter' || presetKey === 'vercel-ai-gateway' || presetKey === 'custom') {
-        setConnectionDefaultModel(providerType === 'openai' ? COMPAT_OPENAI_DEFAULTS : COMPAT_ANTHROPIC_DEFAULTS)
+      } else if (
+        presetKey === 'anthropic'
+        || presetKey === 'openai'
+        || presetKey === 'openai-eu'
+        || presetKey === 'openai-us'
+        || presetKey === 'azure-openai-responses'
+        || presetKey === 'google'
+        || presetKey === 'openrouter'
+        || presetKey === 'vercel-ai-gateway'
+        || presetKey === 'minimax-global'
+        || presetKey === 'minimax-cn'
+        || presetKey === 'kimi-coding'
+        || presetKey === 'custom'
+      ) {
+        setConnectionDefaultModel(getRecommendedModelDefaults(presetKey, providerType, customApi))
       }
     }
   }
@@ -312,7 +383,7 @@ export function ApiKeyInput({
     // Pi API key flow with tier dropdowns — submit selected models
     if (hasPiModels) {
       if (!bestModel || !defaultModel || !cheapModel) {
-        setModelError('Please select a model for each tier.')
+        setModelError(t('common.apiKeyInput.tierSelectionRequiredError'))
         return
       }
       const models: string[] = [bestModel, defaultModel, cheapModel]
@@ -615,7 +686,7 @@ export function ApiKeyInput({
                 setConnectionDefaultModel(e.target.value)
                 setModelError(null)
               }}
-              placeholder={t('common.apiKeyInput.modelPlaceholder')}
+              placeholder={modelPlaceholder || t('common.apiKeyInput.modelPlaceholder')}
               className="border-0 bg-transparent shadow-none"
               disabled={isDisabled}
             />

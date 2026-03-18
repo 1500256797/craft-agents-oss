@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 import { Key, Monitor } from "lucide-react"
-import { CraftAgentsSymbol } from "@/components/icons/CraftAgentsSymbol"
+import { ZhangyugeAgentSymbol } from "@/components/icons/ZhangyugeAgentSymbol"
 import { StepFormLayout } from "./primitives"
 import { useI18n } from "@/context/I18nContext"
 
@@ -71,7 +71,7 @@ export function ProviderSelectStep({ onSelect }: ProviderSelectStepProps) {
     <StepFormLayout
       iconElement={
         <div className="flex size-16 items-center justify-center">
-          <CraftAgentsSymbol className="size-10 text-accent" />
+          <ZhangyugeAgentSymbol className="size-10 text-accent" />
         </div>
       }
       title={t('onboarding.providerSelect.title')}

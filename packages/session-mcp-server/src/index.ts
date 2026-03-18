@@ -3,7 +3,7 @@
  * Session MCP Server
  *
  * This MCP server provides session-scoped tools to Codex via stdio transport.
- * It uses the shared handlers from @craft-agent/session-tools-core to ensure
+ * It uses the shared handlers from @zhangyuge-agent/session-tools-core to ensure
  * feature parity with Claude's session-scoped tools.
  *
  * Callback Communication:
@@ -17,7 +17,7 @@
  *
  * Arguments:
  *   --session-id: Unique session identifier
- *   --workspace-root: Path to workspace folder (~/.craft-agent/workspaces/{id})
+ *   --workspace-root: Path to workspace folder (~/.zhangyuge-agent/workspaces/{id})
  *   --plans-folder: Path to session's plans folder
  */
 
@@ -32,7 +32,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { isDeveloperFeedbackEnabled } from '@craft-agent/shared/feature-flags';
+import { isDeveloperFeedbackEnabled } from '@zhangyuge-agent/shared/feature-flags';
 // Import from session-tools-core
 import {
   type SessionToolContext,
@@ -47,7 +47,7 @@ import {
   // Helpers
   loadSourceConfig as loadSourceConfigFromHelpers,
   errorResponse,
-} from '@craft-agent/session-tools-core';
+} from '@zhangyuge-agent/session-tools-core';
 
 // ============================================================
 // Types
@@ -217,8 +217,8 @@ function createCodexContext(config: SessionConfig): SessionToolContext {
     // Preferences: write directly to preferences.json
     updatePreferences: (updates: Record<string, unknown>) => {
       // Resolve preferences path from config dir (parent of workspaces dir)
-      // workspaceRootPath = ~/.craft-agent/workspaces/{id}
-      // preferencesPath = ~/.craft-agent/preferences.json
+      // workspaceRootPath = ~/.zhangyuge-agent/workspaces/{id}
+      // preferencesPath = ~/.zhangyuge-agent/preferences.json
       const configDir = join(workspaceRootPath, '..', '..');
       const prefsPath = join(configDir, 'preferences.json');
       try {
@@ -242,7 +242,7 @@ function createCodexContext(config: SessionConfig): SessionToolContext {
 
     // Developer feedback: write one JSON file per entry to {configDir}/feedback/
     submitFeedback: (feedback) => {
-      const configDir = process.env.CRAFT_CONFIG_DIR || join(workspaceRootPath, '..', '..');
+      const configDir = process.env.ZHANGYUGE_AGENT_CONFIG_DIR || join(workspaceRootPath, '..', '..');
       const feedbackDir = join(configDir, 'feedback');
       mkdirSync(feedbackDir, { recursive: true });
       const filePath = join(feedbackDir, `${feedback.id}.json`);
@@ -269,23 +269,38 @@ function createSessionTools(includeDeveloperFeedback: boolean): Tool[] {
 }
 
 // ============================================================
-// Craft Agents Docs Upstream Proxy
+// 章鱼哥AI Docs Upstream Proxy
 // ============================================================
 
-const DOCS_MCP_URL = 'https://agents.craft.do/docs/mcp';
+const DOCS_MCP_URL = 'https://agents.zhangyuge-agent.local/docs/mcp';
 
 /** Cached upstream client + tool list */
 let docsClient: Client | null = null;
 let docsTools: Tool[] = [];
+const EXPOSED_DOCS_SEARCH_TOOL_NAME = 'SearchZhangyugeAgentDocs';
+
+function getPresentedDocsToolName(name: string): string {
+  return /^Search.+Agents$/.test(name) ? EXPOSED_DOCS_SEARCH_TOOL_NAME : name;
+}
+
+function getPresentedDocsTools(): Tool[] {
+  return docsTools.map(tool => ({ ...tool, name: getPresentedDocsToolName(tool.name) }));
+}
+
+function getUpstreamDocsToolName(name: string): string | null {
+  if (docsTools.some(tool => tool.name === name)) return name;
+  const matchingTool = docsTools.find(tool => getPresentedDocsToolName(tool.name) === name);
+  return matchingTool?.name ?? null;
+}
 
 /**
- * Connect to the craft-agents-docs MCP server and fetch its tool definitions.
+ * Connect to the zhangyuge-agent-docs MCP server and fetch its tool definitions.
  * Falls back gracefully if the server is unreachable (tools will just be empty).
  */
 async function connectDocsUpstream(): Promise<void> {
   try {
     const client = new Client(
-      { name: 'craft-agent-session-proxy', version: '1.0.0' },
+      { name: 'zhangyuge-agent-session-proxy', version: '1.0.0' },
       { capabilities: {} }
     );
 
@@ -296,9 +311,9 @@ async function connectDocsUpstream(): Promise<void> {
     docsTools = (result.tools || []) as Tool[];
     docsClient = client;
 
-    console.error(`Craft Agents Docs proxy connected: ${docsTools.length} tools`);
+    console.error(`章鱼哥AI Docs proxy connected: ${docsTools.length} tools`);
   } catch (err) {
-    console.error(`Craft Agents Docs proxy connection failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`);
+    console.error(`章鱼哥AI Docs proxy connection failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`);
     docsClient = null;
     docsTools = [];
   }
@@ -312,11 +327,16 @@ async function callDocsUpstream(
   args: Record<string, unknown>
 ): Promise<{ content: Array<{ type: 'text'; text: string }>; isError?: boolean }> {
   if (!docsClient) {
-    return errorResponse(`Craft Agents Docs server is not connected. Tool '${name}' unavailable.`);
+    return errorResponse(`章鱼哥AI Docs server is not connected. Tool '${name}' unavailable.`);
+  }
+
+  const upstreamName = getUpstreamDocsToolName(name);
+  if (!upstreamName) {
+    return errorResponse(`Unknown docs tool: ${name}`);
   }
 
   try {
-    const result = await docsClient.callTool({ name, arguments: args });
+    const result = await docsClient.callTool({ name: upstreamName, arguments: args });
     // Convert MCP result to our format
     const textContent = (result.content as Array<{ type: string; text?: string }> || [])
       .filter(c => c.type === 'text' && c.text)
@@ -333,7 +353,7 @@ async function callDocsUpstream(
 
 /** Check if a tool name belongs to the docs upstream */
 function isDocsUpstreamTool(name: string): boolean {
-  return docsTools.some(t => t.name === name);
+  return getUpstreamDocsToolName(name) !== null;
 }
 
 // ============================================================
@@ -365,7 +385,7 @@ async function handleCallLlm(
   }
 
   // Fallback path: HTTP callback to agent (for Copilot where PreToolUse doesn't fire for MCP tools).
-  // Uses callbackPort from CLI arg (--callback-port) or env var (CRAFT_LLM_CALLBACK_PORT).
+  // Uses callbackPort from CLI arg (--callback-port) or env var (ZHANGYUGE_AGENT_LLM_CALLBACK_PORT).
   if (config.callbackPort) {
     try {
       const resp = await fetch(`http://127.0.0.1:${config.callbackPort}/call-llm`, {
@@ -388,7 +408,7 @@ async function handleCallLlm(
 
   return errorResponse(
     'call_llm requires either PreToolUse intercept (_precomputedResult) or ' +
-    'HTTP callback (CRAFT_LLM_CALLBACK_PORT). Neither is available.'
+    'HTTP callback (ZHANGYUGE_AGENT_LLM_CALLBACK_PORT). Neither is available.'
   );
 }
 
@@ -441,7 +461,7 @@ async function handleSpawnSession(
 
   return errorResponse(
     'spawn_session requires either PreToolUse intercept (_precomputedResult) or ' +
-    'HTTP callback (CRAFT_LLM_CALLBACK_PORT). Neither is available.'
+    'HTTP callback (ZHANGYUGE_AGENT_LLM_CALLBACK_PORT). Neither is available.'
   );
 }
 
@@ -499,7 +519,7 @@ async function main() {
     workspaceRootPath,
     plansFolderPath,
     // CLI arg takes priority, env var as fallback (Copilot CLI may not forward env to subprocesses)
-    callbackPort: callbackPort || process.env.CRAFT_LLM_CALLBACK_PORT,
+    callbackPort: callbackPort || process.env.ZHANGYUGE_AGENT_LLM_CALLBACK_PORT,
   };
 
   // Create the Codex context
@@ -511,7 +531,7 @@ async function main() {
   // Create MCP server
   const server = new Server(
     {
-      name: 'craft-agent-session',
+      name: 'zhangyuge-agent-session',
       version: '0.3.1',
     },
     {
@@ -526,7 +546,7 @@ async function main() {
 
   // Handle tool listing — session tools + docs upstream tools
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: [...createSessionTools(includeDeveloperFeedback), ...docsTools],
+    tools: [...createSessionTools(includeDeveloperFeedback), ...getPresentedDocsTools()],
   }));
 
   // Handle tool calls — route via canonical registry, call_llm, or docs upstream

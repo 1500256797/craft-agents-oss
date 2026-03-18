@@ -23,10 +23,12 @@
     "noPropertyAccessFromIndexSignature": false,
     "baseUrl": ".",
     "paths": {
-      "@craft-agent/core": ["../core/src/index.ts"],
-      "@craft-agent/core/*": ["../core/src/*"],
-      "@craft-agent/shared": ["./src/index.ts"],
-      "@craft-agent/shared/*": ["./src/*"]
+      "@zhangyuge-agent/core": ["../core/src/index.ts"],
+      "@zhangyuge-agent/core/*": ["../core/src/*"],
+      "@zhangyuge-agent/session-tools-core": ["../session-tools-core/src/index.ts"],
+      "@zhangyuge-agent/session-tools-core/*": ["../session-tools-core/src/*"],
+      "@zhangyuge-agent/shared": ["./src/index.ts"],
+      "@zhangyuge-agent/shared/*": ["./src/*"]
     }
   },
   "include": ["src/**/*"],

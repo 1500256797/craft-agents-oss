@@ -43,7 +43,7 @@ describe('getTransportBannerCopy', () => {
   const mockT = (key: string, params?: any) => {
     const translations: Record<string, string> = {
       'common.banners.cannotConnectToRemote': 'Cannot connect to remote server',
-      'common.banners.authFailed': 'Authentication failed. Verify CRAFT_SERVER_TOKEN.',
+      'common.banners.authFailed': 'Authentication failed. Verify ZHANGYUGE_AGENT_SERVER_TOKEN.',
       'common.banners.reconnectingToRemote': 'Reconnecting to remote server',
       'common.banners.retryIn': `retry in ${params?.ms}ms`,
       'common.banners.attempt': `attempt ${params?.count}`,
@@ -58,7 +58,7 @@ describe('getTransportBannerCopy', () => {
     }), mockT)
 
     expect(copy.title).toContain('Cannot connect')
-    expect(copy.description).toContain('CRAFT_SERVER_TOKEN')
+    expect(copy.description).toContain('ZHANGYUGE_AGENT_SERVER_TOKEN')
     expect(copy.showRetry).toBe(true)
     expect(copy.tone).toBe('error')
   })

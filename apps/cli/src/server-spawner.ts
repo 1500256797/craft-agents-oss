@@ -1,8 +1,8 @@
 /**
- * Server spawner — start a headless Craft Agent server as a child process.
+ * Server spawner — start a headless 章鱼哥AI server as a child process.
  *
- * Spawns `bun run <serverEntry>`, reads stdout for the `CRAFT_SERVER_URL=`
- * and `CRAFT_SERVER_TOKEN=` lines, and returns a handle to stop the server.
+ * Spawns `bun run <serverEntry>`, reads stdout for the `ZHANGYUGE_AGENT_SERVER_URL=`
+ * and `ZHANGYUGE_AGENT_SERVER_TOKEN=` lines, and returns a handle to stop the server.
  */
 
 import { resolve, join } from 'node:path'
@@ -61,9 +61,9 @@ export async function spawnServer(opts?: SpawnServerOptions): Promise<SpawnedSer
     env: {
       ...process.env,
       ...opts?.env,
-      CRAFT_SERVER_TOKEN: token,
-      CRAFT_RPC_PORT: '0',
-      CRAFT_RPC_HOST: '127.0.0.1',
+      ZHANGYUGE_AGENT_SERVER_TOKEN: token,
+      ZHANGYUGE_AGENT_RPC_PORT: '0',
+      ZHANGYUGE_AGENT_RPC_HOST: '127.0.0.1',
     },
     stdout: 'pipe',
     stderr: 'pipe',
@@ -86,7 +86,7 @@ export async function spawnServer(opts?: SpawnServerOptions): Promise<SpawnedSer
     })()
   }
 
-  // Read stdout line by line looking for CRAFT_SERVER_URL=
+  // Read stdout line by line looking for ZHANGYUGE_AGENT_SERVER_URL=
   return new Promise<SpawnedServer>((resolve, reject) => {
     const timer = setTimeout(() => {
       proc.kill()
@@ -100,10 +100,10 @@ export async function spawnServer(opts?: SpawnServerOptions): Promise<SpawnedSer
       const lines = buffer.split('\n')
       buffer = lines.pop() ?? '' // keep incomplete last line in buffer
       for (const line of lines) {
-        if (line.startsWith('CRAFT_SERVER_URL=')) {
-          url = line.slice('CRAFT_SERVER_URL='.length).trim()
+        if (line.startsWith('ZHANGYUGE_AGENT_SERVER_URL=')) {
+          url = line.slice('ZHANGYUGE_AGENT_SERVER_URL='.length).trim()
         }
-        if (line.startsWith('CRAFT_SERVER_TOKEN=')) {
+        if (line.startsWith('ZHANGYUGE_AGENT_SERVER_TOKEN=')) {
           // Server echoes the token — we already have it but this confirms ready
         }
         // Once we have the URL, the server is ready
@@ -139,7 +139,7 @@ export async function spawnServer(opts?: SpawnServerOptions): Promise<SpawnedSer
       // If we get here without resolving, the process exited before printing the URL
       clearTimeout(timer)
       if (!url) {
-        reject(new Error('Server process exited before printing CRAFT_SERVER_URL'))
+        reject(new Error('Server process exited before printing ZHANGYUGE_AGENT_SERVER_URL'))
       }
     })()
   })

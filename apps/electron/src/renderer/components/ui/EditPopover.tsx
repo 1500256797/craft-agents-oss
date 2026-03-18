@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from 'motion/react' // motion used for backdr
 import { Popover, PopoverTrigger, PopoverContent } from './popover'
 import { Button } from './button'
 import { cn } from '@/lib/utils'
-import { usePlatform } from '@craft-agent/ui'
+import { usePlatform } from '@zhangyuge-agent/ui'
 import type { ContentBadge, Session, CreateSessionOptions } from '../../../shared/types'
 import { useActiveWorkspace, useAppShellContext, useSession } from '@/context/AppShellContext'
 import { useEscapeInterrupt } from '@/context/EscapeInterruptContext'
@@ -137,7 +137,7 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
       label: t('common.editPopover.configs.defaultPermissions.label'),
       filePath: location,
       context:
-        'The user is editing app-level default permissions (~/.craft-agent/permissions/default.json). ' +
+        'The user is editing app-level default permissions (~/.zhangyuge-agent/permissions/default.json). ' +
         'This file configures Explore mode rules that apply to ALL workspaces. ' +
         'It can contain: allowedBashPatterns, allowedMcpPatterns, allowedApiEndpoints, blockedTools, and allowedWritePaths. ' +
         'Each pattern can be a string or an object with pattern and comment fields. ' +
@@ -260,7 +260,7 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
       label: t('common.editPopover.configs.preferencesNotes.label'),
       filePath: location,
       context:
-        'The user is editing the notes field in their preferences (~/.craft-agent/preferences.json). ' +
+        'The user is editing the notes field in their preferences (~/.zhangyuge-agent/preferences.json). ' +
         'This is a JSON file. Only modify the "notes" field unless explicitly asked otherwise. ' +
         'The notes field is free-form text that provides context about the user to the AI. ' +
         'After editing, call config_validate with target "preferences" to verify the changes. ' +
@@ -281,7 +281,7 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
         'Sources can be MCP servers (HTTP/SSE or stdio), REST APIs, or local filesystems. ' +
         'Ask clarifying questions if needed: What service? MCP or API? Auth type? ' +
         'Create the source folder and config.json in the workspace sources directory. ' +
-        'Follow the patterns in ~/.craft-agent/docs/sources.md. ' +
+        'Follow the patterns in ~/.zhangyuge-agent/docs/sources.md. ' +
         'After creating the source, call source_test with the source slug to verify the configuration.',
     },
     example: t('common.editPopover.configs.addSource.example'),
@@ -298,7 +298,7 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
         'APIs connect to REST endpoints with authentication (bearer, header, basic, or query). ' +
         'Ask about the API endpoint URL and auth type. ' +
         'Create the source folder and config.json in the workspace sources directory. ' +
-        'Follow the patterns in ~/.craft-agent/docs/sources.md. ' +
+        'Follow the patterns in ~/.zhangyuge-agent/docs/sources.md. ' +
         'After creating the source, call source_test with the source slug to verify the configuration.',
     },
     example: t('common.editPopover.configs.addSourceApi.example'),
@@ -315,7 +315,7 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
         'MCP servers can use HTTP/SSE transport (remote) or stdio transport (local subprocess). ' +
         'Ask about the service they want to connect to and whether it\'s a remote URL or local command. ' +
         'Create the source folder and config.json in the workspace sources directory. ' +
-        'Follow the patterns in ~/.craft-agent/docs/sources.md. ' +
+        'Follow the patterns in ~/.zhangyuge-agent/docs/sources.md. ' +
         'After creating the source, call source_test with the source slug to verify the configuration.',
     },
     example: t('common.editPopover.configs.addSourceMcp.example'),
@@ -328,12 +328,12 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
       filePath: `${location}/sources/`,
       context:
         'The user wants to add a local folder source. ' +
-        'First, look up the guide: mcp__craft-agents-docs__SearchCraftAgents({ query: "filesystem" }). ' +
+        'First, look up the guide: mcp__zhangyuge-agent-docs__SearchZhangyugeAgentDocs({ query: "filesystem" }). ' +
         'Local folders are bookmarks - use type: "local" with a local.path field. ' +
         'They use existing Read, Write, Glob, Grep tools - no MCP server needed. ' +
         'If unclear, ask about the folder path they want to connect. ' +
         'Create the source folder and config.json in the workspace sources directory. ' +
-        'Follow the patterns in ~/.craft-agent/docs/sources.md. ' +
+        'Follow the patterns in ~/.zhangyuge-agent/docs/sources.md. ' +
         'After creating the source, call source_test with the source slug to verify the configuration.',
     },
     example: t('common.editPopover.configs.addSourceLocal.example'),
@@ -349,7 +349,7 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
         'Skills are specialized instructions with a SKILL.md file containing YAML frontmatter (name, description) and markdown instructions. ' +
         'Ask clarifying questions if needed: What should the skill do? When should it trigger? ' +
         'Create the skill folder and SKILL.md in the workspace skills directory. ' +
-        'Follow the patterns in ~/.craft-agent/docs/skills.md. ' +
+        'Follow the patterns in ~/.zhangyuge-agent/docs/skills.md. ' +
         'After creating the skill, call skill_validate with the skill slug to verify the SKILL.md file.',
     },
     example: t('common.editPopover.configs.addSkill.example'),
@@ -388,7 +388,7 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
         'Colors use EntityColor format: string shorthand (e.g. "blue") or { light, dark } object for theme-aware colors. ' +
         'Labels are color-only (no icons) — rendered as colored circles in the UI. ' +
         'Children form a recursive tree structure — array position determines display order. ' +
-        'Read ~/.craft-agent/docs/labels.md for full format reference. ' +
+        'Read ~/.zhangyuge-agent/docs/labels.md for full format reference. ' +
         'Confirm clearly when done.',
     },
     example: 'Add a "Bug" label with red color',
@@ -408,7 +408,7 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
         'Each rule has: pattern (regex with capture groups), flags (default "gi"), valueTemplate ($1/$2 substitution), description. ' +
         'Multiple rules on the same label = multiple ways to trigger. The "g" flag is always enforced. ' +
         'Avoid catastrophic backtracking patterns (e.g., (a+)+). ' +
-        'Read ~/.craft-agent/docs/labels.md for full format reference. ' +
+        'Read ~/.zhangyuge-agent/docs/labels.md for full format reference. ' +
         'Confirm clearly when done.',
     },
     example: t('common.editPopover.configs.editAutoRules.example'),
@@ -428,7 +428,7 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
         'Each label has: id (slug, globally unique), name (display), color (optional EntityColor), children (sub-labels array). ' +
         'Colors use EntityColor format: string shorthand (e.g. "blue") or { light, dark } object for theme-aware colors. ' +
         'Labels are color-only (no icons) — rendered as colored circles in the UI. ' +
-        'Read ~/.craft-agent/docs/labels.md for full format reference. ' +
+        'Read ~/.zhangyuge-agent/docs/labels.md for full format reference. ' +
         'Confirm clearly when done.',
     },
     example: t('common.editPopover.configs.addLabel.example'),
@@ -466,11 +466,11 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
       filePath: location,
       context:
         'The user wants to edit CLI tool icon mappings. ' +
-        'The file is tool-icons.json in ~/.craft-agent/tool-icons/. Icon image files live in the same directory. ' +
+        'The file is tool-icons.json in ~/.zhangyuge-agent/tool-icons/. Icon image files live in the same directory. ' +
         'Schema: { version: 1, tools: [{ id, displayName, icon, commands }] }. ' +
         'Each tool has: id (unique slug), displayName (shown in UI), icon (filename like "git.ico"), commands (array of CLI command names). ' +
         'Supported icon formats: .png, .ico, .svg, .jpg. Icons display at 20x20px. ' +
-        'Read ~/.craft-agent/docs/tool-icons.md for full format reference. ' +
+        'Read ~/.zhangyuge-agent/docs/tool-icons.md for full format reference. ' +
         'After editing, call config_validate with target "tool-icons" to verify the changes are valid. ' +
         'Confirm clearly when done.',
     },
@@ -488,7 +488,7 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
         'The user is editing automations.json which configures automations. ' +
         'Structure: { version: 2, automations: { EventName: [{ name?, matcher?, cron?, timezone?, permissionMode?, labels?, actions: [...] }] } }. ' +
         'Each event maps to an array of matcher entries. Each matcher has an actions array ({ type: "prompt", prompt }). ' +
-        'Read ~/.craft-agent/docs/automations.md for full format reference. ' +
+        'Read ~/.zhangyuge-agent/docs/automations.md for full format reference. ' +
         'After editing, confirm clearly what changed.',
     },
     example: t('common.editPopover.configs.automationConfig.example'),
@@ -920,7 +920,7 @@ export function EditPopover({
     const modelParam = model ? `&model=${encodeURIComponent(model)}` : ''
     const systemPromptParam = systemPromptPreset ? `&systemPrompt=${encodeURIComponent(systemPromptPreset)}` : ''
     // Navigate in same window by omitting window=focused parameter
-    const url = `craftagents://action/new-session?input=${encodedInput}&send=true&mode=${permissionMode}&badges=${encodedBadges}${workdirParam}${modelParam}${systemPromptParam}`
+    const url = `zhangyuge-agent://action/new-session?input=${encodedInput}&send=true&mode=${permissionMode}&badges=${encodedBadges}${workdirParam}${modelParam}${systemPromptParam}`
 
     window.electronAPI.openUrl(url)
     setOpen(false)

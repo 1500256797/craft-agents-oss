@@ -14,7 +14,7 @@ import { OnboardingWizard, ReauthScreen } from '@/components/onboarding'
 import { LoginScreen } from '@/components/auth/LoginScreen'
 import { ResetConfirmationDialog } from '@/components/ResetConfirmationDialog'
 import { SplashScreen } from '@/components/SplashScreen'
-import { TooltipProvider } from '@craft-agent/ui'
+import { TooltipProvider } from '@zhangyuge-agent/ui'
 import { FocusProvider } from '@/context/FocusContext'
 import { ModalProvider } from '@/context/ModalContext'
 import { DismissibleLayerProvider } from '@/context/DismissibleLayerContext'
@@ -26,7 +26,7 @@ import { useUpdateChecker } from '@/hooks/useUpdateChecker'
 import { NavigationProvider } from '@/contexts/NavigationContext'
 import { navigate, routes } from './lib/navigate'
 import { stripMarkdown } from './utils/text'
-import { extractWorkspaceSlugFromPath } from '@craft-agent/shared/utils/workspace-slug'
+import { extractWorkspaceSlugFromPath } from '@zhangyuge-agent/shared/utils/workspace-slug'
 import { initRendererPerf } from './lib/perf'
 import {
   initializeSessionsAtom,
@@ -53,7 +53,7 @@ import {
   CodePreviewOverlay,
   DocumentFormattedMarkdownOverlay,
   JSONPreviewOverlay,
-} from '@craft-agent/ui'
+} from '@zhangyuge-agent/ui'
 import { useLinkInterceptor, type FilePreviewState } from '@/hooks/useLinkInterceptor'
 import { useTransportConnectionState } from '@/hooks/useTransportConnectionState'
 import { TransportConnectionBanner, shouldShowTransportConnectionBanner } from '@/components/app-shell/TransportConnectionBanner'
@@ -615,7 +615,7 @@ export default function App() {
             handleInputChange(sessionId, restored)
             // handleInputChange updates the ref but ChatPage has local state.
             // Dispatch a custom event so ChatPage re-reads the draft.
-            window.dispatchEvent(new CustomEvent('craft:restore-input', {
+            window.dispatchEvent(new CustomEvent('zhangyuge-agent:restore-input', {
               detail: { sessionId, text: restored },
             }))
             break
@@ -686,7 +686,7 @@ export default function App() {
       // Note: markCompactionComplete is called on the backend (sessions.ts) to ensure
       // it happens even if CMD+R occurs during compaction
       if (event.type === 'info' && event.statusType === 'compaction_complete') {
-        window.dispatchEvent(new CustomEvent('craft:compaction-complete', {
+        window.dispatchEvent(new CustomEvent('zhangyuge-agent:compaction-complete', {
           detail: { sessionId }
         }))
       }
@@ -1484,7 +1484,7 @@ export default function App() {
     openNewChat,
   ])
 
-  // Platform actions for @craft-agent/ui components (overlays, etc.)
+  // Platform actions for @zhangyuge-agent/ui components (overlays, etc.)
   // Memoized to prevent re-renders when these callbacks don't change
   // NOTE: Must be defined before early returns to maintain consistent hook order
   const platformActions = useMemo(() => ({

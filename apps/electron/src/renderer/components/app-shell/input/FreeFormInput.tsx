@@ -12,10 +12,10 @@ import {
   AlertCircle,
   X,
 } from 'lucide-react'
-import { Icon_Home, Icon_Folder, Spinner } from '@craft-agent/ui'
+import { Icon_Home, Icon_Folder, Spinner } from '@zhangyuge-agent/ui'
 
 import * as storage from '@/lib/local-storage'
-import { extractWorkspaceSlugFromPath } from '@craft-agent/shared/utils/workspace-slug'
+import { extractWorkspaceSlugFromPath } from '@zhangyuge-agent/shared/utils/workspace-slug'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -33,10 +33,10 @@ import {
   InlineLabelMenu,
   useInlineLabelMenu,
 } from '@/components/ui/label-menu'
-import type { LabelConfig } from '@craft-agent/shared/labels'
+import type { LabelConfig } from '@zhangyuge-agent/shared/labels'
 import { parseMentions } from '@/lib/mentions'
 import { RichTextInput, type RichTextInputHandle } from '@/components/ui/rich-text-input'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@craft-agent/ui'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@zhangyuge-agent/ui'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -65,8 +65,8 @@ import { ConnectionIcon } from '@/components/icons/ConnectionIcon'
 import { FreeFormInputContextBadge } from './FreeFormInputContextBadge'
 import { useI18n } from '@/context/I18nContext'
 import type { FileAttachment, LoadedSource, LoadedSkill } from '../../../../shared/types'
-import type { PermissionMode } from '@craft-agent/shared/agent/modes'
-import { type ThinkingLevel, THINKING_LEVELS, getThinkingLevelName } from '@craft-agent/shared/agent/thinking-levels'
+import type { PermissionMode } from '@zhangyuge-agent/shared/agent/modes'
+import { type ThinkingLevel, THINKING_LEVELS, getThinkingLevelName } from '@zhangyuge-agent/shared/agent/thinking-levels'
 import { useEscapeInterrupt } from '@/context/EscapeInterruptContext'
 import { hasOpenOverlay } from '@/lib/overlay-detection'
 import { ToolbarStatusSlot } from './ToolbarStatusSlot'
@@ -360,7 +360,7 @@ export function FreeFormInput({
   const connectionsByProvider = React.useMemo(() => {
     const groups: Record<string, typeof llmConnections> = {
       [t('common.freeFormInput.providerGroups.anthropic')]: [],
-      [t('common.freeFormInput.providerGroups.craftAgentsBackend')]: [],
+      [t('common.freeFormInput.providerGroups.zhangyugeAgentBackend')]: [],
     }
     for (const conn of llmConnections) {
       const provider = conn.providerType || 'anthropic'
@@ -368,7 +368,7 @@ export function FreeFormInput({
       if (provider === 'anthropic' || provider === 'anthropic_compat' || provider === 'bedrock' || provider === 'vertex') {
         groups[t('common.freeFormInput.providerGroups.anthropic')].push(conn)
       } else if (provider === 'pi' || provider === 'pi_compat') {
-        groups[t('common.freeFormInput.providerGroups.craftAgentsBackend')].push(conn)
+        groups[t('common.freeFormInput.providerGroups.zhangyugeAgentBackend')].push(conn)
       }
     }
     // Return only non-empty groups
@@ -545,7 +545,7 @@ export function FreeFormInput({
   // Track last caret position for focus restoration (e.g., after permission mode popover closes)
   const lastCaretPositionRef = React.useRef<number | null>(null)
 
-  // Listen for craft:insert-text events (generic mechanism for inserting text into input)
+  // Listen for zhangyuge-agent:insert-text events (generic mechanism for inserting text into input)
   // Used by components that want to pre-fill the input with text
   React.useEffect(() => {
     const handleInsertText = (e: CustomEvent<{ text: string; sessionId?: string }>) => {
@@ -563,8 +563,8 @@ export function FreeFormInput({
       }, 0)
     }
 
-    window.addEventListener('craft:insert-text', handleInsertText as EventListener)
-    return () => window.removeEventListener('craft:insert-text', handleInsertText as EventListener)
+    window.addEventListener('zhangyuge-agent:insert-text', handleInsertText as EventListener)
+    return () => window.removeEventListener('zhangyuge-agent:insert-text', handleInsertText as EventListener)
   }, [sessionId, isFocusedPanel, syncToParent, richInputRef])
 
   const clearInputDraft = React.useCallback(() => {
@@ -587,7 +587,7 @@ export function FreeFormInput({
     source?: string
   }
 
-  // Listen for craft:approve-plan events (used by ResponseCard's Accept Plan button)
+  // Listen for zhangyuge-agent:approve-plan events (used by ResponseCard's Accept Plan button)
   // This disables safe mode AND submits the message in one action
   // Only process events for this session (sessionId must match)
   React.useEffect(() => {
@@ -613,11 +613,11 @@ export function FreeFormInput({
       onSubmit(text, undefined)
     }
 
-    window.addEventListener('craft:approve-plan', handleApprovePlan as EventListener)
-    return () => window.removeEventListener('craft:approve-plan', handleApprovePlan as EventListener)
+    window.addEventListener('zhangyuge-agent:approve-plan', handleApprovePlan as EventListener)
+    return () => window.removeEventListener('zhangyuge-agent:approve-plan', handleApprovePlan as EventListener)
   }, [sessionId, permissionMode, onPermissionModeChange, onSubmit, consumeInputDraftSnapshot])
 
-  // Listen for craft:approve-plan-with-compact events (Accept & Compact option)
+  // Listen for zhangyuge-agent:approve-plan-with-compact events (Accept & Compact option)
   // This compacts the conversation first, then executes the plan.
   // The pending state is persisted to survive page reloads (CMD+R).
   React.useEffect(() => {
@@ -658,7 +658,7 @@ export function FreeFormInput({
         }
 
         // Remove the listener (one-time use)
-        window.removeEventListener('craft:compaction-complete', handleCompactionComplete as unknown as EventListener)
+        window.removeEventListener('zhangyuge-agent:compaction-complete', handleCompactionComplete as unknown as EventListener)
 
         const executionMessage = buildPlanApprovalMessage({
           planPath,
@@ -674,11 +674,11 @@ export function FreeFormInput({
         }
       }
 
-      window.addEventListener('craft:compaction-complete', handleCompactionComplete as unknown as EventListener)
+      window.addEventListener('zhangyuge-agent:compaction-complete', handleCompactionComplete as unknown as EventListener)
     }
 
-    window.addEventListener('craft:approve-plan-with-compact', handleApprovePlanWithCompact as unknown as EventListener)
-    return () => window.removeEventListener('craft:approve-plan-with-compact', handleApprovePlanWithCompact as unknown as EventListener)
+    window.addEventListener('zhangyuge-agent:approve-plan-with-compact', handleApprovePlanWithCompact as unknown as EventListener)
+    return () => window.removeEventListener('zhangyuge-agent:approve-plan-with-compact', handleApprovePlanWithCompact as unknown as EventListener)
   }, [sessionId, permissionMode, onPermissionModeChange, onSubmit, consumeInputDraftSnapshot])
 
   // Reload recovery: Check for pending plan execution on mount.
@@ -722,13 +722,13 @@ export function FreeFormInput({
       executePendingPlan()
     }
 
-    window.addEventListener('craft:compaction-complete', handleCompactionComplete as unknown as EventListener)
+    window.addEventListener('zhangyuge-agent:compaction-complete', handleCompactionComplete as unknown as EventListener)
     return () => {
-      window.removeEventListener('craft:compaction-complete', handleCompactionComplete as unknown as EventListener)
+      window.removeEventListener('zhangyuge-agent:compaction-complete', handleCompactionComplete as unknown as EventListener)
     }
   }, [sessionId, onSubmit])
 
-  // Listen for craft:focus-input events (restore focus after popover/dropdown closes)
+  // Listen for zhangyuge-agent:focus-input events (restore focus after popover/dropdown closes)
   React.useEffect(() => {
     const handleFocusInput = (e: Event) => {
       const detail = (e as CustomEvent<{ sessionId?: string }>).detail
@@ -750,8 +750,8 @@ export function FreeFormInput({
       }
     }
 
-    window.addEventListener('craft:focus-input', handleFocusInput)
-    return () => window.removeEventListener('craft:focus-input', handleFocusInput)
+    window.addEventListener('zhangyuge-agent:focus-input', handleFocusInput)
+    return () => window.removeEventListener('zhangyuge-agent:focus-input', handleFocusInput)
   }, [sessionId, isFocusedPanel, richInputRef])
 
   // Recover queued focus requests after session switch/mount races.
@@ -779,7 +779,7 @@ export function FreeFormInput({
     return maxNum + 1
   }
 
-  // Listen for craft:paste-files events (for global paste when input not focused)
+  // Listen for zhangyuge-agent:paste-files events (for global paste when input not focused)
   React.useEffect(() => {
     const handlePasteFiles = async (e: CustomEvent<{ files: File[]; sessionId?: string }>) => {
       if (disabled) return
@@ -818,8 +818,8 @@ export function FreeFormInput({
       richInputRef.current?.focus()
     }
 
-    window.addEventListener('craft:paste-files', handlePasteFiles as unknown as EventListener)
-    return () => window.removeEventListener('craft:paste-files', handlePasteFiles as unknown as EventListener)
+    window.addEventListener('zhangyuge-agent:paste-files', handlePasteFiles as unknown as EventListener)
+    return () => window.removeEventListener('zhangyuge-agent:paste-files', handlePasteFiles as unknown as EventListener)
   }, [disabled, sessionId, isFocusedPanel, richInputRef])
 
   // Build active commands list for slash command menu
@@ -1180,7 +1180,7 @@ export function FreeFormInput({
     return true
   }, [input, attachments, followUpItems, disabled, disableSend, onInputChange, onSubmit, skills, sources, optimisticSourceSlugs, onSourcesChange, onWorkingDirectoryChange, homeDir])
 
-  // Listen for craft:submit-input events (simulate pressing the Send button)
+  // Listen for zhangyuge-agent:submit-input events (simulate pressing the Send button)
   React.useEffect(() => {
     const handleSubmitInput = (e: CustomEvent<{ sessionId?: string }>) => {
       const targetSessionId = e.detail?.sessionId
@@ -1188,8 +1188,8 @@ export function FreeFormInput({
       submitMessage()
     }
 
-    window.addEventListener('craft:submit-input', handleSubmitInput as EventListener)
-    return () => window.removeEventListener('craft:submit-input', handleSubmitInput as EventListener)
+    window.addEventListener('zhangyuge-agent:submit-input', handleSubmitInput as EventListener)
+    return () => window.removeEventListener('zhangyuge-agent:submit-input', handleSubmitInput as EventListener)
   }, [sessionId, isFocusedPanel, submitMessage])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -1602,7 +1602,7 @@ export function FreeFormInput({
           onLongTextPaste={handleLongTextPaste}
           onFocus={() => { setIsFocused(true); onFocusChange?.(true) }}
           onBlur={() => {
-            // Save caret position before losing focus (for restoration via craft:focus-input)
+            // Save caret position before losing focus (for restoration via zhangyuge-agent:focus-input)
             lastCaretPositionRef.current = richInputRef.current?.selectionStart ?? null
             setIsFocused(false)
             onFocusChange?.(false)

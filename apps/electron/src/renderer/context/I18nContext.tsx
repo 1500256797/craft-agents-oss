@@ -1,5 +1,5 @@
 import * as React from 'react'
-import type { ResolvedUiLanguage, UiLanguage } from '@craft-agent/shared/config'
+import type { ResolvedUiLanguage, UiLanguage } from '@zhangyuge-agent/shared/config'
 import { resolveUiLanguage, translateUi } from '../../shared/i18n'
 
 type TranslationParams = Record<string, string | number>

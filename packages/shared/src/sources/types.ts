@@ -5,7 +5,7 @@
  * They replace the old "connections" concept with a more flexible, folder-based architecture.
  *
  * File structure:
- * ~/.craft-agent/workspaces/{workspaceId}/sources/{sourceSlug}/
+ * ~/.zhangyuge-agent/workspaces/{workspaceId}/sources/{sourceSlug}/
  *   ├── config.json   - Source settings
  *   └── guide.md      - Usage guidelines + cached data (in YAML frontmatter)
  */
@@ -412,7 +412,7 @@ export interface LoadedSource {
   /** Absolute path to source folder (for resolving relative icon paths) */
   folderPath: string;
 
-  /** Absolute path to workspace folder (e.g., ~/.craft-agent/workspaces/xxx) */
+  /** Absolute path to workspace folder (e.g., ~/.zhangyuge-agent/workspaces/xxx) */
   workspaceRootPath: string;
 
   /**
@@ -422,7 +422,7 @@ export interface LoadedSource {
   workspaceId: string;
 
   /**
-   * Whether this is a built-in source (e.g., craft-agents-docs).
+   * Whether this is a built-in source (e.g., zhangyuge-agent-docs).
    * Built-in sources are always available and not shown in the sources UI.
    */
   isBuiltin?: boolean;

@@ -3,7 +3,7 @@
   "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "craft-agent",
+      "name": "zhangyuge-agent",
       "dependencies": {
         "@anthropic-ai/claude-agent-sdk": "^0.2.72",
         "@dnd-kit/dom": "^0.4.0-beta-20260227032529",
@@ -103,14 +103,14 @@
       },
     },
     "apps/cli": {
-      "name": "@craft-agent/cli",
+      "name": "@zhangyuge-agent/cli",
       "version": "0.7.6",
       "bin": {
-        "craft-cli": "src/index.ts",
+        "zhangyuge-agent-cli": "src/index.ts",
       },
       "dependencies": {
-        "@craft-agent/server-core": "workspace:*",
-        "@craft-agent/shared": "workspace:*",
+        "@zhangyuge-agent/server-core": "workspace:*",
+        "@zhangyuge-agent/shared": "workspace:*",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -119,13 +119,13 @@
       },
     },
     "apps/electron": {
-      "name": "@craft-agent/electron",
+      "name": "@zhangyuge-agent/electron",
       "version": "0.7.6",
       "dependencies": {
-        "@craft-agent/core": "workspace:*",
-        "@craft-agent/server-core": "workspace:*",
-        "@craft-agent/shared": "workspace:*",
-        "@craft-agent/ui": "workspace:*",
+        "@zhangyuge-agent/core": "workspace:*",
+        "@zhangyuge-agent/server-core": "workspace:*",
+        "@zhangyuge-agent/shared": "workspace:*",
+        "@zhangyuge-agent/ui": "workspace:*",
         "@dnd-kit/core": "^6.3.1",
         "@dnd-kit/sortable": "^10.0.0",
         "@dnd-kit/utilities": "^3.2.2",
@@ -163,11 +163,11 @@
       },
     },
     "apps/viewer": {
-      "name": "@craft-agent/viewer",
+      "name": "@zhangyuge-agent/viewer",
       "version": "0.7.6",
       "dependencies": {
-        "@craft-agent/core": "workspace:*",
-        "@craft-agent/ui": "workspace:*",
+        "@zhangyuge-agent/core": "workspace:*",
+        "@zhangyuge-agent/ui": "workspace:*",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
       },
@@ -190,7 +190,7 @@
       },
     },
     "packages/core": {
-      "name": "@craft-agent/core",
+      "name": "@zhangyuge-agent/core",
       "version": "0.7.6",
       "devDependencies": {
         "@types/uuid": "^11.0.0",
@@ -201,7 +201,7 @@
       },
     },
     "packages/pi-agent-server": {
-      "name": "@craft-agent/pi-agent-server",
+      "name": "@zhangyuge-agent/pi-agent-server",
       "version": "0.7.6",
       "bin": {
         "pi-agent-server": "./dist/index.js",
@@ -221,15 +221,15 @@
       },
     },
     "packages/server": {
-      "name": "@craft-agent/server",
+      "name": "@zhangyuge-agent/server",
       "version": "0.7.6",
       "bin": {
-        "craft-server": "src/index.ts",
+        "zhangyuge-agent-server": "src/index.ts",
       },
       "dependencies": {
-        "@craft-agent/core": "workspace:*",
-        "@craft-agent/server-core": "workspace:*",
-        "@craft-agent/shared": "workspace:*",
+        "@zhangyuge-agent/core": "workspace:*",
+        "@zhangyuge-agent/server-core": "workspace:*",
+        "@zhangyuge-agent/shared": "workspace:*",
       },
       "devDependencies": {
         "@types/node": "^22.0.0",
@@ -237,11 +237,11 @@
       },
     },
     "packages/server-core": {
-      "name": "@craft-agent/server-core",
+      "name": "@zhangyuge-agent/server-core",
       "version": "0.7.6",
       "dependencies": {
-        "@craft-agent/core": "workspace:*",
-        "@craft-agent/shared": "workspace:*",
+        "@zhangyuge-agent/core": "workspace:*",
+        "@zhangyuge-agent/shared": "workspace:*",
         "@mariozechner/pi-ai": "0.56.2",
         "sharp": "0.34.5",
         "ws": "^8.19.0",
@@ -252,14 +252,14 @@
       },
     },
     "packages/session-mcp-server": {
-      "name": "@craft-agent/session-mcp-server",
+      "name": "@zhangyuge-agent/session-mcp-server",
       "version": "0.7.6",
       "bin": {
         "session-mcp-server": "./dist/index.js",
       },
       "dependencies": {
-        "@craft-agent/session-tools-core": "workspace:*",
-        "@craft-agent/shared": "workspace:*",
+        "@zhangyuge-agent/session-tools-core": "workspace:*",
+        "@zhangyuge-agent/shared": "workspace:*",
         "@modelcontextprotocol/sdk": "^1.11.0",
         "zod": "^3.23.0",
       },
@@ -268,7 +268,7 @@
       },
     },
     "packages/session-tools-core": {
-      "name": "@craft-agent/session-tools-core",
+      "name": "@zhangyuge-agent/session-tools-core",
       "version": "0.7.6",
       "dependencies": {
         "beautiful-mermaid": "*",
@@ -281,11 +281,11 @@
       },
     },
     "packages/shared": {
-      "name": "@craft-agent/shared",
+      "name": "@zhangyuge-agent/shared",
       "version": "0.7.6",
       "dependencies": {
-        "@craft-agent/core": "workspace:*",
-        "@craft-agent/session-tools-core": "workspace:*",
+        "@zhangyuge-agent/core": "workspace:*",
+        "@zhangyuge-agent/session-tools-core": "workspace:*",
         "@isaacs/ttlcache": "^2.1.4",
         "@leeoniya/ufuzzy": "^1.0.19",
         "@mariozechner/pi-ai": "0.56.2",
@@ -307,10 +307,10 @@
       },
     },
     "packages/ui": {
-      "name": "@craft-agent/ui",
+      "name": "@zhangyuge-agent/ui",
       "version": "0.7.6",
       "dependencies": {
-        "@craft-agent/core": "workspace:*",
+        "@zhangyuge-agent/core": "workspace:*",
         "@paper-design/shaders-react": "^0.0.69",
         "@types/mdast": "^4.0.0",
         "@uiw/react-json-view": "^2.0.0-alpha.40",
@@ -527,27 +527,27 @@
 
     "@borewit/text-codec": ["@borewit/text-codec@0.2.1", "https://registry.npmmirror.com/@borewit/text-codec/-/text-codec-0.2.1.tgz", {}, "sha512-k7vvKPbf7J2fZ5klGRD9AeKfUvojuZIQ3BT5u7Jfv+puwXkUBUT5PVyMDfJZpy30CBDXGMgw7fguK/lpOMBvgw=="],
 
-    "@craft-agent/cli": ["@craft-agent/cli@workspace:apps/cli"],
+    "@zhangyuge-agent/cli": ["@zhangyuge-agent/cli@workspace:apps/cli"],
 
-    "@craft-agent/core": ["@craft-agent/core@workspace:packages/core"],
+    "@zhangyuge-agent/core": ["@zhangyuge-agent/core@workspace:packages/core"],
 
-    "@craft-agent/electron": ["@craft-agent/electron@workspace:apps/electron"],
+    "@zhangyuge-agent/electron": ["@zhangyuge-agent/electron@workspace:apps/electron"],
 
-    "@craft-agent/pi-agent-server": ["@craft-agent/pi-agent-server@workspace:packages/pi-agent-server"],
+    "@zhangyuge-agent/pi-agent-server": ["@zhangyuge-agent/pi-agent-server@workspace:packages/pi-agent-server"],
 
-    "@craft-agent/server": ["@craft-agent/server@workspace:packages/server"],
+    "@zhangyuge-agent/server": ["@zhangyuge-agent/server@workspace:packages/server"],
 
-    "@craft-agent/server-core": ["@craft-agent/server-core@workspace:packages/server-core"],
+    "@zhangyuge-agent/server-core": ["@zhangyuge-agent/server-core@workspace:packages/server-core"],
 
-    "@craft-agent/session-mcp-server": ["@craft-agent/session-mcp-server@workspace:packages/session-mcp-server"],
+    "@zhangyuge-agent/session-mcp-server": ["@zhangyuge-agent/session-mcp-server@workspace:packages/session-mcp-server"],
 
-    "@craft-agent/session-tools-core": ["@craft-agent/session-tools-core@workspace:packages/session-tools-core"],
+    "@zhangyuge-agent/session-tools-core": ["@zhangyuge-agent/session-tools-core@workspace:packages/session-tools-core"],
 
-    "@craft-agent/shared": ["@craft-agent/shared@workspace:packages/shared"],
+    "@zhangyuge-agent/shared": ["@zhangyuge-agent/shared@workspace:packages/shared"],
 
-    "@craft-agent/ui": ["@craft-agent/ui@workspace:packages/ui"],
+    "@zhangyuge-agent/ui": ["@zhangyuge-agent/ui@workspace:packages/ui"],
 
-    "@craft-agent/viewer": ["@craft-agent/viewer@workspace:apps/viewer"],
+    "@zhangyuge-agent/viewer": ["@zhangyuge-agent/viewer@workspace:apps/viewer"],
 
     "@date-fns/tz": ["@date-fns/tz@1.4.1", "https://registry.npmmirror.com/@date-fns/tz/-/tz-1.4.1.tgz", {}, "sha512-P5LUNhtbj6YfI3iJjw5EL9eUAG6OitD0W3fWQcpQjDRc/QIsL0tRNuO1PcDvPccWL1fSTXXdE1ds+l95DV/OFA=="],
 
@@ -3463,33 +3463,33 @@
 
     "@babel/highlight/chalk": ["chalk@2.4.2", "https://registry.npmmirror.com/chalk/-/chalk-2.4.2.tgz", { "dependencies": { "ansi-styles": "^3.2.1", "escape-string-regexp": "^1.0.5", "supports-color": "^5.3.0" } }, "sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ=="],
 
-    "@craft-agent/cli/@types/bun": ["@types/bun@1.3.10", "https://registry.npmmirror.com/@types/bun/-/bun-1.3.10.tgz", { "dependencies": { "bun-types": "1.3.10" } }, "sha512-0+rlrUrOrTSskibryHbvQkDOWRJwJZqZlxrUs1u4oOoTln8+WIXBPmAuCF35SWB2z4Zl3E84Nl/D0P7803nigQ=="],
+    "@zhangyuge-agent/cli/@types/bun": ["@types/bun@1.3.10", "https://registry.npmmirror.com/@types/bun/-/bun-1.3.10.tgz", { "dependencies": { "bun-types": "1.3.10" } }, "sha512-0+rlrUrOrTSskibryHbvQkDOWRJwJZqZlxrUs1u4oOoTln8+WIXBPmAuCF35SWB2z4Zl3E84Nl/D0P7803nigQ=="],
 
-    "@craft-agent/cli/@types/node": ["@types/node@22.19.6", "https://registry.npmmirror.com/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
+    "@zhangyuge-agent/cli/@types/node": ["@types/node@22.19.6", "https://registry.npmmirror.com/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
 
-    "@craft-agent/pi-agent-server/@mariozechner/pi-ai": ["@mariozechner/pi-ai@0.56.2", "https://registry.npmmirror.com/@mariozechner/pi-ai/-/pi-ai-0.56.2.tgz", { "dependencies": { "@anthropic-ai/sdk": "^0.73.0", "@aws-sdk/client-bedrock-runtime": "^3.983.0", "@google/genai": "^1.40.0", "@mistralai/mistralai": "1.14.1", "@sinclair/typebox": "^0.34.41", "ajv": "^8.17.1", "ajv-formats": "^3.0.1", "chalk": "^5.6.2", "openai": "6.26.0", "partial-json": "^0.1.7", "proxy-agent": "^6.5.0", "undici": "^7.19.1", "zod-to-json-schema": "^3.24.6" }, "bin": { "pi-ai": "dist/cli.js" } }, "sha512-7cPhumqo/Ke7W4Lng5RyGmBWuhK0G9Z7JVfTl00m11snk5G+MYtNeqpi7VHZ5yW1K0DLsTAY9Mi2KLghaFImiA=="],
+    "@zhangyuge-agent/pi-agent-server/@mariozechner/pi-ai": ["@mariozechner/pi-ai@0.56.2", "https://registry.npmmirror.com/@mariozechner/pi-ai/-/pi-ai-0.56.2.tgz", { "dependencies": { "@anthropic-ai/sdk": "^0.73.0", "@aws-sdk/client-bedrock-runtime": "^3.983.0", "@google/genai": "^1.40.0", "@mistralai/mistralai": "1.14.1", "@sinclair/typebox": "^0.34.41", "ajv": "^8.17.1", "ajv-formats": "^3.0.1", "chalk": "^5.6.2", "openai": "6.26.0", "partial-json": "^0.1.7", "proxy-agent": "^6.5.0", "undici": "^7.19.1", "zod-to-json-schema": "^3.24.6" }, "bin": { "pi-ai": "dist/cli.js" } }, "sha512-7cPhumqo/Ke7W4Lng5RyGmBWuhK0G9Z7JVfTl00m11snk5G+MYtNeqpi7VHZ5yW1K0DLsTAY9Mi2KLghaFImiA=="],
 
-    "@craft-agent/pi-agent-server/@mariozechner/pi-coding-agent": ["@mariozechner/pi-coding-agent@0.56.2", "https://registry.npmmirror.com/@mariozechner/pi-coding-agent/-/pi-coding-agent-0.56.2.tgz", { "dependencies": { "@mariozechner/jiti": "^2.6.2", "@mariozechner/pi-agent-core": "^0.56.2", "@mariozechner/pi-ai": "^0.56.2", "@mariozechner/pi-tui": "^0.56.2", "@silvia-odwyer/photon-node": "^0.3.4", "chalk": "^5.5.0", "cli-highlight": "^2.1.11", "diff": "^8.0.2", "extract-zip": "^2.0.1", "file-type": "^21.1.1", "glob": "^13.0.1", "hosted-git-info": "^9.0.2", "ignore": "^7.0.5", "marked": "^15.0.12", "minimatch": "^10.2.3", "proper-lockfile": "^4.1.2", "strip-ansi": "^7.1.0", "undici": "^7.19.1", "yaml": "^2.8.2" }, "optionalDependencies": { "@mariozechner/clipboard": "^0.3.2" }, "bin": { "pi": "dist/cli.js" } }, "sha512-svK9zg5f+I4yko57MzdfBQBqZpFT1Hr8nZ3o7nYMTuIFcf2vABylA8lNI57Avjg38js1PToc6jXXFa/3JWqELg=="],
+    "@zhangyuge-agent/pi-agent-server/@mariozechner/pi-coding-agent": ["@mariozechner/pi-coding-agent@0.56.2", "https://registry.npmmirror.com/@mariozechner/pi-coding-agent/-/pi-coding-agent-0.56.2.tgz", { "dependencies": { "@mariozechner/jiti": "^2.6.2", "@mariozechner/pi-agent-core": "^0.56.2", "@mariozechner/pi-ai": "^0.56.2", "@mariozechner/pi-tui": "^0.56.2", "@silvia-odwyer/photon-node": "^0.3.4", "chalk": "^5.5.0", "cli-highlight": "^2.1.11", "diff": "^8.0.2", "extract-zip": "^2.0.1", "file-type": "^21.1.1", "glob": "^13.0.1", "hosted-git-info": "^9.0.2", "ignore": "^7.0.5", "marked": "^15.0.12", "minimatch": "^10.2.3", "proper-lockfile": "^4.1.2", "strip-ansi": "^7.1.0", "undici": "^7.19.1", "yaml": "^2.8.2" }, "optionalDependencies": { "@mariozechner/clipboard": "^0.3.2" }, "bin": { "pi": "dist/cli.js" } }, "sha512-svK9zg5f+I4yko57MzdfBQBqZpFT1Hr8nZ3o7nYMTuIFcf2vABylA8lNI57Avjg38js1PToc6jXXFa/3JWqELg=="],
 
-    "@craft-agent/pi-agent-server/@types/node": ["@types/node@22.19.6", "https://registry.npmmirror.com/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
+    "@zhangyuge-agent/pi-agent-server/@types/node": ["@types/node@22.19.6", "https://registry.npmmirror.com/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
 
-    "@craft-agent/server/@types/node": ["@types/node@22.19.6", "https://registry.npmmirror.com/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
+    "@zhangyuge-agent/server/@types/node": ["@types/node@22.19.6", "https://registry.npmmirror.com/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
 
-    "@craft-agent/server-core/@types/node": ["@types/node@22.19.6", "https://registry.npmmirror.com/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
+    "@zhangyuge-agent/server-core/@types/node": ["@types/node@22.19.6", "https://registry.npmmirror.com/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
 
-    "@craft-agent/session-mcp-server/@types/node": ["@types/node@22.19.6", "https://registry.npmmirror.com/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
+    "@zhangyuge-agent/session-mcp-server/@types/node": ["@types/node@22.19.6", "https://registry.npmmirror.com/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
 
-    "@craft-agent/session-mcp-server/zod": ["zod@3.25.76", "https://registry.npmmirror.com/zod/-/zod-3.25.76.tgz", {}, "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="],
+    "@zhangyuge-agent/session-mcp-server/zod": ["zod@3.25.76", "https://registry.npmmirror.com/zod/-/zod-3.25.76.tgz", {}, "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="],
 
-    "@craft-agent/session-tools-core/zod": ["zod@3.25.76", "https://registry.npmmirror.com/zod/-/zod-3.25.76.tgz", {}, "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="],
+    "@zhangyuge-agent/session-tools-core/zod": ["zod@3.25.76", "https://registry.npmmirror.com/zod/-/zod-3.25.76.tgz", {}, "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="],
 
-    "@craft-agent/viewer/@vitejs/plugin-react": ["@vitejs/plugin-react@4.7.0", "https://registry.npmmirror.com/@vitejs/plugin-react/-/plugin-react-4.7.0.tgz", { "dependencies": { "@babel/core": "^7.28.0", "@babel/plugin-transform-react-jsx-self": "^7.27.1", "@babel/plugin-transform-react-jsx-source": "^7.27.1", "@rolldown/pluginutils": "1.0.0-beta.27", "@types/babel__core": "^7.20.5", "react-refresh": "^0.17.0" }, "peerDependencies": { "vite": "^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0" } }, "sha512-gUu9hwfWvvEDBBmgtAowQCojwZmJ5mcLn3aufeCsitijs3+f2NsrPtlAWIR6OPiqljl96GVCUbLe0HyqIpVaoA=="],
+    "@zhangyuge-agent/viewer/@vitejs/plugin-react": ["@vitejs/plugin-react@4.7.0", "https://registry.npmmirror.com/@vitejs/plugin-react/-/plugin-react-4.7.0.tgz", { "dependencies": { "@babel/core": "^7.28.0", "@babel/plugin-transform-react-jsx-self": "^7.27.1", "@babel/plugin-transform-react-jsx-source": "^7.27.1", "@rolldown/pluginutils": "1.0.0-beta.27", "@types/babel__core": "^7.20.5", "react-refresh": "^0.17.0" }, "peerDependencies": { "vite": "^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0" } }, "sha512-gUu9hwfWvvEDBBmgtAowQCojwZmJ5mcLn3aufeCsitijs3+f2NsrPtlAWIR6OPiqljl96GVCUbLe0HyqIpVaoA=="],
 
-    "@craft-agent/viewer/lucide-react": ["lucide-react@0.501.0", "https://registry.npmmirror.com/lucide-react/-/lucide-react-0.501.0.tgz", { "peerDependencies": { "react": "^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-E2KoyhW59fCb/yUbR3rbDer83fqn7a8NG91ZhIot2yWaPHjPyGzzsNKh40N//GezYShAuycf3TcQksRQznIsRw=="],
+    "@zhangyuge-agent/viewer/lucide-react": ["lucide-react@0.501.0", "https://registry.npmmirror.com/lucide-react/-/lucide-react-0.501.0.tgz", { "peerDependencies": { "react": "^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-E2KoyhW59fCb/yUbR3rbDer83fqn7a8NG91ZhIot2yWaPHjPyGzzsNKh40N//GezYShAuycf3TcQksRQznIsRw=="],
 
-    "@craft-agent/viewer/react-markdown": ["react-markdown@9.1.0", "https://registry.npmmirror.com/react-markdown/-/react-markdown-9.1.0.tgz", { "dependencies": { "@types/hast": "^3.0.0", "@types/mdast": "^4.0.0", "devlop": "^1.0.0", "hast-util-to-jsx-runtime": "^2.0.0", "html-url-attributes": "^3.0.0", "mdast-util-to-hast": "^13.0.0", "remark-parse": "^11.0.0", "remark-rehype": "^11.0.0", "unified": "^11.0.0", "unist-util-visit": "^5.0.0", "vfile": "^6.0.0" }, "peerDependencies": { "@types/react": ">=18", "react": ">=18" } }, "sha512-xaijuJB0kzGiUdG7nc2MOMDUDBWPyGAjZtUrow9XxUeua8IqeP+VlIfAZ3bphpcLTnSZXz6z9jcVC/TCwbfgdw=="],
+    "@zhangyuge-agent/viewer/react-markdown": ["react-markdown@9.1.0", "https://registry.npmmirror.com/react-markdown/-/react-markdown-9.1.0.tgz", { "dependencies": { "@types/hast": "^3.0.0", "@types/mdast": "^4.0.0", "devlop": "^1.0.0", "hast-util-to-jsx-runtime": "^2.0.0", "html-url-attributes": "^3.0.0", "mdast-util-to-hast": "^13.0.0", "remark-parse": "^11.0.0", "remark-rehype": "^11.0.0", "unified": "^11.0.0", "unist-util-visit": "^5.0.0", "vfile": "^6.0.0" }, "peerDependencies": { "@types/react": ">=18", "react": ">=18" } }, "sha512-xaijuJB0kzGiUdG7nc2MOMDUDBWPyGAjZtUrow9XxUeua8IqeP+VlIfAZ3bphpcLTnSZXz6z9jcVC/TCwbfgdw=="],
 
-    "@craft-agent/viewer/tailwind-merge": ["tailwind-merge@2.6.0", "https://registry.npmmirror.com/tailwind-merge/-/tailwind-merge-2.6.0.tgz", {}, "sha512-P+Vu1qXfzediirmHOC3xKGAYeZtPcV9g76X+xg2FD4tYgR71ewMA35Y3sCz3zhiN/dwefRpJX0yBcgwi1fXNQA=="],
+    "@zhangyuge-agent/viewer/tailwind-merge": ["tailwind-merge@2.6.0", "https://registry.npmmirror.com/tailwind-merge/-/tailwind-merge-2.6.0.tgz", {}, "sha512-P+Vu1qXfzediirmHOC3xKGAYeZtPcV9g76X+xg2FD4tYgR71ewMA35Y3sCz3zhiN/dwefRpJX0yBcgwi1fXNQA=="],
 
     "@electron/asar/commander": ["commander@13.1.0", "https://registry.npmmirror.com/commander/-/commander-13.1.0.tgz", {}, "sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw=="],
 
@@ -3925,35 +3925,35 @@
 
     "@babel/highlight/chalk/supports-color": ["supports-color@5.5.0", "https://registry.npmmirror.com/supports-color/-/supports-color-5.5.0.tgz", { "dependencies": { "has-flag": "^3.0.0" } }, "sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow=="],
 
-    "@craft-agent/cli/@types/bun/bun-types": ["bun-types@1.3.10", "https://registry.npmmirror.com/bun-types/-/bun-types-1.3.10.tgz", { "dependencies": { "@types/node": "*" } }, "sha512-tcpfCCl6XWo6nCVnpcVrxQ+9AYN1iqMIzgrSKYMB/fjLtV2eyAVEg7AxQJuCq/26R6HpKWykQXuSOq/21RYcbg=="],
+    "@zhangyuge-agent/cli/@types/bun/bun-types": ["bun-types@1.3.10", "https://registry.npmmirror.com/bun-types/-/bun-types-1.3.10.tgz", { "dependencies": { "@types/node": "*" } }, "sha512-tcpfCCl6XWo6nCVnpcVrxQ+9AYN1iqMIzgrSKYMB/fjLtV2eyAVEg7AxQJuCq/26R6HpKWykQXuSOq/21RYcbg=="],
 
-    "@craft-agent/cli/@types/node/undici-types": ["undici-types@6.21.0", "https://registry.npmmirror.com/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
+    "@zhangyuge-agent/cli/@types/node/undici-types": ["undici-types@6.21.0", "https://registry.npmmirror.com/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
 
-    "@craft-agent/pi-agent-server/@mariozechner/pi-ai/ajv": ["ajv@8.17.1", "https://registry.npmmirror.com/ajv/-/ajv-8.17.1.tgz", { "dependencies": { "fast-deep-equal": "^3.1.3", "fast-uri": "^3.0.1", "json-schema-traverse": "^1.0.0", "require-from-string": "^2.0.2" } }, "sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g=="],
+    "@zhangyuge-agent/pi-agent-server/@mariozechner/pi-ai/ajv": ["ajv@8.17.1", "https://registry.npmmirror.com/ajv/-/ajv-8.17.1.tgz", { "dependencies": { "fast-deep-equal": "^3.1.3", "fast-uri": "^3.0.1", "json-schema-traverse": "^1.0.0", "require-from-string": "^2.0.2" } }, "sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g=="],
 
-    "@craft-agent/pi-agent-server/@mariozechner/pi-ai/chalk": ["chalk@5.6.2", "https://registry.npmmirror.com/chalk/-/chalk-5.6.2.tgz", {}, "sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA=="],
+    "@zhangyuge-agent/pi-agent-server/@mariozechner/pi-ai/chalk": ["chalk@5.6.2", "https://registry.npmmirror.com/chalk/-/chalk-5.6.2.tgz", {}, "sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA=="],
 
-    "@craft-agent/pi-agent-server/@mariozechner/pi-ai/openai": ["openai@6.26.0", "https://registry.npmmirror.com/openai/-/openai-6.26.0.tgz", { "peerDependencies": { "ws": "^8.18.0", "zod": "^3.25 || ^4.0" }, "optionalPeers": ["ws", "zod"], "bin": { "openai": "bin/cli" } }, "sha512-zd23dbWTjiJ6sSAX6s0HrCZi41JwTA1bQVs0wLQPZ2/5o2gxOJA5wh7yOAUgwYybfhDXyhwlpeQf7Mlgx8EOCA=="],
+    "@zhangyuge-agent/pi-agent-server/@mariozechner/pi-ai/openai": ["openai@6.26.0", "https://registry.npmmirror.com/openai/-/openai-6.26.0.tgz", { "peerDependencies": { "ws": "^8.18.0", "zod": "^3.25 || ^4.0" }, "optionalPeers": ["ws", "zod"], "bin": { "openai": "bin/cli" } }, "sha512-zd23dbWTjiJ6sSAX6s0HrCZi41JwTA1bQVs0wLQPZ2/5o2gxOJA5wh7yOAUgwYybfhDXyhwlpeQf7Mlgx8EOCA=="],
 
-    "@craft-agent/pi-agent-server/@mariozechner/pi-coding-agent/@mariozechner/pi-tui": ["@mariozechner/pi-tui@0.56.2", "https://registry.npmmirror.com/@mariozechner/pi-tui/-/pi-tui-0.56.2.tgz", { "dependencies": { "@types/mime-types": "^2.1.4", "chalk": "^5.5.0", "get-east-asian-width": "^1.3.0", "marked": "^15.0.12", "mime-types": "^3.0.1" }, "optionalDependencies": { "koffi": "^2.9.0" } }, "sha512-UsbJNeyRnUqEp5AOCxNB/1EOCSN4ZpA/Irbbu1DLCzBPPGMrQnSp9mcFcuwqzw/t2P7VqGxY4n0hGkiAKbvgpQ=="],
+    "@zhangyuge-agent/pi-agent-server/@mariozechner/pi-coding-agent/@mariozechner/pi-tui": ["@mariozechner/pi-tui@0.56.2", "https://registry.npmmirror.com/@mariozechner/pi-tui/-/pi-tui-0.56.2.tgz", { "dependencies": { "@types/mime-types": "^2.1.4", "chalk": "^5.5.0", "get-east-asian-width": "^1.3.0", "marked": "^15.0.12", "mime-types": "^3.0.1" }, "optionalDependencies": { "koffi": "^2.9.0" } }, "sha512-UsbJNeyRnUqEp5AOCxNB/1EOCSN4ZpA/Irbbu1DLCzBPPGMrQnSp9mcFcuwqzw/t2P7VqGxY4n0hGkiAKbvgpQ=="],
 
-    "@craft-agent/pi-agent-server/@mariozechner/pi-coding-agent/chalk": ["chalk@5.6.2", "https://registry.npmmirror.com/chalk/-/chalk-5.6.2.tgz", {}, "sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA=="],
+    "@zhangyuge-agent/pi-agent-server/@mariozechner/pi-coding-agent/chalk": ["chalk@5.6.2", "https://registry.npmmirror.com/chalk/-/chalk-5.6.2.tgz", {}, "sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA=="],
 
-    "@craft-agent/pi-agent-server/@mariozechner/pi-coding-agent/marked": ["marked@15.0.12", "https://registry.npmmirror.com/marked/-/marked-15.0.12.tgz", { "bin": { "marked": "bin/marked.js" } }, "sha512-8dD6FusOQSrpv9Z1rdNMdlSgQOIP880DHqnohobOmYLElGEqAL/JvxvuxZO16r4HtjTlfPRDC1hbvxC9dPN2nA=="],
+    "@zhangyuge-agent/pi-agent-server/@mariozechner/pi-coding-agent/marked": ["marked@15.0.12", "https://registry.npmmirror.com/marked/-/marked-15.0.12.tgz", { "bin": { "marked": "bin/marked.js" } }, "sha512-8dD6FusOQSrpv9Z1rdNMdlSgQOIP880DHqnohobOmYLElGEqAL/JvxvuxZO16r4HtjTlfPRDC1hbvxC9dPN2nA=="],
 
-    "@craft-agent/pi-agent-server/@mariozechner/pi-coding-agent/minimatch": ["minimatch@10.2.4", "https://registry.npmmirror.com/minimatch/-/minimatch-10.2.4.tgz", { "dependencies": { "brace-expansion": "^5.0.2" } }, "sha512-oRjTw/97aTBN0RHbYCdtF1MQfvusSIBQM0IZEgzl6426+8jSC0nF1a/GmnVLpfB9yyr6g6FTqWqiZVbxrtaCIg=="],
+    "@zhangyuge-agent/pi-agent-server/@mariozechner/pi-coding-agent/minimatch": ["minimatch@10.2.4", "https://registry.npmmirror.com/minimatch/-/minimatch-10.2.4.tgz", { "dependencies": { "brace-expansion": "^5.0.2" } }, "sha512-oRjTw/97aTBN0RHbYCdtF1MQfvusSIBQM0IZEgzl6426+8jSC0nF1a/GmnVLpfB9yyr6g6FTqWqiZVbxrtaCIg=="],
 
-    "@craft-agent/pi-agent-server/@types/node/undici-types": ["undici-types@6.21.0", "https://registry.npmmirror.com/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
+    "@zhangyuge-agent/pi-agent-server/@types/node/undici-types": ["undici-types@6.21.0", "https://registry.npmmirror.com/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
 
-    "@craft-agent/server-core/@types/node/undici-types": ["undici-types@6.21.0", "https://registry.npmmirror.com/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
+    "@zhangyuge-agent/server-core/@types/node/undici-types": ["undici-types@6.21.0", "https://registry.npmmirror.com/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
 
-    "@craft-agent/server/@types/node/undici-types": ["undici-types@6.21.0", "https://registry.npmmirror.com/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
+    "@zhangyuge-agent/server/@types/node/undici-types": ["undici-types@6.21.0", "https://registry.npmmirror.com/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
 
-    "@craft-agent/session-mcp-server/@types/node/undici-types": ["undici-types@6.21.0", "https://registry.npmmirror.com/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
+    "@zhangyuge-agent/session-mcp-server/@types/node/undici-types": ["undici-types@6.21.0", "https://registry.npmmirror.com/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
 
-    "@craft-agent/viewer/@vitejs/plugin-react/@rolldown/pluginutils": ["@rolldown/pluginutils@1.0.0-beta.27", "https://registry.npmmirror.com/@rolldown/pluginutils/-/pluginutils-1.0.0-beta.27.tgz", {}, "sha512-+d0F4MKMCbeVUJwG96uQ4SgAznZNSq93I3V+9NHA4OpvqG8mRCpGdKmK8l/dl02h2CCDHwW2FqilnTyDcAnqjA=="],
+    "@zhangyuge-agent/viewer/@vitejs/plugin-react/@rolldown/pluginutils": ["@rolldown/pluginutils@1.0.0-beta.27", "https://registry.npmmirror.com/@rolldown/pluginutils/-/pluginutils-1.0.0-beta.27.tgz", {}, "sha512-+d0F4MKMCbeVUJwG96uQ4SgAznZNSq93I3V+9NHA4OpvqG8mRCpGdKmK8l/dl02h2CCDHwW2FqilnTyDcAnqjA=="],
 
-    "@craft-agent/viewer/@vitejs/plugin-react/react-refresh": ["react-refresh@0.17.0", "https://registry.npmmirror.com/react-refresh/-/react-refresh-0.17.0.tgz", {}, "sha512-z6F7K9bV85EfseRCp2bzrpyQ0Gkw1uLoCel9XBVWPg/TjRj94SkJzUTGfOa4bs7iJvBWtQG0Wq7wnI0syw3EBQ=="],
+    "@zhangyuge-agent/viewer/@vitejs/plugin-react/react-refresh": ["react-refresh@0.17.0", "https://registry.npmmirror.com/react-refresh/-/react-refresh-0.17.0.tgz", {}, "sha512-z6F7K9bV85EfseRCp2bzrpyQ0Gkw1uLoCel9XBVWPg/TjRj94SkJzUTGfOa4bs7iJvBWtQG0Wq7wnI0syw3EBQ=="],
 
     "@electron/rebuild/got/@sindresorhus/is": ["@sindresorhus/is@4.6.0", "https://registry.npmmirror.com/@sindresorhus/is/-/is-4.6.0.tgz", {}, "sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw=="],
 
@@ -4225,13 +4225,13 @@
 
     "@babel/highlight/chalk/supports-color/has-flag": ["has-flag@3.0.0", "https://registry.npmmirror.com/has-flag/-/has-flag-3.0.0.tgz", {}, "sha512-sKJf1+ceQBr4SMkvQnBDNDtf4TXpVhVGateu0t918bl30FnbE2m4vNLX+VWe/dpjlb+HugGYzW7uQXH98HPEYw=="],
 
-    "@craft-agent/cli/@types/bun/bun-types/@types/node": ["@types/node@25.0.8", "https://registry.npmmirror.com/@types/node/-/node-25.0.8.tgz", { "dependencies": { "undici-types": "~7.16.0" } }, "sha512-powIePYMmC3ibL0UJ2i2s0WIbq6cg6UyVFQxSCpaPxxzAaziRfimGivjdF943sSGV6RADVbk0Nvlm5P/FB44Zg=="],
+    "@zhangyuge-agent/cli/@types/bun/bun-types/@types/node": ["@types/node@25.0.8", "https://registry.npmmirror.com/@types/node/-/node-25.0.8.tgz", { "dependencies": { "undici-types": "~7.16.0" } }, "sha512-powIePYMmC3ibL0UJ2i2s0WIbq6cg6UyVFQxSCpaPxxzAaziRfimGivjdF943sSGV6RADVbk0Nvlm5P/FB44Zg=="],
 
-    "@craft-agent/pi-agent-server/@mariozechner/pi-ai/ajv/json-schema-traverse": ["json-schema-traverse@1.0.0", "https://registry.npmmirror.com/json-schema-traverse/-/json-schema-traverse-1.0.0.tgz", {}, "sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug=="],
+    "@zhangyuge-agent/pi-agent-server/@mariozechner/pi-ai/ajv/json-schema-traverse": ["json-schema-traverse@1.0.0", "https://registry.npmmirror.com/json-schema-traverse/-/json-schema-traverse-1.0.0.tgz", {}, "sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug=="],
 
-    "@craft-agent/pi-agent-server/@mariozechner/pi-coding-agent/@mariozechner/pi-tui/mime-types": ["mime-types@3.0.2", "https://registry.npmmirror.com/mime-types/-/mime-types-3.0.2.tgz", { "dependencies": { "mime-db": "^1.54.0" } }, "sha512-Lbgzdk0h4juoQ9fCKXW4by0UJqj+nOOrI9MJ1sSj4nI8aI2eo1qmvQEie4VD1glsS250n15LsWsYtCugiStS5A=="],
+    "@zhangyuge-agent/pi-agent-server/@mariozechner/pi-coding-agent/@mariozechner/pi-tui/mime-types": ["mime-types@3.0.2", "https://registry.npmmirror.com/mime-types/-/mime-types-3.0.2.tgz", { "dependencies": { "mime-db": "^1.54.0" } }, "sha512-Lbgzdk0h4juoQ9fCKXW4by0UJqj+nOOrI9MJ1sSj4nI8aI2eo1qmvQEie4VD1glsS250n15LsWsYtCugiStS5A=="],
 
-    "@craft-agent/pi-agent-server/@mariozechner/pi-coding-agent/minimatch/brace-expansion": ["brace-expansion@5.0.2", "https://registry.npmmirror.com/brace-expansion/-/brace-expansion-5.0.2.tgz", { "dependencies": { "balanced-match": "^4.0.2" } }, "sha512-Pdk8c9poy+YhOgVWw1JNN22/HcivgKWwpxKq04M/jTmHyCZn12WPJebZxdjSa5TmBqISrUSgNYU3eRORljfCCw=="],
+    "@zhangyuge-agent/pi-agent-server/@mariozechner/pi-coding-agent/minimatch/brace-expansion": ["brace-expansion@5.0.2", "https://registry.npmmirror.com/brace-expansion/-/brace-expansion-5.0.2.tgz", { "dependencies": { "balanced-match": "^4.0.2" } }, "sha512-Pdk8c9poy+YhOgVWw1JNN22/HcivgKWwpxKq04M/jTmHyCZn12WPJebZxdjSa5TmBqISrUSgNYU3eRORljfCCw=="],
 
     "@electron/rebuild/got/cacheable-request/keyv": ["keyv@4.5.4", "https://registry.npmmirror.com/keyv/-/keyv-4.5.4.tgz", { "dependencies": { "json-buffer": "3.0.1" } }, "sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw=="],
 
@@ -4311,9 +4311,9 @@
 
     "@babel/highlight/chalk/ansi-styles/color-convert/color-name": ["color-name@1.1.3", "https://registry.npmmirror.com/color-name/-/color-name-1.1.3.tgz", {}, "sha512-72fSenhMw2HZMTVHeCA9KCmpEIbzWiQsjN+BHcBbS9vr1mtt+vJjPdksIBNUmKAW8TFUDPJK5SUU3QhE9NEXDw=="],
 
-    "@craft-agent/pi-agent-server/@mariozechner/pi-coding-agent/@mariozechner/pi-tui/mime-types/mime-db": ["mime-db@1.54.0", "https://registry.npmmirror.com/mime-db/-/mime-db-1.54.0.tgz", {}, "sha512-aU5EJuIN2WDemCcAp2vFBfp/m4EAhWJnUNSSw0ixs7/kXbd6Pg64EmwJkNdFhB8aWt1sH2CTXrLxo/iAGV3oPQ=="],
+    "@zhangyuge-agent/pi-agent-server/@mariozechner/pi-coding-agent/@mariozechner/pi-tui/mime-types/mime-db": ["mime-db@1.54.0", "https://registry.npmmirror.com/mime-db/-/mime-db-1.54.0.tgz", {}, "sha512-aU5EJuIN2WDemCcAp2vFBfp/m4EAhWJnUNSSw0ixs7/kXbd6Pg64EmwJkNdFhB8aWt1sH2CTXrLxo/iAGV3oPQ=="],
 
-    "@craft-agent/pi-agent-server/@mariozechner/pi-coding-agent/minimatch/brace-expansion/balanced-match": ["balanced-match@4.0.3", "https://registry.npmmirror.com/balanced-match/-/balanced-match-4.0.3.tgz", {}, "sha512-1pHv8LX9CpKut1Zp4EXey7Z8OfH11ONNH6Dhi2WDUt31VVZFXZzKwXcysBgqSumFCmR+0dqjMK5v5JiFHzi0+g=="],
+    "@zhangyuge-agent/pi-agent-server/@mariozechner/pi-coding-agent/minimatch/brace-expansion/balanced-match": ["balanced-match@4.0.3", "https://registry.npmmirror.com/balanced-match/-/balanced-match-4.0.3.tgz", {}, "sha512-1pHv8LX9CpKut1Zp4EXey7Z8OfH11ONNH6Dhi2WDUt31VVZFXZzKwXcysBgqSumFCmR+0dqjMK5v5JiFHzi0+g=="],
 
     "cli-highlight/yargs/cliui/strip-ansi/ansi-regex": ["ansi-regex@5.0.1", "https://registry.npmmirror.com/ansi-regex/-/ansi-regex-5.0.1.tgz", {}, "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ=="],
 

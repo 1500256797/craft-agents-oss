@@ -4,12 +4,12 @@
  */
 
 import { join } from 'node:path'
-import { startHeadlessServer } from '@craft-agent/server-core/bootstrap'
+import { startHeadlessServer } from '@zhangyuge-agent/server-core/bootstrap'
 import { registerCoreRpcHandlers } from '../main/handlers/index'
-import { cleanupSessionFileWatchForClient } from '@craft-agent/server-core/handlers/rpc'
-import { SessionManager, setSessionPlatform, setSessionRuntimeHooks } from '@craft-agent/server-core/sessions'
-import { initModelRefreshService, setFetcherPlatform } from '@craft-agent/server-core/model-fetchers'
-import { setSearchPlatform, setImageProcessor } from '@craft-agent/server-core/services'
+import { cleanupSessionFileWatchForClient } from '@zhangyuge-agent/server-core/handlers/rpc'
+import { SessionManager, setSessionPlatform, setSessionRuntimeHooks } from '@zhangyuge-agent/server-core/sessions'
+import { initModelRefreshService, setFetcherPlatform } from '@zhangyuge-agent/server-core/model-fetchers'
+import { setSearchPlatform, setImageProcessor } from '@zhangyuge-agent/server-core/services'
 import type { HandlerDeps } from '../main/handlers/handler-deps'
 
 const bundledAssetsRoot = join(import.meta.dir, '..', '..')
@@ -32,7 +32,7 @@ const instance = await (async (): Promise<{ host: string; port: number; token: s
         setImageProcessor(platform.imageProcessor)
       },
       initModelRefreshService: () => initModelRefreshService(async (slug: string) => {
-        const { getCredentialManager } = await import('@craft-agent/shared/credentials')
+        const { getCredentialManager } = await import('@zhangyuge-agent/shared/credentials')
         const manager = getCredentialManager()
         const [apiKey, oauth] = await Promise.all([
           manager.getLlmApiKey(slug).catch(() => null),
@@ -75,8 +75,8 @@ const instance = await (async (): Promise<{ host: string; port: number; token: s
   }
 })()
 
-console.log(`CRAFT_SERVER_URL=ws://${instance.host}:${instance.port}`)
-console.log(`CRAFT_SERVER_TOKEN=${instance.token}`)
+console.log(`ZHANGYUGE_AGENT_SERVER_URL=ws://${instance.host}:${instance.port}`)
+console.log(`ZHANGYUGE_AGENT_SERVER_TOKEN=${instance.token}`)
 
 const shutdown = async () => {
   await instance.stop()

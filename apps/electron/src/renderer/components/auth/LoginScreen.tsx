@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { AlertCircle, Eye, EyeOff, Loader2, RefreshCw } from 'lucide-react'
 import { StepFormLayout } from '@/components/onboarding/primitives'
-import { CraftAppIcon } from '@/components/icons/CraftAppIcon'
+import { 章鱼哥AIAppIcon } from '@/components/icons/ZhangyugeAgentAppIcon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -90,7 +90,7 @@ export function LoginScreen({ onLoginSuccess, onReset }: LoginScreenProps) {
         <StepFormLayout
           iconElement={
             <div className="mb-1 flex items-center justify-center">
-              <CraftAppIcon size={72} className="size-[72px]" />
+              <章鱼哥AIAppIcon size={72} className="size-[72px]" />
             </div>
           }
           title={t('auth.login.title')}

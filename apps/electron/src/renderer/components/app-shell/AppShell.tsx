@@ -41,7 +41,7 @@ import { isMac } from "@/lib/platform"
 import { Button } from "@/components/ui/button"
 import { HeaderIconButton } from "@/components/ui/HeaderIconButton"
 import { Separator } from "@/components/ui/separator"
-import { Tooltip, TooltipTrigger, TooltipContent, DocumentFormattedMarkdownOverlay } from "@craft-agent/ui"
+import { Tooltip, TooltipTrigger, TooltipContent, DocumentFormattedMarkdownOverlay } from "@zhangyuge-agent/ui"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -95,9 +95,9 @@ import { useLabels } from "@/hooks/useLabels"
 import { useViews } from "@/hooks/useViews"
 import { LabelIcon, LabelValueTypeIcon } from "@/components/ui/label-icon"
 import { filterItems as filterLabelMenuItems, filterSessionStatuses as filterLabelMenuStates, type LabelMenuItem } from "@/components/ui/label-menu"
-import { buildLabelTree, getDescendantIds, getLabelDisplayName, flattenLabels, extractLabelId, findLabelById } from "@craft-agent/shared/labels"
-import type { LabelConfig, LabelTreeNode } from "@craft-agent/shared/labels"
-import { resolveEntityColor } from "@craft-agent/shared/colors"
+import { buildLabelTree, getDescendantIds, getLabelDisplayName, flattenLabels, extractLabelId, findLabelById } from "@zhangyuge-agent/shared/labels"
+import type { LabelConfig, LabelTreeNode } from "@zhangyuge-agent/shared/labels"
+import { resolveEntityColor } from "@zhangyuge-agent/shared/colors"
 import * as storage from "@/lib/local-storage"
 import { toast } from "sonner"
 import { navigate, routes } from "@/lib/navigate"
@@ -1205,7 +1205,7 @@ function AppShellContent({
       const filesArray = Array.from(files)
       const targetSessionId = focusedSessionId ?? session.selected
       if (!targetSessionId) return
-      window.dispatchEvent(new CustomEvent('craft:paste-files', {
+      window.dispatchEvent(new CustomEvent('zhangyuge-agent:paste-files', {
         detail: { files: filesArray, sessionId: targetSessionId }
       }))
     }

@@ -18,7 +18,7 @@ import { PatchDiff, type PatchDiffProps } from '@pierre/diffs/react'
 import { DIFFS_TAG_NAME } from '@pierre/diffs'
 import { cn } from '../../lib/utils'
 import { CodeBlock } from './CodeBlock'
-import { registerCraftShikiThemes } from '../code-viewer/registerShikiThemes'
+import { register章鱼哥AIShikiThemes } from '../code-viewer/registerShikiThemes'
 
 // ── Custom element + theme registration (same as ShikiDiffViewer) ──────────
 // Idempotent: safe to run even if ShikiDiffViewer already registered these.
@@ -35,7 +35,7 @@ if (typeof HTMLElement !== 'undefined' && !customElements.get(DIFFS_TAG_NAME)) {
 }
 
 // Register custom themes once per runtime.
-registerCraftShikiThemes()
+register章鱼哥AIShikiThemes()
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -125,7 +125,7 @@ export interface MarkdownDiffBlockProps {
 
 export function MarkdownDiffBlock({ code, className }: MarkdownDiffBlockProps) {
   const dark = isDarkMode()
-  const themeName = dark ? 'craft-dark' : 'craft-light'
+  const themeName = dark ? 'zhangyuge-dark' : 'zhangyuge-light'
 
   // Build the same options used in ShikiDiffViewer for visual consistency
   const options: PatchDiffProps<undefined>['options'] = React.useMemo(() => ({

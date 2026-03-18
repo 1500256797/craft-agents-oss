@@ -1,4 +1,4 @@
-import { CraftAgentsSymbol } from "@/components/icons/CraftAgentsSymbol"
+import { ZhangyugeAgentSymbol } from "@/components/icons/ZhangyugeAgentSymbol"
 import { StepFormLayout, ContinueButton } from "./primitives"
 import { useI18n } from "@/context/I18nContext"
 
@@ -14,7 +14,7 @@ interface WelcomeStepProps {
  * WelcomeStep - Initial welcome screen for onboarding
  *
  * Shows different messaging for new vs existing users:
- * - New users: Welcome to Craft Agents
+ * - New users: Welcome to 章鱼哥AI
  * - Existing users: Update your API connection settings
  */
 export function WelcomeStep({
@@ -27,7 +27,7 @@ export function WelcomeStep({
     <StepFormLayout
       iconElement={
         <div className="flex size-16 items-center justify-center">
-          <CraftAgentsSymbol className="size-10 text-accent" />
+          <ZhangyugeAgentSymbol className="size-10 text-accent" />
         </div>
       }
       title={isExistingUser ? t('onboarding.welcome.titleExisting') : t('onboarding.welcome.titleNew')}

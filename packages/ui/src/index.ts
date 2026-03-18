@@ -1,5 +1,5 @@
 /**
- * @craft-agent/ui - Shared React UI components for Craft Agent
+ * @zhangyuge-agent/ui - Shared React UI components for 章鱼哥AI
  *
  * This package provides platform-agnostic UI components that work in both:
  * - Electron desktop app (full interactive mode)

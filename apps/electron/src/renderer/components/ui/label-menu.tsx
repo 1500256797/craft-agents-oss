@@ -2,8 +2,8 @@ import * as React from 'react'
 import { Check, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { LabelIcon } from './label-icon'
-import type { LabelConfig } from '@craft-agent/shared/labels'
-import { flattenLabels } from '@craft-agent/shared/labels'
+import type { LabelConfig } from '@zhangyuge-agent/shared/labels'
+import { flattenLabels } from '@zhangyuge-agent/shared/labels'
 import { getStatusIconStyle, type SessionStatus } from '@/config/session-status-config'
 
 // ============================================================================

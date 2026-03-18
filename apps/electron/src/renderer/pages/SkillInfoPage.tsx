@@ -106,7 +106,7 @@ export default function SkillInfoPage({ skillSlug, workspaceId }: SkillInfoPageP
 
   // Handle opening in new window
   const handleOpenInNewWindow = useCallback(() => {
-    window.electronAPI.openUrl(`craftagents://skills/skill/${skillSlug}?window=focused`)
+    window.electronAPI.openUrl(`zhangyuge-agent://skills/skill/${skillSlug}?window=focused`)
   }, [skillSlug])
 
   // Get skill name for header

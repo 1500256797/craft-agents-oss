@@ -125,6 +125,72 @@ async function testAnthropicCompatible(
   }
 }
 
+function buildOpenAiCompatibleUrls(baseUrl: string): string[] {
+  const trimmedBaseUrl = baseUrl.replace(/\/$/, '');
+  const hasV1Suffix = /\/v1$/i.test(trimmedBaseUrl);
+
+  return hasV1Suffix
+    ? [`${trimmedBaseUrl}/chat/completions`, `${trimmedBaseUrl}/responses`]
+    : [`${trimmedBaseUrl}/v1/chat/completions`, `${trimmedBaseUrl}/v1/responses`];
+}
+
+async function testOpenAiCompatible(
+  apiKey: string,
+  baseUrl: string,
+  model: string,
+  timeoutMs: number,
+): Promise<{ success: boolean; error?: string }> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const urls = buildOpenAiCompatibleUrls(baseUrl);
+
+    for (const [index, url] of urls.entries()) {
+      const isResponsesApi = url.endsWith('/responses');
+      const res = await fetch(url, {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          'content-type': 'application/json',
+          'authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(isResponsesApi
+          ? {
+            model,
+            input: 'Say ok',
+            max_output_tokens: 16,
+          }
+          : {
+            model,
+            max_tokens: 16,
+            messages: [{ role: 'user', content: 'Say ok' }],
+          }),
+      });
+
+      if (res.ok) return { success: true };
+
+      const text = await res.text().catch(() => '');
+      const error = `${res.status} ${text}`.slice(0, 500);
+
+      // Many OpenAI-compatible gateways only expose one of the two APIs.
+      const shouldTryNext = index < urls.length - 1 && (res.status === 404 || res.status === 405);
+      if (shouldTryNext) continue;
+
+      return { success: false, error };
+    }
+
+    return { success: false, error: 'API endpoint not found. Check the URL.' };
+  } catch (err) {
+    if ((err as Error).name === 'AbortError') {
+      return { success: false, error: 'Connection test timed out' };
+    }
+    return { success: false, error: (err as Error).message };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export const piDriver: ProviderDriver = {
   provider: 'pi',
   buildRuntime: ({ context, providerOptions, resolvedPaths }) => ({
@@ -188,14 +254,19 @@ export const piDriver: ProviderDriver = {
       }
     } catch { /* ignore — fall through to subprocess */ }
 
-    if (modelApi !== 'anthropic-messages') {
-      // Non-Anthropic API types need the full Pi SDK — let factory.ts handle it
-      return null;
-    }
-
+    const customEndpointApi = args.connection?.customEndpoint?.api;
     const baseUrl = args.baseUrl?.trim() || modelBaseUrl || getPiProviderBaseUrl(piAuthProvider);
     if (!baseUrl) {
       return { success: false, error: 'Could not determine API endpoint for provider' };
+    }
+
+    if (customEndpointApi === 'openai-completions') {
+      return testOpenAiCompatible(args.apiKey, baseUrl, args.model, args.timeoutMs);
+    }
+
+    if (modelApi !== 'anthropic-messages') {
+      // Non-Anthropic API types need the full Pi SDK — let factory.ts handle it
+      return null;
     }
 
     // Strip Pi SDK's 'pi/' prefix — Anthropic-compatible endpoints only accept bare model IDs

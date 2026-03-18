@@ -10,8 +10,8 @@ import {
   PROTOCOL_VERSION,
   REQUEST_TIMEOUT_MS,
   type MessageEnvelope,
-} from '@craft-agent/shared/protocol'
-import type { RpcClient } from '@craft-agent/server-core/transport'
+} from '@zhangyuge-agent/shared/protocol'
+import type { RpcClient } from '@zhangyuge-agent/server-core/transport'
 import { serializeEnvelope, deserializeEnvelope } from './codec'
 
 // ---------------------------------------------------------------------------

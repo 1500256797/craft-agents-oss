@@ -2,18 +2,18 @@ import { resolve } from 'path'
 import { join } from 'path'
 import { homedir } from 'os'
 import { execSync } from 'child_process'
-import { RPC_CHANNELS } from '@craft-agent/shared/protocol'
-import { getGitBashPath, setGitBashPath, clearGitBashPath } from '@craft-agent/shared/config'
-import { isUsableGitBashPath, validateGitBashPath } from '@craft-agent/server-core/services'
-import { validateFilePath } from '@craft-agent/server-core/handlers'
-import type { RpcServer } from '@craft-agent/server-core/transport'
+import { RPC_CHANNELS } from '@zhangyuge-agent/shared/protocol'
+import { getGitBashPath, setGitBashPath, clearGitBashPath } from '@zhangyuge-agent/shared/config'
+import { isUsableGitBashPath, validateGitBashPath } from '@zhangyuge-agent/server-core/services'
+import { validateFilePath } from '@zhangyuge-agent/server-core/handlers'
+import type { RpcServer } from '@zhangyuge-agent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 import {
   requestClientOpenExternal,
   requestClientOpenPath,
   requestClientShowInFolder,
   requestClientOpenFileDialog,
-} from '@craft-agent/server-core/transport'
+} from '@zhangyuge-agent/server-core/transport'
 
 export const CORE_HANDLED_CHANNELS = [
   RPC_CHANNELS.theme.GET_SYSTEM_PREFERENCE,
@@ -66,8 +66,8 @@ function collectDeepLinkParams(parsed: URL, pathId?: string): Record<string, str
   return Object.keys(params).length > 0 ? params : undefined
 }
 
-function parseInternalCraftAgentsDeepLink(parsed: URL): ParsedInternalDeepLink | null {
-  if (parsed.protocol !== 'craftagents:') return null
+function parseInternalZhangyugeAgentDeepLink(parsed: URL): ParsedInternalDeepLink | null {
+  if (parsed.protocol !== 'zhangyuge-agent:') return null
 
   const host = parsed.hostname
   const pathParts = parsed.pathname.split('/').filter(Boolean)
@@ -161,12 +161,12 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
 
   // Release notes
   server.handle(RPC_CHANNELS.releaseNotes.GET, async () => {
-    const { getCombinedReleaseNotes } = require('@craft-agent/shared/release-notes') as typeof import('@craft-agent/shared/release-notes')
+    const { getCombinedReleaseNotes } = require('@zhangyuge-agent/shared/release-notes') as typeof import('@zhangyuge-agent/shared/release-notes')
     return getCombinedReleaseNotes()
   })
 
   server.handle(RPC_CHANNELS.releaseNotes.GET_LATEST_VERSION, async () => {
-    const { getLatestReleaseVersion } = require('@craft-agent/shared/release-notes') as typeof import('@craft-agent/shared/release-notes')
+    const { getLatestReleaseVersion } = require('@zhangyuge-agent/shared/release-notes') as typeof import('@zhangyuge-agent/shared/release-notes')
     return getLatestReleaseVersion()
   })
 
@@ -268,14 +268,14 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
     deps.platform.logger.info('[renderer]', ...args)
   })
 
-  // Shell operations - open URL in external browser (or handle craftagents:// internally)
+  // Shell operations - open URL in external browser (or handle zhangyuge-agent:// internally)
   server.handle(RPC_CHANNELS.shell.OPEN_URL, async (ctx, url: string) => {
     deps.platform.logger.info('[OPEN_URL] Received request:', url)
     try {
       const parsed = new URL(url)
 
-      if (parsed.protocol === 'craftagents:') {
-        const deepLink = parseInternalCraftAgentsDeepLink(parsed)
+      if (parsed.protocol === 'zhangyuge-agent:') {
+        const deepLink = parseInternalZhangyugeAgentDeepLink(parsed)
 
         if (deepLink?.handledNoop) {
           deps.platform.logger.info('[OPEN_URL] Ignoring auth-callback deep link in OPEN_URL handler')
@@ -287,14 +287,14 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
             ? { to: 'workspace' as const, workspaceId: deepLink.workspaceId }
             : { to: 'client' as const, clientId: ctx.clientId }
 
-          deps.platform.logger.info('[OPEN_URL] Routing craftagents:// URL internally via deeplink:navigate')
+          deps.platform.logger.info('[OPEN_URL] Routing zhangyuge-agent:// URL internally via deeplink:navigate')
           server.push(RPC_CHANNELS.deeplink.NAVIGATE, target, deepLink.navigation)
           return
         }
 
         // For links requiring window management (e.g. window=focused/full), or
         // unknown deep-link shapes, fall back to the client protocol handler.
-        deps.platform.logger.info('[OPEN_URL] Falling back to client openExternal for craftagents:// URL')
+        deps.platform.logger.info('[OPEN_URL] Falling back to client openExternal for zhangyuge-agent:// URL')
         const deepLinkResult = await requestClientOpenExternal(server, ctx.clientId, url)
         if (!deepLinkResult.opened) {
           deps.platform.logger.error(`[OPEN_URL] Client capability failed: ${deepLinkResult.error}`)
@@ -303,8 +303,8 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
         return
       }
 
-      if (!['http:', 'https:', 'mailto:', 'craftdocs:'].includes(parsed.protocol)) {
-        throw new Error('Only http, https, mailto, craftdocs, craftagents URLs are allowed')
+      if (!['http:', 'https:', 'mailto:', 'zhangyuge-docs:'].includes(parsed.protocol)) {
+        throw new Error('Only http, https, mailto, zhangyuge-docs, zhangyuge-agent URLs are allowed')
       }
 
       const result = await requestClientOpenExternal(server, ctx.clientId, url)

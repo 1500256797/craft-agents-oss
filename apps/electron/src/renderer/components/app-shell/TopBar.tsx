@@ -7,7 +7,7 @@
  */
 
 import * as Icons from "lucide-react"
-import { Tooltip, TooltipTrigger, TooltipContent } from "@craft-agent/ui"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@zhangyuge-agent/ui"
 import { PanelLeftRounded } from "../icons/PanelLeftRounded"
 import { TopBarButton } from "../ui/TopBarButton"
 import { isMac } from "@/lib/platform"
@@ -37,7 +37,7 @@ import { SquarePenRounded } from "../icons/SquarePenRounded"
 import { useEffect, useRef, useState } from "react"
 import { BrowserTabStrip } from "../browser/BrowserTabStrip"
 import type { Workspace } from "../../../shared/types"
-import { getDocUrl } from "@craft-agent/shared/docs/doc-links"
+import { getDocUrl } from "@zhangyuge-agent/shared/docs/doc-links"
 import { getMenuItemLabel, getMenuSectionLabel, getSettingsPageCopy } from "../../../shared/i18n"
 
 // --- Menu rendering (moved from AppMenu) ---
@@ -373,7 +373,7 @@ export function TopBar({
               <Icons.ExternalLink className="h-3 w-3 text-muted-foreground" />
             </StyledDropdownMenuItem>
             <StyledDropdownMenuSeparator />
-            <StyledDropdownMenuItem onClick={() => window.electronAPI.openUrl('https://agents.craft.do/docs')}>
+            <StyledDropdownMenuItem onClick={() => window.electronAPI.openUrl('https://agents.zhangyuge-agent.local/docs')}>
               <Icons.ExternalLink className="h-3.5 w-3.5" />
               <span className="flex-1">{t('menu.topBar.allDocumentation')}</span>
             </StyledDropdownMenuItem>

@@ -17,12 +17,12 @@ import { HeaderMenu } from '@/components/ui/HeaderMenu'
 import { routes } from '@/lib/navigate'
 import { X, MoreHorizontal, Pencil, Trash2, Star, ChevronDown, ChevronRight, CheckCircle2, AlertTriangle, RefreshCcw, Settings2 } from 'lucide-react'
 import type { CredentialHealthStatus, CredentialHealthIssue } from '../../../shared/types'
-import { Spinner, FullscreenOverlayBase } from '@craft-agent/ui'
+import { Spinner, FullscreenOverlayBase } from '@zhangyuge-agent/ui'
 import { useSetAtom } from 'jotai'
 import { fullscreenOverlayOpenAtom } from '@/atoms/overlay'
 import { motion, AnimatePresence } from 'motion/react'
 import type { LlmConnectionWithStatus, ThinkingLevel, WorkspaceSettings, Workspace } from '../../../shared/types'
-import { DEFAULT_THINKING_LEVEL, THINKING_LEVELS } from '@craft-agent/shared/agent/thinking-levels'
+import { DEFAULT_THINKING_LEVEL, THINKING_LEVELS } from '@zhangyuge-agent/shared/agent/thinking-levels'
 import type { DetailsPageMeta } from '@/lib/navigation-registry'
 import {
   DropdownMenu,
@@ -229,10 +229,10 @@ function ConnectionRow({ connection, isLastConnection, onRenameClick, onDelete, 
         const piLabel = !isSubscription && connection.piAuthProvider
           ? PI_AUTH_PROVIDER_LABELS[connection.piAuthProvider]
           : null
-        parts.push(piLabel ?? t('settings.ai.connectionRow.providerCraftBackend'))
+        parts.push(piLabel ?? t('settings.ai.connectionRow.provider章鱼哥AIBackend'))
         break
       }
-      case 'pi_compat': parts.push(t('settings.ai.connectionRow.providerCraftBackendCompat')); break
+      case 'pi_compat': parts.push(t('settings.ai.connectionRow.provider章鱼哥AIBackendCompat')); break
       default: parts.push(provider || t('settings.ai.connectionRow.unknown'))
     }
 
@@ -507,7 +507,7 @@ function WorkspaceOverrideCard({ workspace, llmConnections, onSettingsChange }: 
                     value: conn.slug,
                     label: conn.name,
                     description: conn.providerType === 'anthropic' ? t('settings.ai.connectionRow.providerAnthropicApi') :
-                                 conn.providerType === 'pi' ? t('settings.ai.connectionRow.providerCraftBackend') :
+                                 conn.providerType === 'pi' ? t('settings.ai.connectionRow.provider章鱼哥AIBackend') :
                                  conn.providerType || t('settings.ai.connectionRow.unknown'),
                   })),
                 ]}
@@ -904,8 +904,8 @@ export default function AiSettingsPage() {
                       description: conn.providerType === 'anthropic' ? t('settings.ai.connectionRow.providerAnthropicApi') :
                                    conn.providerType === 'bedrock' ? t('settings.ai.connectionRow.providerBedrock') :
                                    conn.providerType === 'vertex' ? t('settings.ai.connectionRow.providerVertex') :
-                                   conn.providerType === 'pi' ? t('settings.ai.connectionRow.providerCraftBackend') :
-                                   conn.providerType === 'pi_compat' ? t('settings.ai.connectionRow.providerCraftBackendCompat') :
+                                   conn.providerType === 'pi' ? t('settings.ai.connectionRow.provider章鱼哥AIBackend') :
+                                   conn.providerType === 'pi_compat' ? t('settings.ai.connectionRow.provider章鱼哥AIBackendCompat') :
                                    conn.providerType || t('settings.ai.connectionRow.unknown'),
                     }))}
                   />

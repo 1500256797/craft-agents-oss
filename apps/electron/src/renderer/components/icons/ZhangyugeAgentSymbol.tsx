@@ -1,13 +1,13 @@
 import brandLogo from "@/assets/logo.svg"
 
-interface CraftAgentsSymbolProps {
+interface ZhangyugeAgentSymbolProps {
   className?: string
 }
 
 /**
  * Small brand mark used in compact UI surfaces.
  */
-export function CraftAgentsSymbol({ className }: CraftAgentsSymbolProps) {
+export function ZhangyugeAgentSymbol({ className }: ZhangyugeAgentSymbolProps) {
   return (
     <img
       src={brandLogo}

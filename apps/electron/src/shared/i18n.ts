@@ -1,4 +1,4 @@
-import type { ResolvedUiLanguage, UiLanguage } from '@craft-agent/shared/config'
+import type { ResolvedUiLanguage, UiLanguage } from '@zhangyuge-agent/shared/config'
 import type { SettingsSubpage } from './settings-registry'
 import type { MenuItem, MenuSection } from './menu-schema'
 import enMessages from '../locales/en.json'
@@ -7,10 +7,30 @@ import zhCNMessages from '../locales/zh-CN.json'
 export const UI_LANGUAGE_OPTIONS: UiLanguage[] = ['system', 'en', 'zh-CN']
 
 type TranslationParams = Record<string, string | number>
+type MessageTree = Record<string, unknown>
+
+function withTopLevelNamespaceAliases(messages: MessageTree): MessageTree {
+  const settings = (messages.settings && typeof messages.settings === 'object')
+    ? messages.settings as MessageTree
+    : null
+  const common = (messages.common && typeof messages.common === 'object')
+    ? messages.common as MessageTree
+    : null
+
+  return {
+    ...messages,
+    common: {
+      ...common,
+      apiKeyInput: common?.apiKeyInput ?? settings?.apiKeyInput,
+    },
+    auth: messages.auth ?? settings?.auth,
+    onboarding: messages.onboarding ?? settings?.onboarding,
+  }
+}
 
 const UI_MESSAGES = {
-  en: enMessages,
-  'zh-CN': zhCNMessages,
+  en: withTopLevelNamespaceAliases(enMessages as MessageTree),
+  'zh-CN': withTopLevelNamespaceAliases(zhCNMessages as MessageTree),
 } as const
 
 type MessageKey = string

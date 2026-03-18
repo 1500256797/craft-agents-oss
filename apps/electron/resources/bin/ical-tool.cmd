@@ -1,2 +1,2 @@
 @echo off
-"%CRAFT_UV%" run --python 3.12 "%CRAFT_SCRIPTS%\ical_tool.py" %*
+"%ZHANGYUGE_AGENT_UV%" run --python 3.12 "%ZHANGYUGE_AGENT_SCRIPTS%\ical_tool.py" %*

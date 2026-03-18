@@ -1,7 +1,7 @@
 {
-  "name": "@craft-agent/viewer",
+  "name": "@zhangyuge-agent/viewer",
   "version": "0.7.6",
-  "description": "Web viewer for Craft Agents sessions - upload and share session transcripts",
+  "description": "Web viewer for 章鱼哥AI sessions - upload and share session transcripts",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,8 +11,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@craft-agent/core": "workspace:*",
-    "@craft-agent/ui": "workspace:*",
+    "@zhangyuge-agent/core": "workspace:*",
+    "@zhangyuge-agent/ui": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

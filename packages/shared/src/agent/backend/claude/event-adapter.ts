@@ -1,7 +1,7 @@
 /**
  * Claude Event Adapter
  *
- * Maps Claude SDK messages (SDKMessage) to Craft Agent's AgentEvent format.
+ * Maps Claude SDK messages (SDKMessage) to 章鱼哥AI's AgentEvent format.
  * Extracted from ClaudeAgent.convertSDKMessage() for testability and
  * consistency with the Codex/Copilot adapter pattern.
  *
@@ -13,7 +13,7 @@
  */
 
 import type { SDKMessage, SDKAssistantMessageError } from '@anthropic-ai/claude-agent-sdk';
-import type { AgentEvent } from '@craft-agent/core/types';
+import type { AgentEvent } from '@zhangyuge-agent/core/types';
 import type { AgentError } from '../../errors.ts';
 import { BaseEventAdapter } from '../base-event-adapter.ts';
 import { ToolIndex, extractToolStarts, extractToolResults, isParentTaskTool, type ContentBlock } from '../../tool-matching.ts';

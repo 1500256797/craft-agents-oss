@@ -27,7 +27,7 @@ function guidePath(slug: string): string {
 }
 
 function browserDocPath(): string {
-  return resolve(join(homedir(), '.craft-agent', 'docs', 'browser-tools.md'));
+  return resolve(join(homedir(), '.zhangyuge-agent', 'docs', 'browser-tools.md'));
 }
 
 describe('PrerequisiteManager', () => {
@@ -83,9 +83,9 @@ describe('PrerequisiteManager', () => {
       expect(result.allowed).toBe(true);
     });
 
-    it('exempts craft-agents-docs MCP tools', () => {
-      mockExistsPaths.add(guidePath('craft-agents-docs'));
-      const result = manager.checkPrerequisites('mcp__craft-agents-docs__search');
+    it('exempts zhangyuge-agent-docs MCP tools', () => {
+      mockExistsPaths.add(guidePath('zhangyuge-agent-docs'));
+      const result = manager.checkPrerequisites('mcp__zhangyuge-agent-docs__search');
       expect(result.allowed).toBe(true);
     });
 

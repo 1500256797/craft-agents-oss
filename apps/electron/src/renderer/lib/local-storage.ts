@@ -3,7 +3,7 @@
  * Provides type-safe access with consistent key prefixing.
  */
 
-const PREFIX = 'craft-'
+const PREFIX = 'zhangyuge-'
 
 /**
  * All localStorage keys used in the app.

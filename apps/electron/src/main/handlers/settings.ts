@@ -1,12 +1,12 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { dirname } from 'path'
-import { RPC_CHANNELS } from '@craft-agent/shared/protocol'
-import { getPreferencesPath, getSessionDraft, setSessionDraft, deleteSessionDraft, getAllSessionDrafts, getWorkspaceByNameOrId } from '@craft-agent/shared/config'
-import { getWorkspaceOrThrow } from '@craft-agent/server-core/handlers'
-import { pushTyped, type RpcServer } from '@craft-agent/server-core/transport'
+import { RPC_CHANNELS } from '@zhangyuge-agent/shared/protocol'
+import { getPreferencesPath, getSessionDraft, setSessionDraft, deleteSessionDraft, getAllSessionDrafts, getWorkspaceByNameOrId } from '@zhangyuge-agent/shared/config'
+import { getWorkspaceOrThrow } from '@zhangyuge-agent/server-core/handlers'
+import { pushTyped, type RpcServer } from '@zhangyuge-agent/server-core/transport'
 import type { HandlerDeps } from './handler-deps'
-import { requestClientOpenFileDialog } from '@craft-agent/server-core/transport'
-import type { UiLanguage } from '@craft-agent/shared/config/types'
+import { requestClientOpenFileDialog } from '@zhangyuge-agent/server-core/transport'
+import type { UiLanguage } from '@zhangyuge-agent/shared/config/types'
 
 export const CORE_HANDLED_CHANNELS = [
   RPC_CHANNELS.workspace.SETTINGS_GET,
@@ -81,7 +81,7 @@ export function registerSettingsHandlers(server: RpcServer, deps: HandlerDeps): 
     }
 
     // Load workspace config
-    const { loadWorkspaceConfig } = await import('@craft-agent/shared/workspaces')
+    const { loadWorkspaceConfig } = await import('@zhangyuge-agent/shared/workspaces')
     const config = loadWorkspaceConfig(workspace.rootPath)
 
     return {
@@ -113,13 +113,13 @@ export function registerSettingsHandlers(server: RpcServer, deps: HandlerDeps): 
 
       // Validate defaultLlmConnection exists before saving
       if (key === 'defaultLlmConnection' && value !== undefined && value !== null) {
-        const { getLlmConnection } = await import('@craft-agent/shared/config/storage')
+        const { getLlmConnection } = await import('@zhangyuge-agent/shared/config/storage')
         if (!getLlmConnection(value as string)) {
           throw new Error(`LLM connection "${value}" not found`)
         }
       }
 
-      const { loadWorkspaceConfig, saveWorkspaceConfig } = await import('@craft-agent/shared/workspaces')
+      const { loadWorkspaceConfig, saveWorkspaceConfig } = await import('@zhangyuge-agent/shared/workspaces')
       const config = loadWorkspaceConfig(workspace.rootPath)
       if (!config) {
         throw new Error(`Failed to load workspace config: ${workspaceId}`)
@@ -203,37 +203,37 @@ export function registerSettingsHandlers(server: RpcServer, deps: HandlerDeps): 
 
   // Get auto-capitalisation setting
   server.handle(RPC_CHANNELS.input.GET_AUTO_CAPITALISATION, async () => {
-    const { getAutoCapitalisation } = await import('@craft-agent/shared/config/storage')
+    const { getAutoCapitalisation } = await import('@zhangyuge-agent/shared/config/storage')
     return getAutoCapitalisation()
   })
 
   // Set auto-capitalisation setting
   server.handle(RPC_CHANNELS.input.SET_AUTO_CAPITALISATION, async (_ctx, enabled: boolean) => {
-    const { setAutoCapitalisation } = await import('@craft-agent/shared/config/storage')
+    const { setAutoCapitalisation } = await import('@zhangyuge-agent/shared/config/storage')
     setAutoCapitalisation(enabled)
   })
 
   // Get send message key setting
   server.handle(RPC_CHANNELS.input.GET_SEND_MESSAGE_KEY, async () => {
-    const { getSendMessageKey } = await import('@craft-agent/shared/config/storage')
+    const { getSendMessageKey } = await import('@zhangyuge-agent/shared/config/storage')
     return getSendMessageKey()
   })
 
   // Set send message key setting
   server.handle(RPC_CHANNELS.input.SET_SEND_MESSAGE_KEY, async (_ctx, key: 'enter' | 'cmd-enter') => {
-    const { setSendMessageKey } = await import('@craft-agent/shared/config/storage')
+    const { setSendMessageKey } = await import('@zhangyuge-agent/shared/config/storage')
     setSendMessageKey(key)
   })
 
   // Get spell check setting
   server.handle(RPC_CHANNELS.input.GET_SPELL_CHECK, async () => {
-    const { getSpellCheck } = await import('@craft-agent/shared/config/storage')
+    const { getSpellCheck } = await import('@zhangyuge-agent/shared/config/storage')
     return getSpellCheck()
   })
 
   // Set spell check setting
   server.handle(RPC_CHANNELS.input.SET_SPELL_CHECK, async (_ctx, enabled: boolean) => {
-    const { setSpellCheck } = await import('@craft-agent/shared/config/storage')
+    const { setSpellCheck } = await import('@zhangyuge-agent/shared/config/storage')
     setSpellCheck(enabled)
   })
 
@@ -243,7 +243,7 @@ export function registerSettingsHandlers(server: RpcServer, deps: HandlerDeps): 
 
   // Get keep awake while running setting
   server.handle(RPC_CHANNELS.power.GET_KEEP_AWAKE, async () => {
-    const { getKeepAwakeWhileRunning } = await import('@craft-agent/shared/config/storage')
+    const { getKeepAwakeWhileRunning } = await import('@zhangyuge-agent/shared/config/storage')
     return getKeepAwakeWhileRunning()
   })
 
@@ -253,25 +253,25 @@ export function registerSettingsHandlers(server: RpcServer, deps: HandlerDeps): 
 
   // Get rich tool descriptions setting
   server.handle(RPC_CHANNELS.appearance.GET_RICH_TOOL_DESCRIPTIONS, async () => {
-    const { getRichToolDescriptions } = await import('@craft-agent/shared/config/storage')
+    const { getRichToolDescriptions } = await import('@zhangyuge-agent/shared/config/storage')
     return getRichToolDescriptions()
   })
 
   // Set rich tool descriptions setting
   server.handle(RPC_CHANNELS.appearance.SET_RICH_TOOL_DESCRIPTIONS, async (_ctx, enabled: boolean) => {
-    const { setRichToolDescriptions } = await import('@craft-agent/shared/config/storage')
+    const { setRichToolDescriptions } = await import('@zhangyuge-agent/shared/config/storage')
     setRichToolDescriptions(enabled)
   })
 
   // Get UI language setting
   server.handle(RPC_CHANNELS.locale.GET_UI_LANGUAGE, async () => {
-    const { getUiLanguage } = await import('@craft-agent/shared/config/storage')
+    const { getUiLanguage } = await import('@zhangyuge-agent/shared/config/storage')
     return getUiLanguage()
   })
 
   // Set UI language setting and broadcast to all windows
   server.handle(RPC_CHANNELS.locale.SET_UI_LANGUAGE, async (_ctx, language: UiLanguage) => {
-    const { setUiLanguage } = await import('@craft-agent/shared/config/storage')
+    const { setUiLanguage } = await import('@zhangyuge-agent/shared/config/storage')
     const { rebuildMenu } = await import('../menu')
     setUiLanguage(language)
     pushTyped(server, RPC_CHANNELS.locale.CHANGED, { to: 'all' }, language)
@@ -284,7 +284,7 @@ export function registerSettingsHandlers(server: RpcServer, deps: HandlerDeps): 
 
   // Get network proxy settings
   server.handle(RPC_CHANNELS.settings.GET_NETWORK_PROXY, async () => {
-    const { getNetworkProxySettings } = await import('@craft-agent/shared/config/storage')
+    const { getNetworkProxySettings } = await import('@zhangyuge-agent/shared/config/storage')
     return getNetworkProxySettings()
   })
 }
@@ -296,7 +296,7 @@ export function registerSettingsHandlers(server: RpcServer, deps: HandlerDeps): 
 export function registerSettingsGuiHandlers(server: RpcServer, deps: HandlerDeps): void {
   // Set keep awake while running setting (requires Electron power-manager)
   server.handle(RPC_CHANNELS.power.SET_KEEP_AWAKE, async (_ctx, enabled: boolean) => {
-    const { setKeepAwakeWhileRunning } = await import('@craft-agent/shared/config/storage')
+    const { setKeepAwakeWhileRunning } = await import('@zhangyuge-agent/shared/config/storage')
     const { setKeepAwakeSetting } = await import('../power-manager')
     // Save to config
     setKeepAwakeWhileRunning(enabled)
@@ -305,7 +305,7 @@ export function registerSettingsGuiHandlers(server: RpcServer, deps: HandlerDeps
   })
 
   // Set network proxy settings (requires Electron session proxy)
-  server.handle(RPC_CHANNELS.settings.SET_NETWORK_PROXY, async (_ctx, settings: import('@craft-agent/shared/config/types').NetworkProxySettings) => {
+  server.handle(RPC_CHANNELS.settings.SET_NETWORK_PROXY, async (_ctx, settings: import('@zhangyuge-agent/shared/config/types').NetworkProxySettings) => {
     const { updateConfiguredProxySettings } = await import('../network-proxy')
     await updateConfiguredProxySettings(settings)
   })

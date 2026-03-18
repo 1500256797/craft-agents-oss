@@ -17,7 +17,7 @@
 
 import type { SettingsSubpage } from './settings-registry'
 import type { ModuleSubpage } from './module-registry'
-import type { PermissionMode } from '@craft-agent/shared/agent/mode-types'
+import type { PermissionMode } from '@zhangyuge-agent/shared/agent/mode-types'
 
 // Helper to build query strings from params
 function toQueryString(params?: Record<string, string | undefined>): string {

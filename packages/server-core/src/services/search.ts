@@ -7,7 +7,7 @@
 
 import { spawn, ChildProcess } from 'child_process';
 import { existsSync } from 'fs';
-import { resolveBackendHostTooling } from '@craft-agent/shared/agent/backend';
+import { resolveBackendHostTooling } from '@zhangyuge-agent/shared/agent/backend';
 import { createScopedLogger, CONSOLE_LOGGER, type PlatformServices, type Logger } from '../runtime/platform';
 
 // Track current search process to cancel on new search

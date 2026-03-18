@@ -50,7 +50,7 @@
       "cannotConnectToRemote": "无法连接到远程服务器",
       "connectionLost": "与远程服务器的连接已断开",
       "remoteServerStatus": "远程服务器连接状态",
-      "authFailed": "身份验证失败。请验证 CRAFT_SERVER_TOKEN。",
+      "authFailed": "身份验证失败。请验证 ZHANGYUGE_AGENT_SERVER_TOKEN。",
       "protocolMismatch": "客户端和服务器版本之间的协议不匹配。",
       "connectionTimeout": "连接到 {{url}} 超时。服务器可能无法访问。",
       "networkError": "无法连接到 {{url}}。远程服务器是否正在运行？",
@@ -299,7 +299,7 @@
       "stopGeneration": "停止生成",
       "providerGroups": {
         "anthropic": "Anthropic",
-        "craftAgentsBackend": "Craft Agents 后端"
+        "zhangyugeAgentBackend": "章鱼哥AI 后端"
       }
     }
   },
@@ -329,7 +329,7 @@
       }
     },
     "appMenu": {
-      "craftMenuAria": "Craft 菜单",
+      "appMenuAria": "应用菜单",
       "newChat": "新建聊天",
       "newWindow": "新建窗口",
       "settings": "设置",
@@ -342,7 +342,7 @@
       "checkForUpdates": "检查更新",
       "installUpdate": "安装更新",
       "toggleDevTools": "切换开发者工具",
-      "quitCraftAgents": "退出 Craft Agents",
+      "quitZhangyugeAgent": "退出 章鱼哥AI",
       "back": "后退",
       "forward": "前进",
       "goBackAria": "后退",
@@ -363,13 +363,13 @@
       "allDocumentation": "全部文档"
     },
     "mainMenu": {
-      "appName": "Craft Agents",
-      "about": "关于 Craft Agents",
+      "appName": "章鱼哥AI",
+      "about": "关于 章鱼哥AI",
       "checkForUpdatesEllipsis": "检查更新…",
       "installUpdateEllipsis": "安装更新…【{{version}}】",
       "settingsEllipsis": "设置...",
-      "hideApp": "隐藏 Craft Agents",
-      "quitApp": "退出 Craft Agents",
+      "hideApp": "隐藏 章鱼哥AI",
+      "quitApp": "退出 章鱼哥AI",
       "file": "文件",
       "newChat": "新建聊天",
       "newWindow": "新建窗口",
@@ -449,7 +449,7 @@
       },
       "descriptions": {
         "workspaceThemes": "按工作区覆盖主题设置",
-        "toolIcons": "聊天活动中 CLI 命令旁显示的图标。存储于 ~/.craft-agent/tool-icons/。",
+        "toolIcons": "聊天活动中 CLI 命令旁显示的图标。存储于 ~/.zhangyuge-agent/tool-icons/。",
         "connectionIcons": "在会话列表和模型选择器中显示提供商图标",
         "richToolDescriptions": "为所有工具调用添加动作名和意图描述，在会话中提供更丰富的活动上下文。"
       },
@@ -606,19 +606,19 @@
     "preferences": {
       "sections": {
         "basicInfo": "基本信息",
-        "basicInfoDescription": "帮助 Craft Agent 更好地为你个性化回复。",
+        "basicInfoDescription": "帮助 章鱼哥AI 更好地为你个性化回复。",
         "location": "位置",
         "locationDescription": "用于天气、本地时间和地域上下文等与位置相关的回复。",
         "notes": "备注",
-        "notesDescription": "帮助 Craft Agent 了解你偏好的自由文本上下文。"
+        "notesDescription": "帮助 章鱼哥AI 了解你偏好的自由文本上下文。"
       },
       "rows": {
         "name": "姓名",
-        "nameDescription": "Craft Agent 应如何称呼你。",
+        "nameDescription": "章鱼哥AI 应如何称呼你。",
         "timezone": "时区",
         "timezoneDescription": "用于“明天”或“下周”等相对日期的理解。",
         "language": "语言",
-        "languageDescription": "Craft Agent 回复你时优先使用的语言。",
+        "languageDescription": "章鱼哥AI 回复你时优先使用的语言。",
         "city": "城市",
         "cityDescription": "用于本地信息和上下文的城市。",
         "country": "国家",
@@ -740,8 +740,8 @@
         "providerAnthropicCompat": "Anthropic Compatible",
         "providerBedrock": "AWS Bedrock",
         "providerVertex": "Google Vertex",
-        "providerCraftBackend": "Craft Agents Backend",
-        "providerCraftBackendCompat": "Craft Agents Backend Compatible"
+        "provider章鱼哥AIBackend": "章鱼哥AI Backend",
+        "provider章鱼哥AIBackendCompat": "章鱼哥AI Backend Compatible"
       },
       "workspaceOverrides": {
         "connectionOverrideLabel": "工作区连接覆盖项",
@@ -810,7 +810,7 @@
         "cancel": "取消"
       },
       "providerSelect": {
-        "title": "欢迎使用 Craft Agents",
+        "title": "欢迎使用 章鱼哥AI",
         "description": "你希望如何连接？",
         "claudeName": "Claude Pro / Max",
         "claudeDescription": "使用你的 Anthropic 订阅。",
@@ -824,7 +824,7 @@
         "localDescription": "通过 Ollama 在本地运行模型。"
       },
       "welcome": {
-        "titleNew": "欢迎使用 Craft Agents",
+        "titleNew": "欢迎使用 章鱼哥AI",
         "titleExisting": "更新设置",
         "descriptionNew": "给 agents 应有的 UX。接入一切，组织会话，完成你真正重要的工作。",
         "descriptionExisting": "更新你的 API 连接或修改当前配置。",
@@ -835,30 +835,30 @@
         "title": "设置你的 Agent",
         "description": "选择你希望如何驱动 AI agents。之后你仍然可以继续添加更多连接。",
         "segmentAnthropic": "Claude",
-        "segmentPi": "Craft Agents Backend",
+        "segmentPi": "章鱼哥AI Backend",
         "beta": "Beta",
         "segmentDescriptionAnthropic": "使用 Claude Agent SDK 作为主 agent，可通过 Claude 订阅或 API key 配置。",
-        "segmentDescriptionPi": "使用 Craft Agents Backend 作为主 agent，可通过 API key、OAuth 订阅或自定义端点配置。",
+        "segmentDescriptionPi": "使用 章鱼哥AI Backend 作为主 agent，可通过 API key、OAuth 订阅或自定义端点配置。",
         "optionClaudeName": "Claude Pro/Max",
         "optionClaudeDescription": "使用你的 Claude 订阅，获得无限访问。",
         "optionAnthropicApiName": "Anthropic API Key",
         "optionAnthropicApiDescription": "通过 Anthropic、OpenRouter 或兼容 API 按量付费。",
         "optionChatgptName": "ChatGPT Plus",
-        "optionChatgptDescription": "通过 Craft Agents Backend 使用你的 ChatGPT 订阅。",
+        "optionChatgptDescription": "通过 章鱼哥AI Backend 使用你的 ChatGPT 订阅。",
         "optionCopilotName": "GitHub Copilot",
-        "optionCopilotDescription": "通过 Craft Agents Backend 使用你的 GitHub Copilot 订阅。",
+        "optionCopilotDescription": "通过 章鱼哥AI Backend 使用你的 GitHub Copilot 订阅。",
         "optionApiName": "API Key",
-        "optionApiDescription": "通过 Craft Agents Backend 使用提供商预设（Anthropic、OpenAI、Google 等）。"
+        "optionApiDescription": "通过 章鱼哥AI Backend 使用提供商预设（Anthropic、OpenAI、Google 等）。"
       },
       "credentials": {
         "chatgptTitle": "连接 ChatGPT",
-        "chatgptDescription": "使用你的 ChatGPT 订阅来驱动 Craft Agents。",
+        "chatgptDescription": "使用你的 ChatGPT 订阅来驱动 章鱼哥AI。",
         "connecting": "连接中...",
         "signInWithChatgpt": "使用 ChatGPT 登录",
         "chatgptBody": "点击上方按钮使用你的 OpenAI 账号登录。系统会打开浏览器进行认证。",
         "chatgptConnected": "连接成功！你的 ChatGPT 订阅已经可用。",
         "copilotTitle": "连接 GitHub Copilot",
-        "copilotDescription": "使用你的 GitHub Copilot 订阅来驱动 Craft Agents。",
+        "copilotDescription": "使用你的 GitHub Copilot 订阅来驱动 章鱼哥AI。",
         "waitingAuth": "等待授权中...",
         "signInWithGithub": "使用 GitHub 登录",
         "copilotEnterCode": "在 GitHub 上输入此代码完成授权：",
@@ -892,7 +892,7 @@
       },
       "gitBash": {
         "title": "需要 Git Bash",
-        "description": "Craft Agent 在 Windows 上运行 shell 命令需要 Git Bash，但当前系统中未检测到。",
+        "description": "章鱼哥AI 在 Windows 上运行 shell 命令需要 Git Bash，但当前系统中未检测到。",
         "installTitle": "安装 Git for Windows",
         "installDescription": "这是获取 Git Bash 最简单的方式。它是免费的，并且包含所需的一切。",
         "downloadButton": "下载 Git for Windows",
@@ -1131,7 +1131,7 @@
       "advanced": "高级"
     },
     "apiKeyInput": {
-      "apiKey": "API Key",
+      "apiKey": "API 密钥",
       "endpoint": "端点",
       "protocol": "协议",
       "defaultModel": "默认模型",
@@ -1150,6 +1150,7 @@
       "modelListHint": "逗号分隔的列表。第一个模型是默认模型，最后一个用于摘要。",
       "customEndpointHint": "自定义端点必填。使用提供商特定的模型 ID。",
       "modelRequiredError": "自定义端点需要指定默认模型。",
+      "tierSelectionRequiredError": "请为每个层级选择一个模型。",
       "tierBest": "最佳",
       "tierBestDesc": "最强能力",
       "tierBalanced": "均衡",
@@ -1175,7 +1176,7 @@
         "minimaxCn": "Minimax CN",
         "kimiCoding": "Kimi (Coding)",
         "vercelAiGateway": "Vercel AI Gateway",
-        "craftAgentsBackend": "Craft Agents 后端（直连）",
+        "zhangyugeAgentBackend": "章鱼哥AI 后端（直连）",
         "custom": "自定义"
       }
     },
@@ -1252,7 +1253,7 @@
         },
         "addSource": {
           "label": "添加数据源",
-          "example": "连接到我的 Craft 空间",
+          "example": "连接到我的 章鱼哥AI 空间",
           "placeholder": "你想连接什么？"
         },
         "addSourceApi": {

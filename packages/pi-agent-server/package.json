@@ -1,5 +1,5 @@
 {
-  "name": "@craft-agent/pi-agent-server",
+  "name": "@zhangyuge-agent/pi-agent-server",
   "version": "0.7.6",
   "license": "Apache-2.0",
   "description": "Out-of-process Pi agent server communicating via JSONL over stdio",

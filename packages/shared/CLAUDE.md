@@ -1,7 +1,7 @@
-# CLAUDE.md — `@craft-agent/shared`
+# CLAUDE.md — `@zhangyuge-agent/shared`
 
 ## Purpose
-Core business logic package for Craft Agent:
+Core business logic package for 章鱼哥AI:
 - Agent backends and session-scoped tools
 - Sources, credentials, sessions, and config
 - Permission modes and validation
@@ -27,7 +27,7 @@ cd packages/shared && bun run tsc --noEmit
 
 ## Notes
 - `ClaudeAgent` is the primary class in `src/agent/claude-agent.ts`.
-- Backward alias export (`CraftAgent`) exists for compatibility.
+- Backward alias export (`ZhangyugeAgent`) exists for compatibility.
 
 ## Source of truth
 - Package exports: `packages/shared/src/index.ts` and subpath export entries.

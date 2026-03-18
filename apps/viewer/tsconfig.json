@@ -16,7 +16,11 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@zhangyuge-agent/core": ["../../packages/core/src/index.ts"],
+      "@zhangyuge-agent/core/*": ["../../packages/core/src/*"],
+      "@zhangyuge-agent/ui": ["../../packages/ui/src/index.ts"],
+      "@zhangyuge-agent/ui/*": ["../../packages/ui/src/*"]
     }
   },
   "include": ["src"],

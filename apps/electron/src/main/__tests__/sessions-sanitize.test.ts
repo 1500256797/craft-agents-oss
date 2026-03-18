@@ -5,7 +5,7 @@
  * XML, and normalizes whitespace for session title generation.
  */
 import { describe, it, expect } from 'bun:test'
-import { sanitizeForTitle } from '@craft-agent/server-core/domain'
+import { sanitizeForTitle } from '@zhangyuge-agent/server-core/domain'
 
 // ============================================================================
 // sanitizeForTitle — bracket mention stripping

@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Build script for standalone Craft Agent server.
+ * Build script for standalone 章鱼哥AI server.
  *
  * Assembles a self-contained distribution directory with all runtime
  * dependencies, resources, and platform-specific binaries.
@@ -80,7 +80,7 @@ interface ServerBuildConfig {
 
 function showHelp(): void {
   console.log(`
-Standalone server build script for Craft Agent
+Standalone server build script for 章鱼哥AI
 
 Usage:
   bun run scripts/build-server.ts [options]
@@ -454,9 +454,9 @@ function copyWorkspacePackages(config: ServerBuildConfig): void {
 function createRootConfig(config: ServerBuildConfig): void {
   const { outputDir, version } = config;
 
-  // Root package.json with workspaces (Bun resolves @craft-agent/* through this)
+  // Root package.json with workspaces (Bun resolves @zhangyuge-agent/* through this)
   const rootPkg = {
-    name: 'craft-server-dist',
+    name: 'zhangyuge-agent-server-dist',
     version,
     private: true,
     workspaces: ['packages/*'],
@@ -470,10 +470,10 @@ function createRootConfig(config: ServerBuildConfig): void {
       module: 'ESNext',
       moduleResolution: 'bundler',
       paths: {
-        '@craft-agent/server-core/*': ['./packages/server-core/src/*'],
-        '@craft-agent/shared/*': ['./packages/shared/src/*'],
-        '@craft-agent/core/*': ['./packages/core/src/*'],
-        '@craft-agent/session-tools-core/*': ['./packages/session-tools-core/src/*'],
+        '@zhangyuge-agent/server-core/*': ['./packages/server-core/src/*'],
+        '@zhangyuge-agent/shared/*': ['./packages/shared/src/*'],
+        '@zhangyuge-agent/core/*': ['./packages/core/src/*'],
+        '@zhangyuge-agent/session-tools-core/*': ['./packages/session-tools-core/src/*'],
       },
     },
   };
@@ -489,8 +489,8 @@ function createEntryScripts(config: ServerBuildConfig): void {
   const binDir = join(outputDir, 'bin');
   mkdirSync(binDir, { recursive: true });
 
-  // bin/craft-server — main entry wrapper
-  const craftServer = `#!/bin/sh
+  // bin/zhangyuge-agent-server — main entry wrapper
+  const zhangyugeAgentServer = `#!/bin/sh
 set -e
 
 # Resolve the distribution root
@@ -498,14 +498,14 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(dirname "$SCRIPT_DIR")"
 
 # Set environment for resource resolution
-export CRAFT_BUNDLED_ASSETS_ROOT="$ROOT"
-export CRAFT_IS_PACKAGED=true
-export CRAFT_APP_ROOT="$ROOT"
-export CRAFT_RESOURCES_PATH="$ROOT/resources"
+export ZHANGYUGE_AGENT_BUNDLED_ASSETS_ROOT="$ROOT"
+export ZHANGYUGE_AGENT_IS_PACKAGED=true
+export ZHANGYUGE_AGENT_APP_ROOT="$ROOT"
+export ZHANGYUGE_AGENT_RESOURCES_PATH="$ROOT/resources"
 
 # CLI tools (doc tools use uv + Python scripts)
-export CRAFT_UV="$ROOT/resources/bin/uv"
-export CRAFT_SCRIPTS="$ROOT/resources/scripts"
+export ZHANGYUGE_AGENT_UV="$ROOT/resources/bin/uv"
+export ZHANGYUGE_AGENT_SCRIPTS="$ROOT/resources/scripts"
 
 # Prepend resource bin to PATH (makes doc tool wrappers available)
 export PATH="$ROOT/resources/bin:$ROOT/vendor/bun:$PATH"
@@ -513,13 +513,13 @@ export PATH="$ROOT/resources/bin:$ROOT/vendor/bun:$PATH"
 # Use bundled Bun runtime
 exec "$ROOT/vendor/bun/bun" run "$ROOT/packages/server/src/index.ts" "$@"
 `;
-  writeFileSync(join(binDir, 'craft-server'), craftServer);
+  writeFileSync(join(binDir, 'zhangyuge-agent-server'), zhangyugeAgentServer);
 
   // start.sh — convenience entry
   const startSh = `#!/bin/sh
-# Craft Agent Server — convenience entry point
+# 章鱼哥AI Server — convenience entry point
 DIR="$(cd "$(dirname "$0")" && pwd)"
-exec "$DIR/bin/craft-server" "$@"
+exec "$DIR/bin/zhangyuge-agent-server" "$@"
 `;
   writeFileSync(join(outputDir, 'start.sh'), startSh);
 
@@ -529,11 +529,11 @@ set -euo pipefail
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
-echo "=== Craft Agent Server Setup ==="
+echo "=== 章鱼哥AI Server Setup ==="
 echo ""
 
 # Make binaries executable
-chmod +x "$DIR/bin/craft-server" "$DIR/start.sh"
+chmod +x "$DIR/bin/zhangyuge-agent-server" "$DIR/start.sh"
 [ -f "$DIR/vendor/bun/bun" ] && chmod +x "$DIR/vendor/bun/bun"
 [ -f "$DIR/resources/bin/uv" ] && chmod +x "$DIR/resources/bin/uv"
 
@@ -545,22 +545,22 @@ done
 echo "Binaries configured."
 
 # Generate token if not set
-if [ -z "\${CRAFT_SERVER_TOKEN:-}" ]; then
+if [ -z "\${ZHANGYUGE_AGENT_SERVER_TOKEN:-}" ]; then
   TOKEN=\$(openssl rand -hex 32)
   cat > "$DIR/.env" <<ENVFILE
-CRAFT_SERVER_TOKEN=$TOKEN
+ZHANGYUGE_AGENT_SERVER_TOKEN=$TOKEN
 
 # TLS — uncomment and set paths to enable wss://
-# CRAFT_RPC_TLS_CERT=/path/to/cert.pem
-# CRAFT_RPC_TLS_KEY=/path/to/key.pem
-# CRAFT_RPC_TLS_CA=/path/to/ca.pem
+# ZHANGYUGE_AGENT_RPC_TLS_CERT=/path/to/cert.pem
+# ZHANGYUGE_AGENT_RPC_TLS_KEY=/path/to/key.pem
+# ZHANGYUGE_AGENT_RPC_TLS_CA=/path/to/ca.pem
 ENVFILE
   echo ""
   echo "Generated server token (saved to $DIR/.env)"
 else
-  TOKEN="\$CRAFT_SERVER_TOKEN"
+  TOKEN="\$ZHANGYUGE_AGENT_SERVER_TOKEN"
   echo ""
-  echo "Using CRAFT_SERVER_TOKEN from environment."
+  echo "Using ZHANGYUGE_AGENT_SERVER_TOKEN from environment."
 fi
 
 # Systemd installation
@@ -570,12 +570,12 @@ if [ "\${1:-}" = "--systemd" ]; then
     exit 1
   fi
 
-  SERVICE_USER="\${CRAFT_USER:-\$(logname 2>/dev/null || echo craft)}"
-  SERVICE_FILE="/etc/systemd/system/craft-server.service"
+  SERVICE_USER="\${ZHANGYUGE_AGENT_USER:-\$(logname 2>/dev/null || echo zhangyuge)}"
+  SERVICE_FILE="/etc/systemd/system/zhangyuge-agent-server.service"
 
   cat > "$SERVICE_FILE" <<UNIT
 [Unit]
-Description=Craft Agent Server
+Description=章鱼哥AI Server
 After=network.target
 
 [Service]
@@ -583,9 +583,9 @@ Type=simple
 User=$SERVICE_USER
 WorkingDirectory=$DIR
 EnvironmentFile=$DIR/.env
-Environment=CRAFT_RPC_HOST=127.0.0.1
-Environment=CRAFT_RPC_PORT=9100
-ExecStart=$DIR/bin/craft-server
+Environment=ZHANGYUGE_AGENT_RPC_HOST=127.0.0.1
+Environment=ZHANGYUGE_AGENT_RPC_PORT=9100
+ExecStart=$DIR/bin/zhangyuge-agent-server
 Restart=on-failure
 RestartSec=5
 
@@ -594,20 +594,20 @@ WantedBy=multi-user.target
 UNIT
 
   systemctl daemon-reload
-  systemctl enable craft-server
+  systemctl enable zhangyuge-agent-server
 
   echo ""
   echo "Systemd service installed."
-  echo "  Start:   sudo systemctl start craft-server"
-  echo "  Status:  sudo systemctl status craft-server"
-  echo "  Logs:    journalctl -u craft-server -f"
+  echo "  Start:   sudo systemctl start zhangyuge-agent-server"
+  echo "  Status:  sudo systemctl status zhangyuge-agent-server"
+  echo "  Logs:    journalctl -u zhangyuge-agent-server -f"
   echo ""
   exit 0
 fi
 
 echo ""
 echo "Quick start:"
-echo "  CRAFT_SERVER_TOKEN=$TOKEN $DIR/start.sh"
+echo "  ZHANGYUGE_AGENT_SERVER_TOKEN=$TOKEN $DIR/start.sh"
 echo ""
 echo "Or with systemd:"
 echo "  sudo $DIR/install.sh --systemd"
@@ -617,7 +617,7 @@ echo ""
 
   // Make scripts executable at build time
   for (const script of [
-    join(binDir, 'craft-server'),
+    join(binDir, 'zhangyuge-agent-server'),
     join(outputDir, 'start.sh'),
     join(outputDir, 'install.sh'),
   ]) {
@@ -640,45 +640,45 @@ WORKDIR /app
 COPY . .
 
 # Make binaries executable
-RUN chmod +x bin/craft-server vendor/bun/bun resources/bin/uv && \\
+RUN chmod +x bin/zhangyuge-agent-server vendor/bun/bun resources/bin/uv && \\
     for f in resources/bin/*; do [ -f "$f" ] && chmod +x "$f"; done
 
-ENV CRAFT_IS_PACKAGED=true
-ENV CRAFT_BUNDLED_ASSETS_ROOT=/app
-ENV CRAFT_APP_ROOT=/app
-ENV CRAFT_RESOURCES_PATH=/app/resources
-ENV CRAFT_UV=/app/resources/bin/uv
-ENV CRAFT_SCRIPTS=/app/resources/scripts
-ENV CRAFT_RPC_HOST=0.0.0.0
-ENV CRAFT_RPC_PORT=9100
+ENV ZHANGYUGE_AGENT_IS_PACKAGED=true
+ENV ZHANGYUGE_AGENT_BUNDLED_ASSETS_ROOT=/app
+ENV ZHANGYUGE_AGENT_APP_ROOT=/app
+ENV ZHANGYUGE_AGENT_RESOURCES_PATH=/app/resources
+ENV ZHANGYUGE_AGENT_UV=/app/resources/bin/uv
+ENV ZHANGYUGE_AGENT_SCRIPTS=/app/resources/scripts
+ENV ZHANGYUGE_AGENT_RPC_HOST=0.0.0.0
+ENV ZHANGYUGE_AGENT_RPC_PORT=9100
 ENV PATH="/app/resources/bin:/app/vendor/bun:\${PATH}"
 
 EXPOSE 9100
 
-ENTRYPOINT ["/app/bin/craft-server"]
+ENTRYPOINT ["/app/bin/zhangyuge-agent-server"]
 `;
   writeFileSync(join(outputDir, 'Dockerfile'), dockerfile);
 
   const dockerCompose = `version: "3.8"
 services:
-  craft-server:
+  zhangyuge-agent-server:
     build: .
     ports:
       - "9100:9100"
     environment:
-      - CRAFT_SERVER_TOKEN=\${CRAFT_SERVER_TOKEN:?Set CRAFT_SERVER_TOKEN}
-      - CRAFT_RPC_PORT=9100
+      - ZHANGYUGE_AGENT_SERVER_TOKEN=\${ZHANGYUGE_AGENT_SERVER_TOKEN:?Set ZHANGYUGE_AGENT_SERVER_TOKEN}
+      - ZHANGYUGE_AGENT_RPC_PORT=9100
       # TLS — uncomment to enable wss://
-      # - CRAFT_RPC_TLS_CERT=/certs/cert.pem
-      # - CRAFT_RPC_TLS_KEY=/certs/key.pem
+      # - ZHANGYUGE_AGENT_RPC_TLS_CERT=/certs/cert.pem
+      # - ZHANGYUGE_AGENT_RPC_TLS_KEY=/certs/key.pem
     volumes:
-      - craft-data:/root/.craft-agent
+      - zhangyuge-agent-data:/root/.zhangyuge-agent
       # TLS — mount cert directory
       # - ./certs:/certs:ro
     restart: unless-stopped
 
 volumes:
-  craft-data:
+  zhangyuge-agent-data:
 `;
   writeFileSync(join(outputDir, 'docker-compose.yml'), dockerCompose);
 }
@@ -744,7 +744,7 @@ async function main(): Promise<void> {
     version,
   };
 
-  console.log(`=== Building Craft Agent Server ${version} for ${platform}-${arch} ===`);
+  console.log(`=== Building 章鱼哥AI Server ${version} for ${platform}-${arch} ===`);
   console.log(`  Output: ${outputDir}`);
 
   // Step 1: Clean
@@ -799,7 +799,7 @@ async function main(): Promise<void> {
 
   // Compress if requested
   if (config.compress) {
-    const archiveName = `craft-server-${version}-${platform}-${arch}.tar.gz`;
+    const archiveName = `zhangyuge-agent-server-${version}-${platform}-${arch}.tar.gz`;
     const archivePath = join(dirname(outputDir), archiveName);
     console.log(`\nCompressing to ${archiveName}...`);
     await $`tar -czf ${archivePath} -C ${outputDir} .`;
@@ -810,7 +810,7 @@ async function main(): Promise<void> {
 
   console.log('\n  Build completed successfully!');
   console.log(`\nQuick start:`);
-  console.log(`  CRAFT_SERVER_TOKEN=<secret> ${outputDir}/start.sh`);
+  console.log(`  ZHANGYUGE_AGENT_SERVER_TOKEN=<secret> ${outputDir}/start.sh`);
 }
 
 main();

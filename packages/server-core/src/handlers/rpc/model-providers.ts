@@ -1,4 +1,4 @@
-import { RPC_CHANNELS } from '@craft-agent/shared/protocol'
+import { RPC_CHANNELS } from '@zhangyuge-agent/shared/protocol'
 import {
   createModelProvider,
   deleteModelProvider,
@@ -9,8 +9,8 @@ import {
   type ModelProviderListQueryParams,
   type ProviderStatus,
   type UpdateModelProviderForm,
-} from '@craft-agent/shared/account-api'
-import type { RpcServer } from '@craft-agent/server-core/transport'
+} from '@zhangyuge-agent/shared/account-api'
+import type { RpcServer } from '@zhangyuge-agent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 
 export const HANDLED_CHANNELS = [

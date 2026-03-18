@@ -61,13 +61,13 @@ export async function packageDarwin(config: BuildConfig): Promise<string> {
 
   // Verify SDK is bundled in the .app before checking artifacts
   const macDir = arch === 'arm64' ? 'mac-arm64' : 'mac';
-  const appPath = join(electronDir, 'release', macDir, 'Craft Agents.app');
+  const appPath = join(electronDir, 'release', macDir, '章鱼哥AI.app');
   console.log('Verifying SDK in packaged app...');
   verifyPackagedSDK(appPath, arch);
 
   // Verify the DMG and ZIP were built (ZIP is used by electron-updater for auto-updates)
-  const dmgName = `Craft-Agent-${arch}.dmg`;
-  const zipName = `Craft-Agent-${arch}.zip`;
+  const dmgName = `章鱼哥AI-${arch}.dmg`;
+  const zipName = `章鱼哥AI-${arch}.zip`;
   const dmgPath = join(electronDir, 'release', dmgName);
   const zipPath = join(electronDir, 'release', zipName);
 

@@ -1,21 +1,20 @@
 # Trademark Policy
 
-This trademark policy governs the use of the "Craft" and "Craft Agents" names, logos, and branding in connection with the Craft Agents open source project.
+This trademark policy governs the use of the "zhangyuge-agent" and "章鱼哥AI" names, logos, and branding in connection with the 章鱼哥AI open source project.
 
 ## Trademarks
 
-The following are trademarks of Craft Docs Ltd.:
+The following are trademarks of Zhangyuge Agent:
 
-- **Craft** (word mark)
-- **Craft Agents** (word mark)
-- The Craft logo and icon
-- The Craft Agents logo and icon
+- **zhangyuge-agent** (word mark)
+- **章鱼哥AI** (word mark)
+- The 章鱼哥AI logo and icon
 
 ## What You Can Do
 
 ### Use the Code Freely
 
-The Craft Agents source code is licensed under the Apache License 2.0. You are free to:
+The 章鱼哥AI source code is licensed under the Apache License 2.0. You are free to:
 
 - Use, modify, and distribute the code
 - Create derivative works
@@ -25,42 +24,42 @@ The Craft Agents source code is licensed under the Apache License 2.0. You are f
 
 You may make accurate, factual statements about your relationship to the project:
 
-- "Based on Craft Agents"
-- "Built with Craft Agents technology"
-- "Compatible with Craft Agents"
-- "Fork of Craft Agents"
+- "Based on 章鱼哥AI"
+- "Built with 章鱼哥AI technology"
+- "Compatible with 章鱼哥AI"
+- "Fork of 章鱼哥AI"
 
 ### Contribute to the Project
 
-Contributors to the official Craft Agents repository may use the trademarks when discussing their contributions.
+Contributors to the official 章鱼哥AI repository may use the trademarks when discussing their contributions.
 
 ## What You Cannot Do
 
-### Use Craft Branding for Forks
+### Use 章鱼哥AI Branding for Forks
 
 If you create a fork or derivative work, you **must**:
 
-- Choose a different name that does not include "Craft"
-- Remove or replace all Craft logos and icons
-- Update the bundle identifier (e.g., `com.lukilabs.craft-agent`) to your own
-- Remove references to `craft.do` domains unless connecting to official Craft services
+- Choose a different name that does not include "zhangyuge-agent" or "章鱼哥AI"
+- Remove or replace all 章鱼哥AI logos and icons
+- Update the bundle identifier (e.g., `com.lukilabs.zhangyuge-agent`) to your own
+- Remove references to official update/documentation endpoints unless you intentionally rely on them
 
 ### Imply Official Endorsement
 
 You may not:
 
-- Use "Craft" or "Craft Agents" as your product name
-- Use the Craft logo as your application icon
+- Use "zhangyuge-agent" or "章鱼哥AI" as your product name
+- Use the 章鱼哥AI logo as your application icon
 - Suggest that your fork is the official version
-- Imply that Craft Docs Ltd. or Craft endorses your product
+- Imply that Zhangyuge Agent endorses your product
 
 ### Create Confusion
 
 You may not use the trademarks in any way that:
 
-- Suggests your product is created by or affiliated with Craft Docs Ltd.
-- Could cause confusion between your product and the official Craft Agents
-- Disparages Craft Docs Ltd. or the Craft Agents project
+- Suggests your product is created by or affiliated with Zhangyuge Agent
+- Could cause confusion between your product and the official 章鱼哥AI
+- Disparages Zhangyuge Agent or the 章鱼哥AI project
 
 ## Branding Locations
 
@@ -76,20 +75,20 @@ For those creating forks, the following files contain branding that should be up
 
 ### Acceptable
 
-- "MyAgent - based on Craft Agents"
-- "This project is a fork of Craft Agents"
-- "Compatible with the Craft Agents ecosystem"
+- "MyAgent - based on 章鱼哥AI"
+- "This project is a fork of 章鱼哥AI"
+- "Compatible with the 章鱼哥AI ecosystem"
 
 ### Not Acceptable
 
-- "Craft Agents Pro"
-- "Craft Agent for Linux"
-- "Better Craft Agents"
-- Using the Craft logo for your fork
+- "章鱼哥AI Pro"
+- "章鱼哥AI for Linux"
+- "Better 章鱼哥AI"
+- Using the 章鱼哥AI logo for your fork
 
 ## Questions
 
-If you have questions about this trademark policy or would like to request permission for a specific use, please open an issue in the repository or contact us at legal@craft.do.
+If you have questions about this trademark policy or would like to request permission for a specific use, please open an issue in the repository.
 
 ## Changes
 

@@ -54,7 +54,7 @@ Implication:
    - target repo is centered around Bun workspaces + Vite/Electron + React 18,
    - source repo is Next 16 + React 19.
 2. UI stack mismatch:
-   - current repo UI centers on `@craft-agent/ui`, Radix, Jotai, custom renderer shell,
+   - current repo UI centers on `@zhangyuge-agent/ui`, Radix, Jotai, custom renderer shell,
    - source repo uses TDesign, Zustand, Next navigation, Monaco, xterm, VNC, custom CSS.
 3. State and protocol are app-specific:
    - `chain-agent-web` uses many dedicated Zustand stores and websocket helpers for agents, sessions, skills, models, connectors, and file panels.
@@ -272,7 +272,7 @@ Decide one of:
 Mitigation:
 
 - Keep the imported app isolated in phase 1.
-- Do not depend on `@craft-agent/ui` immediately.
+- Do not depend on `@zhangyuge-agent/ui` immediately.
 
 ### Risk 2: Next-specific runtime assumptions
 

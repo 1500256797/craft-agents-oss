@@ -1,12 +1,12 @@
-import type { EventSink } from '@craft-agent/server-core/transport'
-import type { ISessionManager, IBrowserPaneManager } from '@craft-agent/server-core/handlers'
-import { createScopedLogger, CONSOLE_LOGGER, type PlatformServices, type Logger } from '@craft-agent/server-core/runtime'
+import type { EventSink } from '@zhangyuge-agent/server-core/transport'
+import type { ISessionManager, IBrowserPaneManager } from '@zhangyuge-agent/server-core/handlers'
+import { createScopedLogger, CONSOLE_LOGGER, type PlatformServices, type Logger } from '@zhangyuge-agent/server-core/runtime'
 import { basename, join, normalize, isAbsolute, sep } from 'path'
 import { existsSync } from 'fs'
 import { appendFile, readFile, writeFile, mkdir, realpath } from 'fs/promises'
 import { homedir, tmpdir } from 'os'
 import { randomUUID } from 'node:crypto'
-import { type AgentEvent, setPermissionMode, hydratePreviousPermissionMode, getPermissionModeDiagnostics, type PermissionMode, unregisterSessionScopedToolCallbacks, mergeSessionScopedToolCallbacks, AbortReason, type AuthRequest, type AuthResult, type CredentialAuthRequest, type BrowserPaneFns } from '@craft-agent/shared/agent'
+import { type AgentEvent, setPermissionMode, hydratePreviousPermissionMode, getPermissionModeDiagnostics, type PermissionMode, unregisterSessionScopedToolCallbacks, mergeSessionScopedToolCallbacks, AbortReason, type AuthRequest, type AuthResult, type CredentialAuthRequest, type BrowserPaneFns } from '@zhangyuge-agent/shared/agent'
 import {
   resolveSessionConnection,
   createBackendFromConnection,
@@ -17,10 +17,10 @@ import {
   type AgentBackend,
   type BackendHostRuntimeContext,
   type PostInitResult,
-} from '@craft-agent/shared/agent/backend'
-import { getLlmConnection, getDefaultLlmConnection, getDefaultThinkingLevel } from '@craft-agent/shared/config'
-import { PrivilegedExecutionBroker } from '@craft-agent/server-core/services'
-import { InitGate } from '@craft-agent/server-core/domain'
+} from '@zhangyuge-agent/shared/agent/backend'
+import { getLlmConnection, getDefaultLlmConnection, getDefaultThinkingLevel } from '@zhangyuge-agent/shared/config'
+import { PrivilegedExecutionBroker } from '@zhangyuge-agent/server-core/services'
+import { InitGate } from '@zhangyuge-agent/server-core/domain'
 import {
   getWorkspaces,
   getWorkspaceByNameOrId,
@@ -32,8 +32,8 @@ import {
   migrateOrphanedDefaultConnections,
   MODEL_REGISTRY,
   type Workspace,
-} from '@craft-agent/shared/config'
-import { loadWorkspaceConfig } from '@craft-agent/shared/workspaces'
+} from '@zhangyuge-agent/shared/config'
+import { loadWorkspaceConfig } from '@zhangyuge-agent/shared/workspaces'
 import {
   // Session persistence functions
   listSessions as listStoredSessions,
@@ -57,31 +57,31 @@ import {
   type SessionStatus,
   type SessionHeader,
   pickSessionFields,
-} from '@craft-agent/shared/sessions'
-import { loadWorkspaceSources, loadAllSources, getSourcesBySlugs, isSourceUsable, type LoadedSource, type McpServerConfig, getSourcesNeedingAuth, getSourceCredentialManager, getSourceServerBuilder, type SourceWithCredential, isApiOAuthProvider, SERVER_BUILD_ERRORS, TokenRefreshManager, createTokenGetter } from '@craft-agent/shared/sources'
-import { ConfigWatcher, type ConfigWatcherCallbacks } from '@craft-agent/shared/config'
-import { getValidClaudeOAuthToken } from '@craft-agent/shared/auth'
-import { resolveAuthEnvVars } from '@craft-agent/shared/config'
-import { toolMetadataStore, getLastApiError } from '@craft-agent/shared/interceptor'
-import { isParentTaskTool } from '@craft-agent/shared/utils/toolNames'
-import { getCredentialManager } from '@craft-agent/shared/credentials'
-import { CraftMcpClient, McpClientPool, McpPoolServer } from '@craft-agent/shared/mcp'
-import { type Session, type SessionEvent, type FileAttachment, type SendMessageOptions, type UnreadSummary, RPC_CHANNELS, generateMessageId } from '@craft-agent/shared/protocol'
-import { messageToStored, storedToMessage, type Message, type StoredAttachment, type ToolDisplayMeta } from '@craft-agent/core/types'
-import { formatPathsToRelative, formatToolInputPaths, perf, encodeIconToDataUrlAsync, getEmojiIcon, resetSummarizationClient, resolveToolIcon, readFileAttachment, selectSpreadMessages, normalizePath } from '@craft-agent/shared/utils'
-import { loadAllSkills, loadSkillBySlug, type LoadedSkill } from '@craft-agent/shared/skills'
-import { getToolIconsDir, getMiniModel } from '@craft-agent/shared/config'
-import type { SummarizeCallback } from '@craft-agent/shared/sources'
-import { type ThinkingLevel, DEFAULT_THINKING_LEVEL } from '@craft-agent/shared/agent/thinking-levels'
-import { evaluateAutoLabels } from '@craft-agent/shared/labels/auto'
-import { listLabels } from '@craft-agent/shared/labels/storage'
-import { extractLabelId } from '@craft-agent/shared/labels'
-import { ensureLabelsExist } from '@craft-agent/shared/labels/crud'
-import { AutomationSystem, AUTOMATIONS_HISTORY_FILE, createPromptHistoryEntry, type AutomationSystemMetadataSnapshot } from '@craft-agent/shared/automations'
+} from '@zhangyuge-agent/shared/sessions'
+import { loadWorkspaceSources, loadAllSources, getSourcesBySlugs, isSourceUsable, type LoadedSource, type McpServerConfig, getSourcesNeedingAuth, getSourceCredentialManager, getSourceServerBuilder, type SourceWithCredential, isApiOAuthProvider, SERVER_BUILD_ERRORS, TokenRefreshManager, createTokenGetter } from '@zhangyuge-agent/shared/sources'
+import { ConfigWatcher, type ConfigWatcherCallbacks } from '@zhangyuge-agent/shared/config'
+import { getValidClaudeOAuthToken } from '@zhangyuge-agent/shared/auth'
+import { resolveAuthEnvVars } from '@zhangyuge-agent/shared/config'
+import { toolMetadataStore, getLastApiError } from '@zhangyuge-agent/shared/interceptor'
+import { isParentTaskTool } from '@zhangyuge-agent/shared/utils/toolNames'
+import { getCredentialManager } from '@zhangyuge-agent/shared/credentials'
+import { 章鱼哥AIMcpClient, McpClientPool, McpPoolServer } from '@zhangyuge-agent/shared/mcp'
+import { type Session, type SessionEvent, type FileAttachment, type SendMessageOptions, type UnreadSummary, RPC_CHANNELS, generateMessageId } from '@zhangyuge-agent/shared/protocol'
+import { messageToStored, storedToMessage, type Message, type StoredAttachment, type ToolDisplayMeta } from '@zhangyuge-agent/core/types'
+import { formatPathsToRelative, formatToolInputPaths, perf, encodeIconToDataUrlAsync, getEmojiIcon, resetSummarizationClient, resolveToolIcon, readFileAttachment, selectSpreadMessages, normalizePath } from '@zhangyuge-agent/shared/utils'
+import { loadAllSkills, loadSkillBySlug, type LoadedSkill } from '@zhangyuge-agent/shared/skills'
+import { getToolIconsDir, getMiniModel } from '@zhangyuge-agent/shared/config'
+import type { SummarizeCallback } from '@zhangyuge-agent/shared/sources'
+import { type ThinkingLevel, DEFAULT_THINKING_LEVEL } from '@zhangyuge-agent/shared/agent/thinking-levels'
+import { evaluateAutoLabels } from '@zhangyuge-agent/shared/labels/auto'
+import { listLabels } from '@zhangyuge-agent/shared/labels/storage'
+import { extractLabelId } from '@zhangyuge-agent/shared/labels'
+import { ensureLabelsExist } from '@zhangyuge-agent/shared/labels/crud'
+import { AutomationSystem, AUTOMATIONS_HISTORY_FILE, createPromptHistoryEntry, type AutomationSystemMetadataSnapshot } from '@zhangyuge-agent/shared/automations'
 
 // Import from server-core domain utilities
-import { sanitizeForTitle, shouldActivateBrowserOverlay, normalizeBrowserToolName, rollbackFailedBranchCreation, releaseBrowserOwnershipOnForcedStop } from '@craft-agent/server-core/domain'
-import { resizeImageForAPI, resizeIconBuffer } from '@craft-agent/server-core/services'
+import { sanitizeForTitle, shouldActivateBrowserOverlay, normalizeBrowserToolName, rollbackFailedBranchCreation, releaseBrowserOwnershipOnForcedStop } from '@zhangyuge-agent/server-core/domain'
+import { resizeImageForAPI, resizeIconBuffer } from '@zhangyuge-agent/server-core/services'
 export { sanitizeForTitle }
 
 // Module-level platform ref — set once during init via setSessionPlatform()
@@ -487,7 +487,7 @@ async function applyBridgeUpdates(
   agent: AgentInstance,
   sessionPath: string,
   enabledSources: LoadedSource[],
-  mcpServers: Record<string, import('@craft-agent/shared/agent/backend').SdkMcpServerConfig>,
+  mcpServers: Record<string, import('@zhangyuge-agent/shared/agent/backend').SdkMcpServerConfig>,
   sessionId: string,
   workspaceRootPath: string,
   context: string,
@@ -525,7 +525,7 @@ async function getBrowserToolIconDataUrl(): Promise<string | undefined> {
   try {
     const iconCandidates = [
       join(getToolIconsDir(), BROWSER_TOOL_ICON_FILENAME),
-      // Dev fallback (before sync to ~/.craft-agent/tool-icons)
+      // Dev fallback (before sync to ~/.zhangyuge-agent/tool-icons)
       join(process.cwd(), 'apps', 'electron', 'resources', 'tool-icons', BROWSER_TOOL_ICON_FILENAME),
       // Packaged fallback (app resources)
       join(process.resourcesPath, 'tool-icons', BROWSER_TOOL_ICON_FILENAME),
@@ -581,8 +581,8 @@ async function resolveToolDisplayMeta(
           'send_developer_feedback': 'Send Feedback',
           'browser_tool': 'Browser',
         },
-        'craft-agents-docs': {
-          'SearchCraftAgents': 'Search Docs',
+        'zhangyuge-agent-docs': {
+          'SearchZhangyugeAgentDocs': 'Search Docs',
         },
       }
 
@@ -659,7 +659,7 @@ async function resolveToolDisplayMeta(
 
   // CLI tool icon resolution for Bash commands
   // Parses the command string to detect known tools (git, npm, docker, etc.)
-  // and resolves their brand icon from ~/.craft-agent/tool-icons/
+  // and resolves their brand icon from ~/.zhangyuge-agent/tool-icons/
   if (toolName === 'Bash' && toolInput?.command) {
     try {
       const toolIconsDir = getToolIconsDir()
@@ -740,7 +740,7 @@ interface ManagedSession {
   // Used to detect if a follow-up message has superseded the current one (stale-request guard).
   processingGeneration: number
   // NOTE: Parent-child tracking state (pendingTools, parentToolStack, toolToParentMap,
-  // pendingTextParent) has been removed. CraftAgent now provides parentToolUseId
+  // pendingTextParent) has been removed. ZhangyugeAgent now provides parentToolUseId
   // directly on all events using the SDK's authoritative parent_tool_use_id field.
   // See: packages/shared/src/agent/tool-matching.ts
   // Session name (user-defined or AI-generated)
@@ -998,7 +998,7 @@ export class SessionManager implements ISessionManager {
   // Automation systems for workspace event automations - one per workspace (includes scheduler, diffing, and handlers)
   private automationSystems: Map<string, AutomationSystem> = new Map()
   // Pending credential request resolvers (keyed by requestId)
-  private pendingCredentialResolvers: Map<string, (response: import('@craft-agent/shared/protocol').CredentialResponse) => void> = new Map()
+  private pendingCredentialResolvers: Map<string, (response: import('@zhangyuge-agent/shared/protocol').CredentialResponse) => void> = new Map()
   // Permission request metadata tracking (keyed by requestId)
   private pendingPermissionRequests: Map<string, {
     sessionId: string
@@ -1255,7 +1255,7 @@ export class SessionManager implements ISessionManager {
       onSkillChange: async (slug, skill) => {
         sessionLog.info(`Skill '${slug}' changed:`, skill ? 'updated' : 'deleted')
         // Broadcast updated list to UI
-        const { loadAllSkills } = await import('@craft-agent/shared/skills')
+        const { loadAllSkills } = await import('@zhangyuge-agent/shared/skills')
         const skills = loadAllSkills(workspaceRootPath)
         this.broadcastSkillsChanged(workspaceId, skills)
       },
@@ -1401,7 +1401,7 @@ export class SessionManager implements ISessionManager {
     this.eventSink(RPC_CHANNELS.automations.CHANGED, { to: 'workspace', workspaceId }, workspaceId)
   }
 
-  private broadcastAppThemeChanged(theme: import('@craft-agent/shared/config').ThemeOverrides | null): void {
+  private broadcastAppThemeChanged(theme: import('@zhangyuge-agent/shared/config').ThemeOverrides | null): void {
     if (!this.eventSink) return
     sessionLog.info(`Broadcasting app theme changed`)
     this.eventSink(RPC_CHANNELS.theme.APP_CHANGED, { to: 'all' }, theme)
@@ -1413,7 +1413,7 @@ export class SessionManager implements ISessionManager {
     this.eventSink(RPC_CHANNELS.llmConnections.CHANGED, { to: 'all' })
   }
 
-  private broadcastSkillsChanged(workspaceId: string, skills: import('@craft-agent/shared/skills').LoadedSkill[]): void {
+  private broadcastSkillsChanged(workspaceId: string, skills: import('@zhangyuge-agent/shared/skills').LoadedSkill[]): void {
     if (!this.eventSink) return
     sessionLog.info(`Broadcasting skills changed (${skills.length} skills)`)
     this.eventSink(RPC_CHANNELS.skills.CHANGED, { to: 'workspace', workspaceId }, workspaceId, skills)
@@ -1436,7 +1436,7 @@ export class SessionManager implements ISessionManager {
     const workspaceRootPath = managed.workspace.rootPath
     sessionLog.info(`Reloading sources for session ${managed.id}`)
 
-    // Reload all sources from disk (craft-agents-docs is always available as MCP server)
+    // Reload all sources from disk (zhangyuge-agent-docs is always available as MCP server)
     const allSources = loadAllSources(workspaceRootPath)
     managed.agent.setAllSources(allSources)
 
@@ -1466,7 +1466,7 @@ export class SessionManager implements ISessionManager {
    * Bun's automatic .env loading is disabled in the subprocess (--env-file=/dev/null)
    * to prevent a user's project .env from injecting ANTHROPIC_API_KEY and overriding
    * OAuth auth — Claude Code prioritizes API key over OAuth token when both are set.
-   * See: https://github.com/lukilabs/craft-agents-oss/issues/39
+   * See: https://github.com/lukilabs/zhangyuge-agent/issues/39
    */
   /**
    * Reinitialize authentication environment variables.
@@ -1779,7 +1779,7 @@ export class SessionManager implements ISessionManager {
   async handleCredentialInput(
     sessionId: string,
     requestId: string,
-    response: import('@craft-agent/shared/protocol').CredentialResponse
+    response: import('@zhangyuge-agent/shared/protocol').CredentialResponse
   ): Promise<void> {
     const managed = this.sessions.get(sessionId)
     if (!managed?.pendingAuthRequest) {
@@ -1835,7 +1835,7 @@ export class SessionManager implements ISessionManager {
       }
 
       // Update source config to mark as authenticated
-      const { markSourceAuthenticated } = await import('@craft-agent/shared/sources')
+      const { markSourceAuthenticated } = await import('@zhangyuge-agent/shared/sources')
       markSourceAuthenticated(managed.workspace.rootPath, request.sourceSlug)
 
       // Mark source as unseen so fresh guide is injected on next message
@@ -2042,7 +2042,7 @@ export class SessionManager implements ISessionManager {
     return getSessionStoragePath(managed.workspace.rootPath, sessionId)
   }
 
-  async createSession(workspaceId: string, options?: import('@craft-agent/shared/protocol').CreateSessionOptions): Promise<Session> {
+  async createSession(workspaceId: string, options?: import('@zhangyuge-agent/shared/protocol').CreateSessionOptions): Promise<Session> {
     const workspace = getWorkspaceByNameOrId(workspaceId)
     if (!workspace) {
       throw new Error(`Workspace ${workspaceId} not found`)
@@ -2469,10 +2469,10 @@ export class SessionManager implements ISessionManager {
       }
 
       // Set session directory for tool metadata cross-process sharing.
-      // The SDK subprocess reads CRAFT_SESSION_DIR to write tool-metadata.json;
+      // The SDK subprocess reads ZHANGYUGE_AGENT_SESSION_DIR to write tool-metadata.json;
       // the main process reads it via toolMetadataStore.setSessionDir().
       const sessionDirForMetadata = getSessionStoragePath(managed.workspace.rootPath, managed.id)
-      process.env.CRAFT_SESSION_DIR = sessionDirForMetadata
+      process.env.ZHANGYUGE_AGENT_SESSION_DIR = sessionDirForMetadata
       toolMetadataStore.setSessionDir(sessionDirForMetadata)
 
       // Set up agentReady promise so title generation can await agent creation
@@ -2506,7 +2506,7 @@ export class SessionManager implements ISessionManager {
 
       // Per-session env overrides
       const envOverrides: Record<string, string> = {
-        CRAFT_WORKSPACE_PATH: managed.workspace.rootPath,
+        ZHANGYUGE_AGENT_WORKSPACE_PATH: managed.workspace.rootPath,
       }
       managed.envOverrides = envOverrides
 
@@ -3080,7 +3080,7 @@ export class SessionManager implements ISessionManager {
       }
 
       // Note: Credential requests now flow through onAuthRequest (unified auth flow)
-      // The legacy onCredentialRequest callback has been removed from CraftAgent
+      // The legacy onCredentialRequest callback has been removed from ZhangyugeAgent
       // Auth refresh for mid-session token expiry is handled by the error handler in sendMessage
       // which destroys/recreates the agent to get fresh credentials
 
@@ -3500,7 +3500,7 @@ export class SessionManager implements ISessionManager {
     }
 
     // Validate connection exists
-    const { getLlmConnection } = await import('@craft-agent/shared/config/storage')
+    const { getLlmConnection } = await import('@zhangyuge-agent/shared/config/storage')
     const connection = getLlmConnection(connectionSlug)
     if (!connection) {
       sessionLog.warn(`setSessionConnection: connection "${connectionSlug}" not found`)
@@ -3583,7 +3583,7 @@ export class SessionManager implements ISessionManager {
    * Share session to the web viewer
    * Uploads session data and returns shareable URL
    */
-  async shareToViewer(sessionId: string): Promise<import('@craft-agent/shared/protocol').ShareResult> {
+  async shareToViewer(sessionId: string): Promise<import('@zhangyuge-agent/shared/protocol').ShareResult> {
     const managed = this.sessions.get(sessionId)
     if (!managed) {
       return { success: false, error: 'Session not found' }
@@ -3600,7 +3600,7 @@ export class SessionManager implements ISessionManager {
         return { success: false, error: 'Session file not found' }
       }
 
-      const { VIEWER_URL } = await import('@craft-agent/shared/branding')
+      const { VIEWER_URL } = await import('@zhangyuge-agent/shared/branding')
       const response = await fetch(`${VIEWER_URL}/s/api`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -3644,7 +3644,7 @@ export class SessionManager implements ISessionManager {
    * Update an existing shared session
    * Re-uploads session data to the same URL
    */
-  async updateShare(sessionId: string): Promise<import('@craft-agent/shared/protocol').ShareResult> {
+  async updateShare(sessionId: string): Promise<import('@zhangyuge-agent/shared/protocol').ShareResult> {
     const managed = this.sessions.get(sessionId)
     if (!managed) {
       return { success: false, error: 'Session not found' }
@@ -3664,7 +3664,7 @@ export class SessionManager implements ISessionManager {
         return { success: false, error: 'Session file not found' }
       }
 
-      const { VIEWER_URL } = await import('@craft-agent/shared/branding')
+      const { VIEWER_URL } = await import('@zhangyuge-agent/shared/branding')
       const response = await fetch(`${VIEWER_URL}/s/api/${managed.sharedId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -3695,7 +3695,7 @@ export class SessionManager implements ISessionManager {
    * Revoke a shared session
    * Deletes from viewer and clears local shared state
    */
-  async revokeShare(sessionId: string): Promise<import('@craft-agent/shared/protocol').ShareResult> {
+  async revokeShare(sessionId: string): Promise<import('@zhangyuge-agent/shared/protocol').ShareResult> {
     const managed = this.sessions.get(sessionId)
     if (!managed) {
       return { success: false, error: 'Session not found' }
@@ -3709,7 +3709,7 @@ export class SessionManager implements ISessionManager {
     this.sendEvent({ type: 'async_operation', sessionId, isOngoing: true }, managed.workspace.id)
 
     try {
-      const { VIEWER_URL } = await import('@craft-agent/shared/branding')
+      const { VIEWER_URL } = await import('@zhangyuge-agent/shared/branding')
       const response = await fetch(
         `${VIEWER_URL}/s/api/${managed.sharedId}`,
         { method: 'DELETE' }
@@ -4373,7 +4373,7 @@ export class SessionManager implements ISessionManager {
     // Revoke share if session was shared (prevent orphaned viewer copies)
     if (managed.sharedId) {
       try {
-        const { VIEWER_URL } = await import('@craft-agent/shared/branding')
+        const { VIEWER_URL } = await import('@zhangyuge-agent/shared/branding')
         const response = await fetch(
           `${VIEWER_URL}/s/api/${managed.sharedId}`,
           { method: 'DELETE', signal: AbortSignal.timeout(5000) }
@@ -4755,7 +4755,7 @@ export class SessionManager implements ISessionManager {
 
       // Skills mentioned via @mentions are handled by the SDK's Skill tool.
       // The UI layer (extractBadges in mentions.ts) injects fully-qualified names
-      // in the rawText, and canUseTool in craft-agent.ts provides a fallback
+      // in the rawText, and canUseTool in zhangyuge-agent.ts provides a fallback
       // to qualify short names. No transformation needed here.
 
       // Ensure main process reads tool metadata from the correct session directory.
@@ -5387,7 +5387,7 @@ export class SessionManager implements ISessionManager {
     requestId: string,
     allowed: boolean,
     alwaysAllow: boolean,
-    options?: import('@craft-agent/shared/protocol').PermissionResponseOptions,
+    options?: import('@zhangyuge-agent/shared/protocol').PermissionResponseOptions,
   ): boolean {
     const managed = this.sessions.get(sessionId)
     if (managed?.agent) {
@@ -5427,7 +5427,7 @@ export class SessionManager implements ISessionManager {
    * - New unified auth flow (via handleCredentialInput)
    * - Legacy callback flow (via pendingCredentialResolvers)
    */
-  async respondToCredential(sessionId: string, requestId: string, response: import('@craft-agent/shared/protocol').CredentialResponse): Promise<boolean> {
+  async respondToCredential(sessionId: string, requestId: string, response: import('@zhangyuge-agent/shared/protocol').CredentialResponse): Promise<boolean> {
     // First, check if this is a new unified auth flow request
     const managed = this.sessions.get(sessionId)
     if (managed?.pendingAuthRequest && managed.pendingAuthRequest.requestId === requestId) {
@@ -5801,7 +5801,7 @@ export class SessionManager implements ISessionManager {
         const existingStartMsg = managed.messages.find(m => m.toolUseId === event.toolUseId)
         const isDuplicateEvent = !!existingStartMsg
 
-        // Use parentToolUseId directly from the event — CraftAgent resolves this
+        // Use parentToolUseId directly from the event — ZhangyugeAgent resolves this
         // from SDK's parent_tool_use_id (authoritative, handles parallel Tasks correctly).
         // No stack or map needed; the event carries the correct parent from the start.
         const parentToolUseId = event.parentToolUseId
@@ -5898,7 +5898,7 @@ export class SessionManager implements ISessionManager {
       }
 
       case 'tool_result': {
-        // toolName comes directly from CraftAgent (resolved via ToolIndex)
+        // toolName comes directly from ZhangyugeAgent (resolved via ToolIndex)
         const toolName = event.toolName || 'unknown'
 
         // Format absolute paths to relative paths for better readability
@@ -5921,7 +5921,7 @@ export class SessionManager implements ISessionManager {
 
         sessionLog.info(`RESULT MATCH: toolUseId=${event.toolUseId}, found=${!!existingToolMsg}, toolName=${existingToolMsg?.toolName || toolName}, wasComplete=${wasAlreadyComplete}`)
 
-        // parentToolUseId comes from CraftAgent (SDK-authoritative) or existing message
+        // parentToolUseId comes from ZhangyugeAgent (SDK-authoritative) or existing message
         const parentToolUseId = existingToolMsg?.parentToolUseId || event.parentToolUseId
 
         if (existingToolMsg) {
@@ -6216,7 +6216,7 @@ export class SessionManager implements ISessionManager {
         break
 
       case 'complete':
-        // Complete event from CraftAgent - accumulate usage from this turn
+        // Complete event from ZhangyugeAgent - accumulate usage from this turn
         // Actual 'complete' sent to renderer comes from the finally block in sendMessage
         if (event.usage) {
           // Initialize tokenUsage if not set

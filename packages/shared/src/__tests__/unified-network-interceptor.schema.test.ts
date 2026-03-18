@@ -5,7 +5,7 @@ let sanitizeEmptyTextCacheControl: typeof import('../unified-network-interceptor
 
 describe('unified-network-interceptor schema metadata injection', () => {
   beforeAll(async () => {
-    process.env.CRAFT_INTERCEPTOR_DISABLE_AUTO_INSTALL = '1';
+    process.env.ZHANGYUGE_AGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL = '1';
     ({ injectMetadataIntoToolSchema, sanitizeEmptyTextCacheControl } = await import('../unified-network-interceptor.ts'));
   });
 

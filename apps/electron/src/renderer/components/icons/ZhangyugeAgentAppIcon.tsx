@@ -1,14 +1,14 @@
 import brandLogo from "@/assets/logo.svg"
 
-interface CraftAppIconProps {
+interface 章鱼哥AIAppIconProps {
   className?: string
   size?: number
 }
 
 /**
- * CraftAppIcon - Displays the current brand logo asset.
+ * 章鱼哥AIAppIcon - Displays the current brand logo asset.
  */
-export function CraftAppIcon({ className, size = 64 }: CraftAppIconProps) {
+export function 章鱼哥AIAppIcon({ className, size = 64 }: 章鱼哥AIAppIconProps) {
   return (
     <img
       src={brandLogo}

@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 import { Button, type ButtonProps } from "@/components/ui/button"
-import { Spinner } from "@craft-agent/ui"
+import { Spinner } from "@zhangyuge-agent/ui"
 import { useI18n } from "@/context/I18nContext"
 
 /* =============================================================================

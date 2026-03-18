@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, mock } from 'bun:test'
-import type { RpcServer } from '@craft-agent/server-core/transport'
+import type { RpcServer } from '@zhangyuge-agent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 
 const registeredChannels: string[] = []
@@ -101,20 +101,20 @@ async function getExpectedCoreChannels(): Promise<Set<string>> {
     workspace,
     onboarding,
   ] = await Promise.all([
-    import('@craft-agent/server-core/handlers/rpc/auth'),
-    import('@craft-agent/server-core/handlers/rpc/automations'),
-    import('@craft-agent/server-core/handlers/rpc/files'),
-    import('@craft-agent/server-core/handlers/rpc/labels'),
-    import('@craft-agent/server-core/handlers/rpc/llm-connections'),
-    import('@craft-agent/server-core/handlers/rpc/oauth'),
-    import('@craft-agent/server-core/handlers/rpc/sessions'),
-    import('@craft-agent/server-core/handlers/rpc/settings'),
-    import('@craft-agent/server-core/handlers/rpc/skills'),
-    import('@craft-agent/server-core/handlers/rpc/sources'),
-    import('@craft-agent/server-core/handlers/rpc/statuses'),
-    import('@craft-agent/server-core/handlers/rpc/system'),
-    import('@craft-agent/server-core/handlers/rpc/workspace'),
-    import('@craft-agent/server-core/handlers/rpc/onboarding'),
+    import('@zhangyuge-agent/server-core/handlers/rpc/auth'),
+    import('@zhangyuge-agent/server-core/handlers/rpc/automations'),
+    import('@zhangyuge-agent/server-core/handlers/rpc/files'),
+    import('@zhangyuge-agent/server-core/handlers/rpc/labels'),
+    import('@zhangyuge-agent/server-core/handlers/rpc/llm-connections'),
+    import('@zhangyuge-agent/server-core/handlers/rpc/oauth'),
+    import('@zhangyuge-agent/server-core/handlers/rpc/sessions'),
+    import('@zhangyuge-agent/server-core/handlers/rpc/settings'),
+    import('@zhangyuge-agent/server-core/handlers/rpc/skills'),
+    import('@zhangyuge-agent/server-core/handlers/rpc/sources'),
+    import('@zhangyuge-agent/server-core/handlers/rpc/statuses'),
+    import('@zhangyuge-agent/server-core/handlers/rpc/system'),
+    import('@zhangyuge-agent/server-core/handlers/rpc/workspace'),
+    import('@zhangyuge-agent/server-core/handlers/rpc/onboarding'),
   ])
 
   return new Set([

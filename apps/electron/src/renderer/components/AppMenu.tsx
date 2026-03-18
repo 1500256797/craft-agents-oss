@@ -14,8 +14,8 @@ import {
   StyledDropdownMenuSubContent,
 } from "@/components/ui/styled-dropdown"
 import * as Icons from "lucide-react"
-import { Tooltip, TooltipTrigger, TooltipContent } from "@craft-agent/ui"
-import { CraftAgentsSymbol } from "./icons/CraftAgentsSymbol"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@zhangyuge-agent/ui"
+import { ZhangyugeAgentSymbol } from "./icons/ZhangyugeAgentSymbol"
 import { SquarePenRounded } from "./icons/SquarePenRounded"
 import { TopBarButton } from "./ui/TopBarButton"
 import {
@@ -27,7 +27,7 @@ import {
 } from "../../shared/menu-schema"
 import type { MenuItem, MenuSection, SettingsMenuItem } from "../../shared/menu-schema"
 import { SETTINGS_ICONS } from "./icons/SettingsIcons"
-import { getDocUrl } from '@craft-agent/shared/docs/doc-links'
+import { getDocUrl } from '@zhangyuge-agent/shared/docs/doc-links'
 import { getMenuItemLabel, getMenuSectionLabel, getSettingsPageCopy } from "../../shared/i18n"
 
 // Map of action handlers for menu items that need custom behavior
@@ -151,7 +151,7 @@ interface AppMenuProps {
 /**
  * AppMenu - Main application dropdown menu and top bar navigation
  *
- * Contains the Craft logo dropdown with all menu functionality:
+ * Contains the app brand dropdown with all menu functionality:
  * - File actions (New Chat, New Window)
  * - Edit submenu (Undo, Redo, Cut, Copy, Paste, Select All)
  * - View submenu (Zoom In/Out, Reset)
@@ -202,12 +202,12 @@ export function AppMenu({
 
   return (
     <div className="flex items-center gap-[5px] w-full">
-      {/* Craft Logo Menu - interactive island */}
+      {/* App brand menu - interactive island */}
       <div className="pointer-events-auto titlebar-no-drag">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <TopBarButton aria-label={t('menu.appMenu.craftMenuAria')}>
-            <CraftAgentsSymbol className="h-4 text-accent" />
+          <TopBarButton aria-label={t('menu.appMenu.appMenuAria')}>
+            <ZhangyugeAgentSymbol className="h-4 text-accent" />
           </TopBarButton>
         </DropdownMenuTrigger>
         <StyledDropdownMenuContent align="start" minWidth="min-w-48">
@@ -272,7 +272,7 @@ export function AppMenu({
               {t('menu.appMenu.help')}
             </StyledDropdownMenuSubTrigger>
             <StyledDropdownMenuSubContent>
-              <StyledDropdownMenuItem onClick={() => window.electronAPI.openUrl('https://agents.craft.do/docs')}>
+              <StyledDropdownMenuItem onClick={() => window.electronAPI.openUrl('https://agents.zhangyuge-agent.local/docs')}>
                 <Icons.HelpCircle className="h-3.5 w-3.5" />
                 {t('menu.appMenu.helpAndDocs')}
                 <Icons.ExternalLink className="h-3 w-3 ml-auto text-muted-foreground" />
@@ -324,7 +324,7 @@ export function AppMenu({
           {/* Quit */}
           <StyledDropdownMenuItem onClick={() => window.electronAPI.menuQuit()}>
             <Icons.LogOut className="h-3.5 w-3.5" />
-            {t('menu.appMenu.quitCraftAgents')}
+            {t('menu.appMenu.quitZhangyugeAgent')}
             {quitHotkey && <DropdownMenuShortcut className="pl-6">{quitHotkey}</DropdownMenuShortcut>}
           </StyledDropdownMenuItem>
         </StyledDropdownMenuContent>

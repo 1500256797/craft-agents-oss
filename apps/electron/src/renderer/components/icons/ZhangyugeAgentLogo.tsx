@@ -1,12 +1,12 @@
-interface CraftAgentsLogoProps {
+interface ZhangyugeAgentLogoProps {
   className?: string
 }
 
 /**
- * Craft Agents pixel art logo - uses accent color from theme
+ * 章鱼哥AI pixel art logo - uses accent color from theme
  * Apply text-accent class to get the brand purple color
  */
-export function CraftAgentsLogo({ className }: CraftAgentsLogoProps) {
+export function ZhangyugeAgentLogo({ className }: ZhangyugeAgentLogoProps) {
   return (
     <svg
       viewBox="0 0 408 66"

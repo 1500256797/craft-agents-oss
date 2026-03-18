@@ -19,8 +19,11 @@
     "noUnusedParameters": false,
     "baseUrl": ".",
     "paths": {
-      "@craft-agent/shared": ["../shared/src/index.ts"],
-      "@craft-agent/shared/*": ["../shared/src/*"]
+      "@zhangyuge-agent/core": ["../core/src/index.ts"],
+      "@zhangyuge-agent/core/*": ["../core/src/*"],
+      "@zhangyuge-agent/shared": ["../shared/src/index.ts"],
+      "@zhangyuge-agent/shared/interceptor": ["../shared/src/interceptor-common.ts"],
+      "@zhangyuge-agent/shared/*": ["../shared/src/*"]
     }
   },
   "include": ["src/**/*", "../shared/src/agent/bash-parser.d.ts"],

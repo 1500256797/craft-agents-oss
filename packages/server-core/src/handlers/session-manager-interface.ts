@@ -6,11 +6,11 @@
  * satisfy it at runtime.
  */
 
-import type { Workspace } from '@craft-agent/core/types'
-import type { StoredAttachment, AnnotationV1 } from '@craft-agent/core/types'
-import type { PermissionMode } from '@craft-agent/shared/agent/mode-types'
-import type { ThinkingLevel } from '@craft-agent/shared/agent/thinking-levels'
-import type { AuthResult } from '@craft-agent/shared/agent'
+import type { Workspace } from '@zhangyuge-agent/core/types'
+import type { StoredAttachment, AnnotationV1 } from '@zhangyuge-agent/core/types'
+import type { PermissionMode } from '@zhangyuge-agent/shared/agent/mode-types'
+import type { ThinkingLevel } from '@zhangyuge-agent/shared/agent/thinking-levels'
+import type { AuthResult } from '@zhangyuge-agent/shared/agent'
 import type {
   Session,
   SessionStatus,
@@ -22,7 +22,7 @@ import type {
   PermissionModeState,
   UnreadSummary,
   ShareResult,
-} from '@craft-agent/shared/protocol'
+} from '@zhangyuge-agent/shared/protocol'
 import type { EventSink } from '../transport'
 
 export interface ISessionManager {

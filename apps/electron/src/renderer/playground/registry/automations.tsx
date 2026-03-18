@@ -221,7 +221,7 @@ const mockAutomations: AutomationListItem[] = [
     name: 'Label Change Logger',
     summary: 'Logs all label additions',
     enabled: true,
-    actions: [{ type: 'prompt', prompt: 'Log the label change: "$CRAFT_LABEL was added" to ~/label-log.txt' }],
+    actions: [{ type: 'prompt', prompt: 'Log the label change: "$ZHANGYUGE_AGENT_LABEL was added" to ~/label-log.txt' }],
     permissionMode: 'allow-all',
     lastExecutedAt: now - 3600_000, // 1 hour ago
   },

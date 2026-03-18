@@ -17,7 +17,7 @@ import {
   type MessageEnvelope,
   type PushTarget,
   type ErrorCode,
-} from '@craft-agent/shared/protocol'
+} from '@zhangyuge-agent/shared/protocol'
 import type { RpcServer, HandlerFn, RequestContext } from './types'
 import { serializeEnvelope, deserializeEnvelope } from './codec'
 

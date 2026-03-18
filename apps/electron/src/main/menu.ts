@@ -3,9 +3,9 @@ import { RPC_CHANNELS, type BroadcastEventMap } from '../shared/types'
 import { EDIT_MENU, VIEW_MENU, WINDOW_MENU } from '../shared/menu-schema'
 import type { MenuItem } from '../shared/menu-schema'
 import type { WindowManager } from './window-manager'
-import type { EventSink } from '@craft-agent/server-core/transport'
+import type { EventSink } from '@zhangyuge-agent/server-core/transport'
 import { mainLog } from './logger'
-import { getUiLanguage } from '@craft-agent/shared/config/storage'
+import { getUiLanguage } from '@zhangyuge-agent/shared/config/storage'
 import { getMenuItemLabel, getMenuSectionLabel, resolveUiLanguage, translateUi } from '../shared/i18n'
 
 type ClientResolver = (webContentsId: number) => string | undefined
@@ -17,7 +17,7 @@ let cachedClientResolver: ClientResolver | null = null
 
 /**
  * Creates and sets the application menu for macOS.
- * Includes only relevant items for the Craft Agents app.
+ * Includes only relevant items for the 章鱼哥AI app.
  *
  * Call rebuildMenu() when update state changes to refresh the menu.
  */
@@ -41,7 +41,7 @@ export function setMenuEventSink(sink: EventSink, resolver: ClientResolver): voi
  * Rebuilds the application menu with current update state.
  * Call this when update availability changes.
  *
- * On Windows/Linux: Menu is hidden - all functionality is in the Craft logo menu.
+ * On Windows/Linux: Menu is hidden - all functionality is in the in-app brand menu.
  * On macOS: Native menu is required by Apple guidelines, so we keep it synced.
  */
 export async function rebuildMenu(): Promise<void> {
@@ -54,7 +54,7 @@ export async function rebuildMenu(): Promise<void> {
     translateUi(locale, key, params, fallback)
 
   // On Windows/Linux, hide the native menu entirely
-  // Users access menu via the Craft logo dropdown in the app
+  // Users access menu via the in-app brand dropdown
   if (!isMac) {
     Menu.setApplicationMenu(null)
     return
@@ -223,7 +223,7 @@ export async function rebuildMenu(): Promise<void> {
             await dialog.showMessageBox({
               type: 'info',
               message: 'Reset to Defaults',
-              detail: 'To reset Craft Agent to defaults, quit the app and run:\n\nbun run fresh-start\n\nThis will delete all configuration, credentials, workspaces, and sessions.',
+              detail: 'To reset 章鱼哥AI to defaults, quit the app and run:\n\nbun run fresh-start\n\nThis will delete all configuration, credentials, workspaces, and sessions.',
               buttons: ['OK']
             })
           }
@@ -237,7 +237,7 @@ export async function rebuildMenu(): Promise<void> {
       submenu: [
         {
           label: t('menu.mainMenu.helpAndDocs'),
-          click: () => shell.openExternal('https://agents.craft.do/docs')
+          click: () => shell.openExternal('https://agents.zhangyuge-agent.local/docs')
         },
         {
           label: t('menu.mainMenu.keyboardShortcuts'),

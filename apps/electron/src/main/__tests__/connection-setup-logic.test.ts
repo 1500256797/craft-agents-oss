@@ -5,8 +5,8 @@ import {
   validateModelList,
   validateSetupTestInput,
   BUILT_IN_CONNECTION_TEMPLATES,
-} from '@craft-agent/server-core/domain'
-import type { ModelDefinition } from '@craft-agent/shared/config/models'
+} from '@zhangyuge-agent/server-core/domain'
+import type { ModelDefinition } from '@zhangyuge-agent/shared/config/models'
 
 // ============================================================
 // validateModelList
@@ -219,7 +219,7 @@ describe('parseTestConnectionError', () => {
 
   it('maps provider mismatch API key errors to actionable guidance', () => {
     const result = parseTestConnectionError('No API key found for huggingface. Use /login or set an API key environment variable.')
-    expect(result).toContain('Provider mismatch during setup')
+    expect(result).toContain('Setup could not route credentials to the selected provider')
   })
 
   it('passes through unknown errors truncated to 300 chars', () => {

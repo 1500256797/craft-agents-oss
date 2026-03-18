@@ -173,8 +173,8 @@ const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
         inputValueRef.current = text
       }
     }
-    window.addEventListener('craft:restore-input', handler)
-    return () => window.removeEventListener('craft:restore-input', handler)
+    window.addEventListener('zhangyuge-agent:restore-input', handler)
+    return () => window.removeEventListener('zhangyuge-agent:restore-input', handler)
   }, [sessionId])
 
   const handleInputChange = React.useCallback((value: string) => {
@@ -372,7 +372,7 @@ const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
   const handleOpenInNewWindow = React.useCallback(async () => {
     const route = routes.view.allSessions(sessionId)
     const separator = route.includes('?') ? '&' : '?'
-    const url = `craftagents://${route}${separator}window=focused`
+    const url = `zhangyuge-agent://${route}${separator}window=focused`
     try {
       await window.electronAPI?.openUrl(url)
     } catch (error) {
@@ -460,7 +460,7 @@ const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
               <span className="flex-1">Stop Sharing</span>
             </StyledDropdownMenuItem>
             <StyledDropdownMenuSeparator />
-            <StyledDropdownMenuItem onClick={() => window.electronAPI.openUrl('https://agents.craft.do/docs/go-further/sharing')}>
+            <StyledDropdownMenuItem onClick={() => window.electronAPI.openUrl('https://agents.zhangyuge-agent.local/docs/go-further/sharing')}>
               <Info className="h-3.5 w-3.5" />
               <span className="flex-1">Learn More</span>
             </StyledDropdownMenuItem>
@@ -474,7 +474,7 @@ const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
               <span className="flex-1">Share Online</span>
             </StyledDropdownMenuItem>
             <StyledDropdownMenuSeparator />
-            <StyledDropdownMenuItem onClick={() => window.electronAPI.openUrl('https://agents.craft.do/docs/go-further/sharing')}>
+            <StyledDropdownMenuItem onClick={() => window.electronAPI.openUrl('https://agents.zhangyuge-agent.local/docs/go-further/sharing')}>
               <Info className="h-3.5 w-3.5" />
               <span className="flex-1">Learn More</span>
             </StyledDropdownMenuItem>

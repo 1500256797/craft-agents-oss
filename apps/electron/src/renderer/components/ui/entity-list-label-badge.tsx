@@ -1,10 +1,10 @@
 import { useState } from "react"
-import { parseLabelEntry, formatLabelEntry, formatDisplayValue } from "@craft-agent/shared/labels"
-import { resolveEntityColor } from "@craft-agent/shared/colors"
+import { parseLabelEntry, formatLabelEntry, formatDisplayValue } from "@zhangyuge-agent/shared/labels"
+import { resolveEntityColor } from "@zhangyuge-agent/shared/colors"
 import { useTheme } from "@/context/ThemeContext"
 import { LabelValuePopover } from "./label-value-popover"
 import { LabelValueTypeIcon } from "./label-icon"
-import type { LabelConfig } from "@craft-agent/shared/labels"
+import type { LabelConfig } from "@zhangyuge-agent/shared/labels"
 
 interface EntityListLabelBadgeProps {
   label: LabelConfig

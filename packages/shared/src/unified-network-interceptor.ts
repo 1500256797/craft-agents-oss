@@ -1081,7 +1081,7 @@ const adapters: ApiAdapter[] = [anthropicAdapter, openAiResponsesAdapter, openAi
  * Example values: anthropic-messages, openai-completions, openai-responses.
  */
 function getPiApiHint(): string | undefined {
-  const hint = process.env.CRAFT_PI_MODEL_API?.trim();
+  const hint = process.env.ZHANGYUGE_AGENT_PI_MODEL_API?.trim();
   return hint || undefined;
 }
 
@@ -1352,7 +1352,7 @@ const fetchProxy = new Proxy(interceptedFetch, {
 });
 
 // Auto-install in runtime subprocesses. Tests can disable this side effect.
-if (process.env.CRAFT_INTERCEPTOR_DISABLE_AUTO_INSTALL !== '1') {
+if (process.env.ZHANGYUGE_AGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL !== '1') {
   (globalThis as unknown as { fetch: unknown }).fetch = fetchProxy;
   debugLog('Unified fetch interceptor installed');
 }

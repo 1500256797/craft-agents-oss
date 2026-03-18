@@ -50,7 +50,7 @@
       "cannotConnectToRemote": "Cannot connect to remote server",
       "connectionLost": "Connection to remote server lost",
       "remoteServerStatus": "Remote server connection status",
-      "authFailed": "Authentication failed. Verify CRAFT_SERVER_TOKEN.",
+      "authFailed": "Authentication failed. Verify ZHANGYUGE_AGENT_SERVER_TOKEN.",
       "protocolMismatch": "Protocol mismatch between client and server versions.",
       "connectionTimeout": "Connection to {{url}} timed out. Server may be unreachable.",
       "networkError": "Could not connect to {{url}}. Is the remote server running?",
@@ -299,7 +299,7 @@
       "stopGeneration": "Stop generation",
       "providerGroups": {
         "anthropic": "Anthropic",
-        "craftAgentsBackend": "Craft Agents Backend"
+        "zhangyugeAgentBackend": "章鱼哥AI Backend"
       }
     }
   },
@@ -329,7 +329,7 @@
       }
     },
     "appMenu": {
-      "craftMenuAria": "Craft menu",
+      "appMenuAria": "App menu",
       "newChat": "New Chat",
       "newWindow": "New Window",
       "settings": "Settings",
@@ -342,7 +342,7 @@
       "checkForUpdates": "Check for Updates",
       "installUpdate": "Install Update",
       "toggleDevTools": "Toggle DevTools",
-      "quitCraftAgents": "Quit Craft Agents",
+      "quitZhangyugeAgent": "Quit 章鱼哥AI",
       "back": "Back",
       "forward": "Forward",
       "goBackAria": "Go back",
@@ -363,13 +363,13 @@
       "allDocumentation": "All Documentation"
     },
     "mainMenu": {
-      "appName": "Craft Agents",
-      "about": "About Craft Agents",
+      "appName": "章鱼哥AI",
+      "about": "About 章鱼哥AI",
       "checkForUpdatesEllipsis": "Check for Updates…",
       "installUpdateEllipsis": "Install Update…【{{version}}】",
       "settingsEllipsis": "Settings...",
-      "hideApp": "Hide Craft Agents",
-      "quitApp": "Quit Craft Agents",
+      "hideApp": "Hide 章鱼哥AI",
+      "quitApp": "Quit 章鱼哥AI",
       "file": "File",
       "newChat": "New Chat",
       "newWindow": "New Window",
@@ -449,7 +449,7 @@
       },
       "descriptions": {
         "workspaceThemes": "Override theme settings per workspace",
-        "toolIcons": "Icons shown next to CLI commands in chat activity. Stored in ~/.craft-agent/tool-icons/.",
+        "toolIcons": "Icons shown next to CLI commands in chat activity. Stored in ~/.zhangyuge-agent/tool-icons/.",
         "connectionIcons": "Show provider icons in the session list and model selector",
         "richToolDescriptions": "Add action names and intent descriptions to all tool calls. Provides richer activity context in sessions."
       },
@@ -606,19 +606,19 @@
     "preferences": {
       "sections": {
         "basicInfo": "Basic Info",
-        "basicInfoDescription": "Help Craft Agent personalize responses to you.",
+        "basicInfoDescription": "Help 章鱼哥AI personalize responses to you.",
         "location": "Location",
         "locationDescription": "Enables location-aware responses like weather, local time, and regional context.",
         "notes": "Notes",
-        "notesDescription": "Free-form context that helps Craft Agent understand your preferences."
+        "notesDescription": "Free-form context that helps 章鱼哥AI understand your preferences."
       },
       "rows": {
         "name": "Name",
-        "nameDescription": "How Craft Agent should address you.",
+        "nameDescription": "How 章鱼哥AI should address you.",
         "timezone": "Timezone",
         "timezoneDescription": "Used for relative dates like 'tomorrow' or 'next week'.",
         "language": "Language",
-        "languageDescription": "Preferred language for Craft Agent's responses.",
+        "languageDescription": "Preferred language for 章鱼哥AI's responses.",
         "city": "City",
         "cityDescription": "Your city for local information and context.",
         "country": "Country",
@@ -740,8 +740,8 @@
         "providerAnthropicCompat": "Anthropic Compatible",
         "providerBedrock": "AWS Bedrock",
         "providerVertex": "Google Vertex",
-        "providerCraftBackend": "Craft Agents Backend",
-        "providerCraftBackendCompat": "Craft Agents Backend Compatible"
+        "provider章鱼哥AIBackend": "章鱼哥AI Backend",
+        "provider章鱼哥AIBackendCompat": "章鱼哥AI Backend Compatible"
       },
       "workspaceOverrides": {
         "connectionOverrideLabel": "workspace connection override",
@@ -810,7 +810,7 @@
         "cancel": "Cancel"
       },
       "providerSelect": {
-        "title": "Welcome to Craft Agents",
+        "title": "Welcome to 章鱼哥AI",
         "description": "How would you like to connect?",
         "claudeName": "Claude Pro / Max",
         "claudeDescription": "Use your Anthropic subscription.",
@@ -824,7 +824,7 @@
         "localDescription": "Run models locally with Ollama."
       },
       "welcome": {
-        "titleNew": "Welcome to Craft Agents",
+        "titleNew": "Welcome to 章鱼哥AI",
         "titleExisting": "Update Settings",
         "descriptionNew": "Agents with the UX they deserve. Connect anything. Organize your sessions. Everything you need to do the work of your life!",
         "descriptionExisting": "Update your API connection or change your setup.",
@@ -835,30 +835,30 @@
         "title": "Set up your Agent",
         "description": "Select how you'd like to power your AI agents. You can add more connections later.",
         "segmentAnthropic": "Claude",
-        "segmentPi": "Craft Agents Backend",
+        "segmentPi": "章鱼哥AI Backend",
         "beta": "Beta",
         "segmentDescriptionAnthropic": "Use Claude Agent SDK as the main agent. Configure it with your Claude subscription or API key.",
-        "segmentDescriptionPi": "Use Craft Agents Backend as the main agent. Configure it with your API key, OAuth subscription, or custom endpoint.",
+        "segmentDescriptionPi": "Use 章鱼哥AI Backend as the main agent. Configure it with your API key, OAuth subscription, or custom endpoint.",
         "optionClaudeName": "Claude Pro/Max",
         "optionClaudeDescription": "Use your Claude subscription for unlimited access.",
         "optionAnthropicApiName": "Anthropic API Key",
         "optionAnthropicApiDescription": "Pay-as-you-go via Anthropic, OpenRouter, or compatible APIs.",
         "optionChatgptName": "ChatGPT Plus",
-        "optionChatgptDescription": "Use your ChatGPT subscription with Craft Agents Backend.",
+        "optionChatgptDescription": "Use your ChatGPT subscription with 章鱼哥AI Backend.",
         "optionCopilotName": "GitHub Copilot",
-        "optionCopilotDescription": "Use your GitHub Copilot subscription with Craft Agents Backend.",
+        "optionCopilotDescription": "Use your GitHub Copilot subscription with 章鱼哥AI Backend.",
         "optionApiName": "API Key",
-        "optionApiDescription": "Use provider presets (Anthropic, OpenAI, Google, etc.) via Craft Agents Backend."
+        "optionApiDescription": "Use provider presets (Anthropic, OpenAI, Google, etc.) via 章鱼哥AI Backend."
       },
       "credentials": {
         "chatgptTitle": "Connect ChatGPT",
-        "chatgptDescription": "Use your ChatGPT subscription to power Craft Agents.",
+        "chatgptDescription": "Use your ChatGPT subscription to power 章鱼哥AI.",
         "connecting": "Connecting...",
         "signInWithChatgpt": "Sign in with ChatGPT",
         "chatgptBody": "Click the button above to sign in with your OpenAI account. A browser window will open for authentication.",
         "chatgptConnected": "Connected! Your ChatGPT subscription is ready.",
         "copilotTitle": "Connect GitHub Copilot",
-        "copilotDescription": "Use your GitHub Copilot subscription to power Craft Agents.",
+        "copilotDescription": "Use your GitHub Copilot subscription to power 章鱼哥AI.",
         "waitingAuth": "Waiting for authorization...",
         "signInWithGithub": "Sign in with GitHub",
         "copilotEnterCode": "Enter this code on GitHub to authorize:",
@@ -892,7 +892,7 @@
       },
       "gitBash": {
         "title": "Git Bash Required",
-        "description": "Craft Agent needs Git Bash to run shell commands on Windows. It was not found on your system.",
+        "description": "章鱼哥AI needs Git Bash to run shell commands on Windows. It was not found on your system.",
         "installTitle": "Install Git for Windows",
         "installDescription": "The easiest way to get Git Bash. It's free and includes everything you need.",
         "downloadButton": "Download Git for Windows",
@@ -1150,6 +1150,7 @@
       "modelListHint": "Comma-separated list. The first model is the default. The last is used for summarization.",
       "customEndpointHint": "Required for custom endpoints. Use the provider-specific model ID.",
       "modelRequiredError": "Default model is required for custom endpoints.",
+      "tierSelectionRequiredError": "Please select a model for each tier.",
       "tierBest": "Best",
       "tierBestDesc": "most capable",
       "tierBalanced": "Balanced",
@@ -1175,7 +1176,7 @@
         "minimaxCn": "Minimax CN",
         "kimiCoding": "Kimi (Coding)",
         "vercelAiGateway": "Vercel AI Gateway",
-        "craftAgentsBackend": "Craft Agents Backend (Direct)",
+        "zhangyugeAgentBackend": "章鱼哥AI Backend (Direct)",
         "custom": "Custom"
       }
     },
@@ -1252,7 +1253,7 @@
         },
         "addSource": {
           "label": "Add Source",
-          "example": "Connect to my Craft space",
+          "example": "Connect to my 章鱼哥AI space",
           "placeholder": "What would you like to connect?"
         },
         "addSourceApi": {

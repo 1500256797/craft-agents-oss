@@ -5,9 +5,9 @@
 import { Sun, Moon, X } from 'lucide-react'
 
 /**
- * CraftAgentLogo - The Craft Agent "C" logo
+ * ZhangyugeAgentLogo - The 章鱼哥AI "C" logo
  */
-function CraftAgentLogo({ className }: { className?: string }) {
+function ZhangyugeAgentLogo({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -38,11 +38,11 @@ export function Header({ hasSession, sessionTitle, isDark, onToggleTheme, onClea
     <header className="shrink-0 grid grid-cols-[auto_1fr_auto] items-center px-4 py-3">
       {/* Logo - links to main site */}
       <a
-        href="https://agents.craft.do"
+        href="https://agents.zhangyuge-agent.local"
         className="hover:opacity-80 transition-opacity"
-        title="Craft Agent"
+        title="章鱼哥AI"
       >
-        <CraftAgentLogo className="w-6 h-6 text-[#9570BE]" />
+        <ZhangyugeAgentLogo className="w-6 h-6 text-[#9570BE]" />
       </a>
 
       {/* Session title - centered */}

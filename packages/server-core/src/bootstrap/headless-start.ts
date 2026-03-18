@@ -1,6 +1,6 @@
-import { OAuthFlowStore } from '@craft-agent/shared/auth'
-import { ensureConfigDir, loadStoredConfig, saveConfig } from '@craft-agent/shared/config'
-import { setBundledAssetsRoot } from '@craft-agent/shared/utils'
+import { OAuthFlowStore } from '@zhangyuge-agent/shared/auth'
+import { ensureConfigDir, loadStoredConfig, saveConfig } from '@zhangyuge-agent/shared/config'
+import { setBundledAssetsRoot } from '@zhangyuge-agent/shared/utils'
 import { WsRpcServer, type WsRpcTlsOptions } from '../transport/server'
 import type { EventSink, RpcServer } from '../transport/types'
 import { createHeadlessPlatform } from '../runtime/platform-headless'
@@ -70,15 +70,15 @@ function ensureGlobalConfigExists(platform: PlatformServices): void {
 export async function startHeadlessServer<TSessionManager, THandlerDeps>(
   options: HeadlessServerBootstrapOptions<TSessionManager, THandlerDeps>,
 ): Promise<HeadlessServerInstance<TSessionManager>> {
-  const serverToken = options.serverToken ?? process.env.CRAFT_SERVER_TOKEN
+  const serverToken = options.serverToken ?? process.env.ZHANGYUGE_AGENT_SERVER_TOKEN
   if (!serverToken) {
-    throw new Error('Server token is required. Pass options.serverToken or set CRAFT_SERVER_TOKEN.')
+    throw new Error('Server token is required. Pass options.serverToken or set ZHANGYUGE_AGENT_SERVER_TOKEN.')
   }
 
   const platform = options.platformFactory?.() ?? createHeadlessPlatform()
 
   const bundledAssetsRoot = options.bundledAssetsRoot
-    ?? process.env.CRAFT_BUNDLED_ASSETS_ROOT
+    ?? process.env.ZHANGYUGE_AGENT_BUNDLED_ASSETS_ROOT
     ?? process.cwd()
   setBundledAssetsRoot(bundledAssetsRoot)
 
@@ -90,8 +90,8 @@ export async function startHeadlessServer<TSessionManager, THandlerDeps>(
   const modelRefreshService = options.initModelRefreshService()
   const sessionManager = options.createSessionManager()
 
-  const rpcHost = options.rpcHost ?? process.env.CRAFT_RPC_HOST ?? '127.0.0.1'
-  const rpcPortRaw = options.rpcPort ?? parseInt(process.env.CRAFT_RPC_PORT ?? '9100', 10)
+  const rpcHost = options.rpcHost ?? process.env.ZHANGYUGE_AGENT_RPC_HOST ?? '127.0.0.1'
+  const rpcPortRaw = options.rpcPort ?? parseInt(process.env.ZHANGYUGE_AGENT_RPC_PORT ?? '9100', 10)
   if (!Number.isFinite(rpcPortRaw) || rpcPortRaw < 0 || rpcPortRaw > 65535) {
     throw new Error(`Invalid RPC port: ${rpcPortRaw}`)
   }
@@ -127,7 +127,7 @@ export async function startHeadlessServer<TSessionManager, THandlerDeps>(
 
   modelRefreshService.startAll()
 
-  platform.logger.info(`Craft Agent headless server listening on ${wsServer.protocol}://${rpcHost}:${wsServer.port}`)
+  platform.logger.info(`章鱼哥AI headless server listening on ${wsServer.protocol}://${rpcHost}:${wsServer.port}`)
 
   let stopped = false
   const stop = async (): Promise<void> => {

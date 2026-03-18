@@ -74,36 +74,36 @@ describe('McpClientPool.sync — config change detection', () => {
   });
 
   it('reconnects when Authorization header changes (token refresh)', async () => {
-    await pool.sync({ craft: httpConfig('old-token') });
-    expect(pool.isConnected('craft')).toBe(true);
+    await pool.sync({ zhangyuge-agent: httpConfig('old-token') });
+    expect(pool.isConnected('zhangyuge')).toBe(true);
     pool.resetTracking();
 
-    await pool.sync({ craft: httpConfig('new-token') });
+    await pool.sync({ zhangyuge-agent: httpConfig('new-token') });
 
-    expect(pool.disconnectCalls).toEqual(['craft']);
+    expect(pool.disconnectCalls).toEqual(['zhangyuge']);
     expect(pool.connectCalls).toHaveLength(1);
     expect(pool.connectCalls[0].config.headers?.Authorization).toBe('Bearer new-token');
-    expect(pool.isConnected('craft')).toBe(true);
+    expect(pool.isConnected('zhangyuge')).toBe(true);
   });
 
   it('does not reconnect when config is unchanged', async () => {
     const config = httpConfig('token-1');
-    await pool.sync({ craft: config });
+    await pool.sync({ zhangyuge-agent: config });
     pool.resetTracking();
 
-    await pool.sync({ craft: config });
+    await pool.sync({ zhangyuge-agent: config });
 
     expect(pool.connectCalls).toHaveLength(0);
     expect(pool.disconnectCalls).toHaveLength(0);
   });
 
   it('reconnects when URL changes', async () => {
-    await pool.sync({ craft: httpConfig('token', 'https://old.example.com') });
+    await pool.sync({ zhangyuge-agent: httpConfig('token', 'https://old.example.com') });
     pool.resetTracking();
 
-    await pool.sync({ craft: httpConfig('token', 'https://new.example.com') });
+    await pool.sync({ zhangyuge-agent: httpConfig('token', 'https://new.example.com') });
 
-    expect(pool.disconnectCalls).toEqual(['craft']);
+    expect(pool.disconnectCalls).toEqual(['zhangyuge']);
     expect(pool.connectCalls).toHaveLength(1);
   });
 
@@ -121,10 +121,10 @@ describe('McpClientPool.sync — config change detection', () => {
       headers: { Authorization: 'Bearer same', 'X-Request-Id': 'bbb' },
     };
 
-    await pool.sync({ craft: config1 });
+    await pool.sync({ zhangyuge-agent: config1 });
     pool.resetTracking();
 
-    await pool.sync({ craft: config2 });
+    await pool.sync({ zhangyuge-agent: config2 });
 
     expect(pool.connectCalls).toHaveLength(0);
     expect(pool.disconnectCalls).toHaveLength(0);
@@ -132,34 +132,34 @@ describe('McpClientPool.sync — config change detection', () => {
 
   it('disconnects sources removed from config', async () => {
     const config = httpConfig('token');
-    await pool.sync({ craft: config, linear: config });
+    await pool.sync({ zhangyuge-agent: config, linear: config });
     pool.resetTracking();
 
-    await pool.sync({ craft: config });
+    await pool.sync({ zhangyuge-agent: config });
 
     expect(pool.disconnectCalls).toEqual(['linear']);
-    expect(pool.isConnected('craft')).toBe(true);
+    expect(pool.isConnected('zhangyuge')).toBe(true);
     expect(pool.isConnected('linear')).toBe(false);
   });
 
   it('handles add + remove + refresh in a single sync', async () => {
     await pool.sync({
-      craft: httpConfig('old-craft-token'),
+      zhangyuge-agent: httpConfig('old-zhangyuge-token'),
       linear: httpConfig('linear-token', 'https://linear.example.com'),
     });
     pool.resetTracking();
 
-    // craft: token refreshed, linear: removed, github: added
+    // zhangyuge-agent: token refreshed, linear: removed, github: added
     await pool.sync({
-      craft: httpConfig('new-craft-token'),
+      zhangyuge-agent: httpConfig('new-zhangyuge-token'),
       github: httpConfig('gh-token', 'https://github.example.com'),
     });
 
     expect(pool.disconnectCalls).toContain('linear');
-    expect(pool.disconnectCalls).toContain('craft');
-    expect(pool.connectCalls.find(c => c.slug === 'craft')?.config.headers?.Authorization).toBe('Bearer new-craft-token');
+    expect(pool.disconnectCalls).toContain('zhangyuge');
+    expect(pool.connectCalls.find(c => c.slug === 'zhangyuge')?.config.headers?.Authorization).toBe('Bearer new-zhangyuge-token');
     expect(pool.connectCalls.find(c => c.slug === 'github')).toBeDefined();
-    expect(pool.isConnected('craft')).toBe(true);
+    expect(pool.isConnected('zhangyuge')).toBe(true);
     expect(pool.isConnected('linear')).toBe(false);
     expect(pool.isConnected('github')).toBe(true);
   });
@@ -174,13 +174,13 @@ describe('McpClientPool.sync — config change detection', () => {
       return origConnect(slug, config);
     };
 
-    await failPool.sync({ craft: httpConfig('old-token') });
-    expect(failPool.isConnected('craft')).toBe(true);
+    await failPool.sync({ zhangyuge-agent: httpConfig('old-token') });
+    expect(failPool.isConnected('zhangyuge')).toBe(true);
 
     // Token refresh — disconnect succeeds but reconnect throws
-    const failures = await failPool.sync({ craft: httpConfig('new-token') });
+    const failures = await failPool.sync({ zhangyuge-agent: httpConfig('new-token') });
 
-    expect(failures).toContain('craft');
-    expect(failPool.isConnected('craft')).toBe(false);
+    expect(failures).toContain('zhangyuge');
+    expect(failPool.isConnected('zhangyuge')).toBe(false);
   });
 });

@@ -1,7 +1,7 @@
 // =============================================================================
 // Protocol re-exports (channels, DTOs, events, wire types)
 // =============================================================================
-export * from '@craft-agent/shared/protocol'
+export * from '@zhangyuge-agent/shared/protocol'
 
 // =============================================================================
 // Package re-exports (convenience for renderer imports)
@@ -19,17 +19,17 @@ import type {
   ContentBadge,
   ToolDisplayMeta,
   AnnotationV1,
-} from '@craft-agent/core/types';
+} from '@zhangyuge-agent/core/types';
 
 // Mode types from dedicated subpath export (avoids pulling in SDK)
-import type { PermissionMode } from '@craft-agent/shared/agent/modes';
+import type { PermissionMode } from '@zhangyuge-agent/shared/agent/modes';
 export type { PermissionMode };
-export { PERMISSION_MODE_CONFIG } from '@craft-agent/shared/agent/modes';
+export { PERMISSION_MODE_CONFIG } from '@zhangyuge-agent/shared/agent/modes';
 
 // Thinking level types
-import type { ThinkingLevel } from '@craft-agent/shared/agent/thinking-levels';
+import type { ThinkingLevel } from '@zhangyuge-agent/shared/agent/thinking-levels';
 export type { ThinkingLevel };
-export { THINKING_LEVELS, DEFAULT_THINKING_LEVEL } from '@craft-agent/shared/agent/thinking-levels';
+export { THINKING_LEVELS, DEFAULT_THINKING_LEVEL } from '@zhangyuge-agent/shared/agent/thinking-levels';
 
 export type {
   CoreMessage as Message,
@@ -45,10 +45,10 @@ export type {
 };
 
 // Auth types for onboarding
-import type { AuthState, SetupNeeds } from '@craft-agent/shared/auth/types';
-import type { AuthType } from '@craft-agent/shared/config/types';
+import type { AuthState, SetupNeeds } from '@zhangyuge-agent/shared/auth/types';
+import type { AuthType } from '@zhangyuge-agent/shared/config/types';
 export type { AuthState, SetupNeeds, AuthType };
-import type { AccountLoginInput, AccountSessionState, AccountUser } from '@craft-agent/shared/account-auth';
+import type { AccountLoginInput, AccountSessionState, AccountUser } from '@zhangyuge-agent/shared/account-auth';
 export type { AccountLoginInput, AccountSessionState, AccountUser };
 import type {
   AccountStatusSummary,
@@ -69,7 +69,7 @@ import type {
   ProviderStatus,
   UserChannelConfig,
   UpdateModelProviderForm,
-} from '@craft-agent/shared/account-api'
+} from '@zhangyuge-agent/shared/account-api'
 export type {
   AccountStatusSummary,
   ChannelAccount,
@@ -92,19 +92,19 @@ export type {
 }
 
 // Credential health types
-import type { CredentialHealthStatus, CredentialHealthIssue, CredentialHealthIssueType } from '@craft-agent/shared/credentials/types';
+import type { CredentialHealthStatus, CredentialHealthIssue, CredentialHealthIssueType } from '@zhangyuge-agent/shared/credentials/types';
 export type { CredentialHealthStatus, CredentialHealthIssue, CredentialHealthIssueType };
 
 // Source types for session source selection
-import type { LoadedSource, FolderSourceConfig, SourceConnectionStatus } from '@craft-agent/shared/sources/types';
+import type { LoadedSource, FolderSourceConfig, SourceConnectionStatus } from '@zhangyuge-agent/shared/sources/types';
 export type { LoadedSource, FolderSourceConfig, SourceConnectionStatus };
 
 // Skill types
-import type { LoadedSkill, SkillMetadata } from '@craft-agent/shared/skills/types';
+import type { LoadedSkill, SkillMetadata } from '@zhangyuge-agent/shared/skills/types';
 export type { LoadedSkill, SkillMetadata };
 
 // LLM connection types
-import type { LlmConnection, LlmConnectionWithStatus, LlmAuthType, LlmProviderType, NetworkProxySettings, UiLanguage } from '@craft-agent/shared/config';
+import type { LlmConnection, LlmConnectionWithStatus, LlmAuthType, LlmProviderType, NetworkProxySettings, UiLanguage } from '@zhangyuge-agent/shared/config';
 export type { LlmConnection, LlmConnectionWithStatus, LlmAuthType, LlmProviderType, NetworkProxySettings, UiLanguage };
 
 // =============================================================================
@@ -209,7 +209,7 @@ export interface TransportConnectionState {
 // =============================================================================
 
 // Re-import types for ElectronAPI
-import type { Workspace, SessionMetadata, StoredAttachment as StoredAttachmentType } from '@craft-agent/core/types';
+import type { Workspace, SessionMetadata, StoredAttachment as StoredAttachmentType } from '@zhangyuge-agent/core/types';
 
 // Import protocol types used by ElectronAPI (they come through the `export *` above,
 // but we need them in scope for the interface definition)
@@ -244,7 +244,7 @@ import type {
   TestAutomationPayload,
   TestAutomationResult,
   WindowCloseRequest,
-} from '@craft-agent/shared/protocol'
+} from '@zhangyuge-agent/shared/protocol'
 
 export interface ElectronAPI {
   // Session management
@@ -351,7 +351,7 @@ export interface ElectronAPI {
   onMenuToggleFocusMode(callback: () => void): () => void
   onMenuToggleSidebar(callback: () => void): () => void
 
-  // Deep link navigation listener (for external craftagents:// URLs)
+  // Deep link navigation listener (for external zhangyuge-agent:// URLs)
   onDeepLinkNavigate(callback: (nav: DeepLinkNavigation) => void): () => void
 
   // Auth
@@ -451,9 +451,9 @@ export interface ElectronAPI {
   deleteSource(workspaceId: string, sourceSlug: string): Promise<void>
   startSourceOAuth(workspaceId: string, sourceSlug: string): Promise<{ success: boolean; error?: string }>
   saveSourceCredentials(workspaceId: string, sourceSlug: string, credential: string): Promise<void>
-  getSourcePermissionsConfig(workspaceId: string, sourceSlug: string): Promise<import('@craft-agent/shared/agent').PermissionsConfigFile | null>
-  getWorkspacePermissionsConfig(workspaceId: string): Promise<import('@craft-agent/shared/agent').PermissionsConfigFile | null>
-  getDefaultPermissionsConfig(): Promise<{ config: import('@craft-agent/shared/agent').PermissionsConfigFile | null; path: string }>
+  getSourcePermissionsConfig(workspaceId: string, sourceSlug: string): Promise<import('@zhangyuge-agent/shared/agent').PermissionsConfigFile | null>
+  getWorkspacePermissionsConfig(workspaceId: string): Promise<import('@zhangyuge-agent/shared/agent').PermissionsConfigFile | null>
+  getDefaultPermissionsConfig(): Promise<{ config: import('@zhangyuge-agent/shared/agent').PermissionsConfigFile | null; path: string }>
   getMcpTools(workspaceId: string, sourceSlug: string): Promise<McpToolsResult>
 
   // OAuth (server-owned credentials, client-orchestrated flow)
@@ -480,13 +480,13 @@ export interface ElectronAPI {
   onSkillsChanged(callback: (workspaceId: string, skills: LoadedSkill[]) => void): () => void
 
   // Statuses (workspace-scoped)
-  listStatuses(workspaceId: string): Promise<import('@craft-agent/shared/statuses').StatusConfig[]>
+  listStatuses(workspaceId: string): Promise<import('@zhangyuge-agent/shared/statuses').StatusConfig[]>
   reorderStatuses(workspaceId: string, orderedIds: string[]): Promise<void>
   onStatusesChanged(callback: (workspaceId: string) => void): () => void
 
   // Labels (workspace-scoped)
-  listLabels(workspaceId: string): Promise<import('@craft-agent/shared/labels').LabelConfig[]>
-  createLabel(workspaceId: string, input: import('@craft-agent/shared/labels').CreateLabelInput): Promise<import('@craft-agent/shared/labels').LabelConfig>
+  listLabels(workspaceId: string): Promise<import('@zhangyuge-agent/shared/labels').LabelConfig[]>
+  createLabel(workspaceId: string, input: import('@zhangyuge-agent/shared/labels').CreateLabelInput): Promise<import('@zhangyuge-agent/shared/labels').LabelConfig>
   deleteLabel(workspaceId: string, labelId: string): Promise<{ stripped: number }>
   onLabelsChanged(callback: (workspaceId: string) => void): () => void
 
@@ -494,8 +494,8 @@ export interface ElectronAPI {
   onLlmConnectionsChanged(callback: () => void): () => void
 
   // Views (workspace-scoped, stored in views.json)
-  listViews(workspaceId: string): Promise<import('@craft-agent/shared/views').ViewConfig[]>
-  saveViews(workspaceId: string, views: import('@craft-agent/shared/views').ViewConfig[]): Promise<void>
+  listViews(workspaceId: string): Promise<import('@zhangyuge-agent/shared/views').ViewConfig[]>
+  saveViews(workspaceId: string, views: import('@zhangyuge-agent/shared/views').ViewConfig[]): Promise<void>
 
   // Generic workspace image loading/saving
   readWorkspaceImage(workspaceId: string, relativePath: string): Promise<string>

@@ -1,4 +1,4 @@
-import { RPC_CHANNELS } from '@craft-agent/shared/protocol'
+import { RPC_CHANNELS } from '@zhangyuge-agent/shared/protocol'
 import {
   createDocumentIndexAsync,
   createKnowledgeBase,
@@ -11,9 +11,9 @@ import {
   type KnowledgeBaseCreateForm,
   type KnowledgeBaseQueryParams,
   type KnowledgeBaseUpdateForm,
-} from '@craft-agent/shared/account-api'
-import { validateFilePath } from '@craft-agent/server-core/handlers'
-import type { RpcServer } from '@craft-agent/server-core/transport'
+} from '@zhangyuge-agent/shared/account-api'
+import { validateFilePath } from '@zhangyuge-agent/server-core/handlers'
+import type { RpcServer } from '@zhangyuge-agent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 
 export const HANDLED_CHANNELS = [
