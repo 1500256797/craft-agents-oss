@@ -58,7 +58,7 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
     shortName: 'Opus',
     description: 'Most capable for complex work',
     provider: 'anthropic',
-    contextWindow: 200_000,
+    contextWindow: 1_000_000,
   },
   {
     id: 'claude-opus-4-5-20251101',
@@ -74,7 +74,7 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
     shortName: 'Sonnet',
     description: 'Best for everyday tasks',
     provider: 'anthropic',
-    contextWindow: 200_000,
+    contextWindow: 1_000_000,
   },
   {
     id: 'claude-haiku-4-5-20251001',
