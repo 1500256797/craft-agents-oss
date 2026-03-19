@@ -3166,11 +3166,11 @@ export class SessionManager implements ISessionManager {
             message: planMessage,
           }, managed.workspace.id)
 
-          // Force-abort execution - plan presentation is a stopping point
+          // Interrupt execution - plan presentation is a stopping point
           // The user needs to review and respond before continuing
           if (managed.isProcessing && managed.agent) {
-            sessionLog.info(`Force-aborting after plan submission for session ${managed.id}`)
-            managed.agent.forceAbort(AbortReason.PlanSubmitted)
+            sessionLog.info(`Interrupting for plan submission in session ${managed.id}`)
+            managed.agent.interruptForHandoff(AbortReason.PlanSubmitted)
             managed.isProcessing = false
 
             // Release browser overlay + session binding because the agent is no longer running.
@@ -3223,10 +3223,10 @@ export class SessionManager implements ISessionManager {
         managed.pendingAuthRequestId = request.requestId
         managed.pendingAuthRequest = request
 
-        // Force-abort execution (like SubmitPlan)
+        // Interrupt execution (like SubmitPlan)
         if (managed.isProcessing && managed.agent) {
-          sessionLog.info(`Force-aborting after auth request for session ${managed.id}`)
-          managed.agent.forceAbort(AbortReason.AuthRequest)
+          sessionLog.info(`Interrupting for auth request in session ${managed.id}`)
+          managed.agent.interruptForHandoff(AbortReason.AuthRequest)
           managed.isProcessing = false
 
           // Release browser overlay + session binding because the agent is paused awaiting user auth.
