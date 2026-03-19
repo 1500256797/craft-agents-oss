@@ -9,6 +9,7 @@ import type { BaseEventPayload } from './event-bus.ts';
 import type { AutomationEvent, AutomationMatcher, PromptReferences, AgentEvent, SdkAutomationInput } from './types.ts';
 import { matchesCron } from './cron-matcher.ts';
 import { sanitizeForShell } from './security.ts';
+import { evaluateConditions } from './conditions.ts';
 
 // ============================================================================
 // String Utilities
@@ -136,7 +137,7 @@ export function getMatchValueForSdkInput(event: AgentEvent, input: SdkAutomation
  * Test if a matcher matches against a pre-computed match value.
  * Shared core: used by both event-bus matching (matcherMatches) and SDK matching (executeAgentEvent).
  */
-export function testMatcherAgainst(matcher: AutomationMatcher, event: AutomationEvent, matchValue: string): boolean {
+function matchesBasePredicate(matcher: AutomationMatcher, event: AutomationEvent, matchValue: string): boolean {
   if (matcher.enabled === false) return false;
   if (event === 'SchedulerTick') {
     return !!matcher.cron && matchesCron(matcher.cron, matcher.timezone);
@@ -149,11 +150,46 @@ export function testMatcherAgainst(matcher: AutomationMatcher, event: Automation
   }
 }
 
+export interface MatcherContext {
+  matchValue: string;
+  payload: Record<string, unknown>;
+  matcherTimezone?: string;
+}
+
+export function matcherMatchesWithContext(
+  matcher: AutomationMatcher,
+  event: AutomationEvent,
+  context: MatcherContext,
+): boolean {
+  if (!matchesBasePredicate(matcher, event, context.matchValue)) return false;
+
+  if (matcher.conditions?.length) {
+    return evaluateConditions(matcher.conditions, {
+      payload: context.payload,
+      matcherTimezone: context.matcherTimezone ?? matcher.timezone,
+    });
+  }
+
+  return true;
+}
+
 /**
  * Check if a matcher matches the given event and data (event-bus payloads).
  */
 export function matcherMatches(matcher: AutomationMatcher, event: AutomationEvent, data: Record<string, unknown>): boolean {
-  return testMatcherAgainst(matcher, event, getMatchValue(event, data));
+  return matcherMatchesWithContext(matcher, event, {
+    matchValue: getMatchValue(event, data),
+    payload: data,
+    matcherTimezone: matcher.timezone,
+  });
+}
+
+export function matcherMatchesSdk(matcher: AutomationMatcher, event: AgentEvent, input: SdkAutomationInput): boolean {
+  return matcherMatchesWithContext(matcher, event, {
+    matchValue: getMatchValueForSdkInput(event, input),
+    payload: input as unknown as Record<string, unknown>,
+    matcherTimezone: matcher.timezone,
+  });
 }
 
 // ============================================================================

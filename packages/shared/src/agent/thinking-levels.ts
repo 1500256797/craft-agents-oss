@@ -1,15 +1,21 @@
 /**
  * Thinking Level Configuration
  *
- * Three-tier thinking system for extended reasoning:
- * - OFF: No extended thinking (0 tokens)
- * - Think: Standard reasoning (moderate token budget)
- * - Max Think: Deep reasoning (maximum token budget)
+ * Five-tier thinking system for extended reasoning:
+ * - OFF: No extended thinking (disabled)
+ * - Low: Light reasoning, faster responses
+ * - Medium: Balanced speed and reasoning (default)
+ * - High: Deep reasoning for complex tasks
+ * - Max: Maximum effort reasoning
  *
  * Session-level setting with workspace defaults.
+ *
+ * Provider mappings:
+ * - Anthropic: adaptive thinking + effort levels
+ * - Pi/OpenAI: reasoning_effort via Pi SDK levels
  */
 
-export type ThinkingLevel = 'off' | 'think' | 'max';
+export type ThinkingLevel = 'off' | 'low' | 'medium' | 'high' | 'max';
 
 export interface ThinkingLevelDefinition {
   id: ThinkingLevel;
@@ -26,12 +32,26 @@ export interface ThinkingLevelDefinition {
  */
 export const THINKING_LEVELS: readonly ThinkingLevelDefinition[] = [
   { id: 'off', name: 'No Thinking', description: 'Fastest responses, no reasoning' },
-  { id: 'think', name: 'Thinking', description: 'Balanced speed and reasoning' },
-  { id: 'max', name: 'Max Thinking', description: 'Deepest reasoning for complex tasks' },
+  { id: 'low', name: 'Low', description: 'Light reasoning, faster responses' },
+  { id: 'medium', name: 'Medium', description: 'Balanced speed and reasoning' },
+  { id: 'high', name: 'High', description: 'Deep reasoning for complex tasks' },
+  { id: 'max', name: 'Max', description: 'Maximum effort reasoning' },
 ] as const;
 
 /** Default thinking level for new sessions when workspace has no default */
-export const DEFAULT_THINKING_LEVEL: ThinkingLevel = 'think';
+export const DEFAULT_THINKING_LEVEL: ThinkingLevel = 'medium';
+
+/**
+ * Map ThinkingLevel to Anthropic adaptive thinking effort.
+ * Returns null for 'off', which disables thinking entirely.
+ */
+export const THINKING_TO_EFFORT: Record<ThinkingLevel, 'low' | 'medium' | 'high' | 'max' | null> = {
+  off: null,
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  max: 'max',
+};
 
 /**
  * Token budgets per model family.
@@ -47,12 +67,16 @@ export const DEFAULT_THINKING_LEVEL: ThinkingLevel = 'think';
 const TOKEN_BUDGETS = {
   haiku: {
     off: 0,
-    think: 4_000,
+    low: 2_000,
+    medium: 4_000,
+    high: 6_000,
     max: 8_000,
   },
   default: {
     off: 0,
-    think: 10_000,
+    low: 4_000,
+    medium: 10_000,
+    high: 20_000,
     max: 32_000,
   },
 } as const;
@@ -82,5 +106,15 @@ export function getThinkingLevelName(level: ThinkingLevel): string {
  * Validate that a value is a valid ThinkingLevel.
  */
 export function isValidThinkingLevel(value: unknown): value is ThinkingLevel {
-  return value === 'off' || value === 'think' || value === 'max';
+  return value === 'off' || value === 'low' || value === 'medium' || value === 'high' || value === 'max';
+}
+
+/**
+ * Normalize a persisted thinking level value, handling legacy values.
+ * Maps the old 'think' level to 'medium' for backward compatibility.
+ */
+export function normalizeThinkingLevel(value: unknown): ThinkingLevel | undefined {
+  if (value === 'think') return 'medium';
+  if (isValidThinkingLevel(value)) return value;
+  return undefined;
 }

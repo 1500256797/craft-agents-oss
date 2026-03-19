@@ -318,12 +318,12 @@ export async function getAuthState(): Promise<AuthState> {
 /**
  * Derive what setup steps are needed based on current auth state
  */
-export function getSetupNeeds(state: AuthState): SetupNeeds {
+export function getSetupNeeds(state: AuthState, setupDeferred = false): SetupNeeds {
   // Need billing config if no billing type is set
-  const needsBillingConfig = state.billing.type === null;
+  const needsBillingConfig = !setupDeferred && state.billing.type === null;
 
   // Need credentials if billing type is set but credentials are missing
-  const needsCredentials = state.billing.type !== null && !state.billing.hasCredentials;
+  const needsCredentials = !setupDeferred && state.billing.type !== null && !state.billing.hasCredentials;
 
   return {
     needsBillingConfig,

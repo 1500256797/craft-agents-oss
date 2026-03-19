@@ -95,6 +95,35 @@ export interface WebhookAction {
 
 export type AutomationAction = PromptAction | WebhookAction;
 
+// ============================================================================
+// Condition Types
+// ============================================================================
+
+export interface TimeCondition {
+  condition: 'time';
+  after?: string;
+  before?: string;
+  weekday?: string[];
+  timezone?: string;
+}
+
+export interface StateCondition {
+  condition: 'state';
+  field: string;
+  value?: unknown;
+  from?: unknown;
+  to?: unknown;
+  contains?: string;
+  not_value?: unknown;
+}
+
+export interface LogicalCondition {
+  condition: 'and' | 'or' | 'not';
+  conditions: AutomationCondition[];
+}
+
+export type AutomationCondition = TimeCondition | StateCondition | LogicalCondition;
+
 export interface AutomationMatcher {
   /** Short 6-character hex ID for stable identification across config changes. */
   id?: string;
@@ -112,6 +141,8 @@ export interface AutomationMatcher {
   labels?: string[];
   /** Whether this automation matcher is enabled. Defaults to true. Set to false to disable without removing. */
   enabled?: boolean;
+  /** Optional conditions that must all pass after the matcher matches, before actions fire. */
+  conditions?: AutomationCondition[];
   actions: AutomationAction[];
 }
 

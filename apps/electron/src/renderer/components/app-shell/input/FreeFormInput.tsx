@@ -160,7 +160,7 @@ export interface FreeFormInputProps {
   /** Callback when model changes (includes connection slug for proper persistence) */
   onModelChange: (model: string, connection?: string) => void
   // Thinking level (session-level setting)
-  /** Current thinking level ('off', 'think', 'max') */
+  /** Current thinking level ('off', 'low', 'medium', 'high', 'max') */
   thinkingLevel?: ThinkingLevel
   /** Callback when thinking level changes */
   onThinkingLevelChange?: (level: ThinkingLevel) => void
@@ -258,7 +258,7 @@ export function FreeFormInput({
   inputRef: externalInputRef,
   currentModel,
   onModelChange,
-  thinkingLevel = 'think',
+  thinkingLevel = 'medium',
   onThinkingLevelChange,
   permissionMode = 'ask',
   onPermissionModeChange,

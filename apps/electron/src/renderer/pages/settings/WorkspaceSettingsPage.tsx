@@ -23,6 +23,8 @@ import { routes } from '@/lib/navigate'
 import { Spinner } from '@zhangyuge-agent/ui'
 import { RenameDialog } from '@/components/ui/rename-dialog'
 import type { PermissionMode, WorkspaceSettings, LoadedSource } from '../../../shared/types'
+import { useDirectoryPicker } from '@/hooks/useDirectoryPicker'
+import { ServerDirectoryBrowser } from '@/components/ServerDirectoryBrowser'
 import type { DetailsPageMeta } from '@/lib/navigation-registry'
 import { SourceAvatar } from '@/components/ui/source-avatar'
 import { useI18n } from '@/context/I18nContext'
@@ -247,19 +249,18 @@ export default function WorkspaceSettingsPage({
     [updateWorkspaceSetting]
   )
 
-  const handleChangeWorkingDirectory = useCallback(async () => {
-    if (!window.electronAPI) return
-
-    try {
-      const selectedPath = await window.electronAPI.openFolderDialog()
-      if (selectedPath) {
-        setWorkingDirectory(selectedPath)
-        await updateWorkspaceSetting('workingDirectory', selectedPath)
-      }
-    } catch (error) {
-      console.error('Failed to change working directory:', error)
-    }
+  const handleWorkingDirectorySelected = useCallback(async (selectedPath: string) => {
+    setWorkingDirectory(selectedPath)
+    await updateWorkspaceSetting('workingDirectory', selectedPath)
   }, [updateWorkspaceSetting])
+
+  const {
+    pickDirectory: handleChangeWorkingDirectory,
+    showServerBrowser: showWdBrowser,
+    serverBrowserMode: wdBrowserMode,
+    cancelServerBrowser: cancelWdBrowser,
+    confirmServerBrowser: confirmWdBrowser,
+  } = useDirectoryPicker(handleWorkingDirectorySelected)
 
   const handleClearWorkingDirectory = useCallback(async () => {
     if (!window.electronAPI) return
@@ -528,8 +529,16 @@ export default function WorkspaceSettingsPage({
           </SettingsSection>
 
         </div>
-      </div>
+        </div>
       </ScrollArea>
+
+      <ServerDirectoryBrowser
+        open={showWdBrowser}
+        mode={wdBrowserMode}
+        onSelect={confirmWdBrowser}
+        onCancel={cancelWdBrowser}
+        initialPath={workingDirectory}
+      />
     </div>
   )
 

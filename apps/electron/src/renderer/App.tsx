@@ -20,6 +20,7 @@ import { ModalProvider } from '@/context/ModalContext'
 import { DismissibleLayerProvider } from '@/context/DismissibleLayerContext'
 import { useWindowCloseHandler } from '@/hooks/useWindowCloseHandler'
 import { useOnboarding } from '@/hooks/useOnboarding'
+import { normalizeThinkingLevel } from '@zhangyuge-agent/shared/agent/thinking-levels'
 import { useNotifications } from '@/hooks/useNotifications'
 import { useSession } from '@/hooks/useSession'
 import { useUpdateChecker } from '@/hooks/useUpdateChecker'
@@ -460,11 +461,12 @@ export default function App() {
       for (const s of loadedSessions) {
         // Only store non-default options to keep the map lean
         const hasNonDefaultMode = s.permissionMode && s.permissionMode !== 'ask'
-        const hasNonDefaultThinking = s.thinkingLevel && s.thinkingLevel !== 'think'
+        const normalizedThinking = normalizeThinkingLevel(s.thinkingLevel)
+        const hasNonDefaultThinking = normalizedThinking && normalizedThinking !== 'medium'
         if (hasNonDefaultMode || hasNonDefaultThinking) {
           optionsMap.set(s.id, {
             permissionMode: s.permissionMode ?? 'ask',
-            thinkingLevel: s.thinkingLevel ?? 'think',
+            thinkingLevel: normalizedThinking ?? 'medium',
           })
         }
       }
@@ -804,13 +806,14 @@ export default function App() {
   // Centralised helper used by all session creation paths (create, branch, event handler).
   const populateSessionOptions = useCallback((session: Session) => {
     const hasNonDefaultMode = session.permissionMode && session.permissionMode !== 'ask'
-    const hasNonDefaultThinking = session.thinkingLevel && session.thinkingLevel !== 'think'
+    const normalizedThinking = normalizeThinkingLevel(session.thinkingLevel)
+    const hasNonDefaultThinking = normalizedThinking && normalizedThinking !== 'medium'
     if (hasNonDefaultMode || hasNonDefaultThinking) {
       setSessionOptions(prev => {
         const next = new Map(prev)
         next.set(session.id, {
           permissionMode: session.permissionMode ?? 'ask',
-          thinkingLevel: session.thinkingLevel ?? 'think',
+          thinkingLevel: normalizedThinking ?? 'medium',
         })
         return next
       })

@@ -24,7 +24,7 @@ import { WorkspaceEventBus, type EventPayloadMap } from './event-bus.ts';
 import { PromptHandler, EventLogHandler, WebhookHandler, type AutomationsConfigProvider } from './handlers/index.ts';
 import { type AutomationsConfig, type AutomationEvent, type AutomationMatcher, type PendingPrompt, type WebhookActionResult, type AppEvent, type AgentEvent, type SdkAutomationCallbackMatcher, type SdkAutomationInput } from './types.ts';
 import { validateAutomationsConfig } from './validation.ts';
-import { testMatcherAgainst, getMatchValueForSdkInput } from './utils.ts';
+import { matcherMatchesSdk } from './utils.ts';
 import { SchedulerService, type SchedulerTickPayload } from '../scheduler/scheduler-service.ts';
 
 const log = createLogger('automation-system');
@@ -498,10 +498,8 @@ export class AutomationSystem implements AutomationsConfigProvider {
     const matchers = this.config.automations[event];
     if (!matchers?.length) return;
 
-    const matchValue = getMatchValueForSdkInput(event, input);
-
     for (const matcher of matchers) {
-      if (!testMatcherAgainst(matcher, event, matchValue)) continue;
+      if (!matcherMatchesSdk(matcher, event, input)) continue;
 
       // Note: Command execution has been removed. Prompt-based execution for
       // non-Claude backends is not yet implemented. This method currently only

@@ -1,13 +1,14 @@
-import { readFile, writeFile, unlink, mkdir, readdir } from 'fs/promises'
-import { join } from 'path'
+import { readFile, writeFile, unlink, mkdir, readdir, stat } from 'fs/promises'
+import { join, resolve, dirname, parse as parsePath } from 'path'
 import { randomUUID } from 'crypto'
-import { RPC_CHANNELS, type FileAttachment } from '@zhangyuge-agent/shared/protocol'
+import { RPC_CHANNELS, type DirectoryListingResult, type FileAttachment } from '@zhangyuge-agent/shared/protocol'
 import type { StoredAttachment } from '@zhangyuge-agent/core/types'
 import { readFileAttachment, validateImageForClaudeAPI, IMAGE_LIMITS } from '@zhangyuge-agent/shared/utils'
 import { getSessionAttachmentsPath, validateSessionId } from '@zhangyuge-agent/shared/sessions'
 import { getWorkspaceByNameOrId } from '@zhangyuge-agent/shared/config'
 import { resizeImageForAPI, getImageSize } from '@zhangyuge-agent/server-core/services'
 import { sanitizeFilename, validateFilePath } from '@zhangyuge-agent/server-core/handlers'
+import { validatePathFormat } from '../../utils/path-validation'
 import { MarkItDown } from 'markitdown-js'
 import type { RpcServer } from '@zhangyuge-agent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
@@ -25,6 +26,7 @@ export const HANDLED_CHANNELS = [
   RPC_CHANNELS.file.STORE_ATTACHMENT,
   RPC_CHANNELS.file.GENERATE_THUMBNAIL,
   RPC_CHANNELS.fs.SEARCH,
+  RPC_CHANNELS.fs.LIST_DIRECTORY,
 ] as const
 
 export function registerFilesHandlers(server: RpcServer, deps: HandlerDeps): void {
@@ -454,5 +456,61 @@ export function registerFilesHandlers(server: RpcServer, deps: HandlerDeps): voi
       deps.platform.logger.error('[FS_SEARCH] error:', err)
       return []
     }
+  })
+
+  server.handle(RPC_CHANNELS.fs.LIST_DIRECTORY, async (_ctx, dirPath: string) => {
+    const pathCheck = validatePathFormat(dirPath)
+    if (!pathCheck.valid) {
+      throw new Error(pathCheck.reason!)
+    }
+
+    const resolved = resolve(dirPath)
+    const raw = await readdir(resolved, { withFileTypes: true })
+
+    const entries: Array<{ name: string; path: string; isSymlink: boolean }> = []
+    for (const entry of raw) {
+      const fullPath = join(resolved, entry.name)
+      const isSymlink = entry.isSymbolicLink()
+
+      if (entry.isDirectory()) {
+        entries.push({ name: entry.name, path: fullPath, isSymlink: false })
+      } else if (isSymlink) {
+        try {
+          const target = await stat(fullPath)
+          if (target.isDirectory()) {
+            entries.push({ name: entry.name, path: fullPath, isSymlink: true })
+          }
+        } catch {
+          // Ignore broken symlinks silently.
+        }
+      }
+    }
+
+    entries.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
+    const totalEntries = entries.length
+    const truncated = totalEntries > 500
+    if (truncated) entries.length = 500
+
+    const parentPath = resolved === parsePath(resolved).root ? null : dirname(resolved)
+
+    const breadcrumbs: Array<{ name: string; path: string }> = []
+    let current = resolved
+    while (true) {
+      const parsed = parsePath(current)
+      const name = parsed.base || parsed.root
+      breadcrumbs.unshift({ name, path: current })
+      if (current === parsed.root) break
+      current = dirname(current)
+    }
+
+    return {
+      currentPath: resolved,
+      parentPath,
+      breadcrumbs,
+      platform: process.platform as DirectoryListingResult['platform'],
+      truncated,
+      totalEntries,
+      entries,
+    } satisfies DirectoryListingResult
   })
 }

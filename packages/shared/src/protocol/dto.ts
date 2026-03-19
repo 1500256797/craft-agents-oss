@@ -188,6 +188,7 @@ export type SessionEvent =
   | { type: 'source_activated'; sessionId: string; sourceSlug: string; originalMessage: string }
   | { type: 'usage_update'; sessionId: string; tokenUsage: { inputTokens: number; contextWindow?: number } }
   | { type: 'message_annotations_updated'; sessionId: string; messageId: string; annotations: AnnotationV1[] }
+  | { type: 'working_directory_error'; sessionId: string; error: string }
 
 export interface SendMessageOptions {
   skillSlugs?: string[]
@@ -262,6 +263,20 @@ export interface CredentialResponse {
   password?: string
   headers?: Record<string, string>
   cancelled: boolean
+}
+
+// ---------------------------------------------------------------------------
+// Directory browsing types (remote mode)
+// ---------------------------------------------------------------------------
+
+export interface DirectoryListingResult {
+  currentPath: string
+  parentPath: string | null
+  breadcrumbs: Array<{ name: string; path: string }>
+  platform: 'win32' | 'darwin' | 'linux'
+  truncated: boolean
+  totalEntries: number
+  entries: Array<{ name: string; path: string; isSymlink: boolean }>
 }
 
 // ---------------------------------------------------------------------------

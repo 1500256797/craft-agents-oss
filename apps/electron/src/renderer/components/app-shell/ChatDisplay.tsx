@@ -143,7 +143,7 @@ interface ChatDisplayProps {
   /** Callback to respond to credential request */
   onRespondToCredential?: (sessionId: string, requestId: string, response: CredentialResponse) => void
   // Thinking level (session-level setting)
-  /** Current thinking level ('off', 'think', 'max') */
+  /** Current thinking level ('off', 'low', 'medium', 'high', 'max') */
   thinkingLevel?: ThinkingLevel
   /** Callback when thinking level changes */
   onThinkingLevelChange?: (level: ThinkingLevel) => void
@@ -451,7 +451,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
   pendingCredential,
   onRespondToCredential,
   // Thinking level
-  thinkingLevel = 'think',
+  thinkingLevel = 'medium',
   onThinkingLevelChange,
   // Advanced options
   permissionMode = 'ask',

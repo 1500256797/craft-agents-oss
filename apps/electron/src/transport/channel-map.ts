@@ -63,6 +63,7 @@ export const CHANNEL_MAP = {
   readFileAttachment: invoke(RPC_CHANNELS.file.READ_ATTACHMENT),
   storeAttachment: invoke(RPC_CHANNELS.file.STORE_ATTACHMENT),
   generateThumbnail: invoke(RPC_CHANNELS.file.GENERATE_THUMBNAIL),
+  listServerDirectory: invoke(RPC_CHANNELS.fs.LIST_DIRECTORY),
 
   // Theme
   getSystemTheme: invoke(RPC_CHANNELS.theme.GET_SYSTEM_PREFERENCE),
@@ -137,6 +138,7 @@ export const CHANNEL_MAP = {
   exchangeClaudeCode: invoke(RPC_CHANNELS.onboarding.EXCHANGE_CLAUDE_CODE),
   hasClaudeOAuthState: invoke(RPC_CHANNELS.onboarding.HAS_CLAUDE_OAUTH_STATE),
   clearClaudeOAuthState: invoke(RPC_CHANNELS.onboarding.CLEAR_CLAUDE_OAUTH_STATE),
+  deferSetup: invoke(RPC_CHANNELS.onboarding.DEFER_SETUP),
 
   // ChatGPT OAuth
   startChatGptOAuth: invoke(RPC_CHANNELS.chatgpt.START_OAUTH),

@@ -27,6 +27,19 @@ export const mockElectronAPI = {
     return null
   },
 
+  listServerDirectory: async (path: string) => {
+    console.log('[Playground] listServerDirectory called:', path)
+    return {
+      currentPath: path,
+      parentPath: '/mock',
+      breadcrumbs: [{ name: 'mock', path: '/mock' }, { name: 'folder', path }],
+      platform: 'darwin' as const,
+      truncated: false,
+      totalEntries: 0,
+      entries: [],
+    }
+  },
+
   getTaskOutput: async (taskId: string) => {
     console.log('[Playground] getTaskOutput called:', taskId)
     return `Output for task ${taskId}:\n\nThis is a mock output in the playground.\nIn the real app, this would show the actual task output.`

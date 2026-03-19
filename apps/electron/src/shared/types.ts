@@ -226,6 +226,7 @@ import type {
   ShareResult,
   RefreshTitleResult,
   FileSearchResult,
+  DirectoryListingResult,
   SessionSearchResult,
   LlmConnectionSetup,
   TestLlmConnectionParams,
@@ -393,6 +394,7 @@ export interface ElectronAPI {
   exchangeClaudeCode(code: string, connectionSlug: string): Promise<ClaudeOAuthResult>
   hasClaudeOAuthState(): Promise<boolean>
   clearClaudeOAuthState(): Promise<{ success: boolean }>
+  deferSetup(): Promise<{ success: boolean }>
 
   // ChatGPT OAuth (for Codex chatgptAuthTokens mode)
   startChatGptOAuth(connectionSlug: string): Promise<{ success: boolean; error?: string }>
@@ -426,6 +428,7 @@ export interface ElectronAPI {
 
   // Folder dialog
   openFolderDialog(): Promise<string | null>
+  listServerDirectory(path: string): Promise<DirectoryListingResult>
 
   // User Preferences
   readPreferences(): Promise<{ content: string; exists: boolean; path: string }>
