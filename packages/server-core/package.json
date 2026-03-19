@@ -22,11 +22,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@mariozechner/pi-ai": "0.60.0",
     "@zhangyuge-agent/core": "workspace:*",
     "@zhangyuge-agent/shared": "workspace:*",
-    "ws": "^8.19.0",
     "sharp": "0.34.5",
-    "@mariozechner/pi-ai": "0.56.2"
+    "ws": "^8.19.0"
   },
   "devDependencies": {
     "typescript": "^5.8.2",
