@@ -20,6 +20,7 @@ import {
 } from '@zhangyuge-agent/shared/agent/backend'
 import { getLlmConnection, getDefaultLlmConnection, getDefaultThinkingLevel } from '@zhangyuge-agent/shared/config'
 import { PrivilegedExecutionBroker } from '@zhangyuge-agent/server-core/services'
+import { isValidWorkingDirectory } from '../utils/path-validation'
 import { InitGate } from '@zhangyuge-agent/server-core/domain'
 import {
   getWorkspaces,
@@ -72,7 +73,7 @@ import { formatPathsToRelative, formatToolInputPaths, perf, encodeIconToDataUrlA
 import { loadAllSkills, loadSkillBySlug, type LoadedSkill } from '@zhangyuge-agent/shared/skills'
 import { getToolIconsDir, getMiniModel } from '@zhangyuge-agent/shared/config'
 import type { SummarizeCallback } from '@zhangyuge-agent/shared/sources'
-import { type ThinkingLevel, DEFAULT_THINKING_LEVEL } from '@zhangyuge-agent/shared/agent/thinking-levels'
+import { type ThinkingLevel, DEFAULT_THINKING_LEVEL, normalizeThinkingLevel } from '@zhangyuge-agent/shared/agent/thinking-levels'
 import { evaluateAutoLabels } from '@zhangyuge-agent/shared/labels/auto'
 import { listLabels } from '@zhangyuge-agent/shared/labels/storage'
 import { extractLabelId } from '@zhangyuge-agent/shared/labels'
@@ -891,19 +892,31 @@ interface ManagedSession {
  * Spreads all matching fields from the source so new persistent fields automatically propagate.
  * Runtime-only fields get sensible defaults.
  */
-function createManagedSession(
+export function createManagedSession(
   source: { id: string } & Partial<ManagedSession>,
   workspace: Workspace,
   overrides?: Partial<ManagedSession>,
 ): ManagedSession {
   const s = source as Record<string, unknown>
+  const sourceFields = Object.fromEntries(
+    Object.entries(s).filter(([, v]) => v !== undefined)
+  ) as Partial<ManagedSession>
+
+  if ('thinkingLevel' in sourceFields) {
+    // TODO: Remove legacy 'think' normalization after old persisted session
+    // headers have realistically aged out across upgrades.
+    const normalizedThinkingLevel = normalizeThinkingLevel(sourceFields.thinkingLevel)
+    if (normalizedThinkingLevel) {
+      sourceFields.thinkingLevel = normalizedThinkingLevel
+    } else {
+      delete sourceFields.thinkingLevel
+    }
+  }
 
   const managed = {
     // Spread all session-like fields from source (id, name, permissionMode, labels, model, etc.)
     // This ensures new persistent fields automatically flow through without manual copying.
-    ...Object.fromEntries(
-      Object.entries(s).filter(([, v]) => v !== undefined)
-    ) as Partial<ManagedSession>,
+    ...sourceFields,
     // Runtime-only defaults (not persisted)
     workspace,
     agent: null,
@@ -2061,7 +2074,7 @@ export class SessionManager implements ISessionManager {
 
     const userDefaultWorkingDir = wsConfig?.defaults?.workingDirectory || undefined
     // Get default thinking level from workspace config, fallback to app-level default
-    const defaultThinkingLevel = wsConfig?.defaults?.thinkingLevel ?? getDefaultThinkingLevel()
+    const defaultThinkingLevel = normalizeThinkingLevel(wsConfig?.defaults?.thinkingLevel) ?? getDefaultThinkingLevel()
     // Get default model from workspace config (used when no session-specific model is set)
     const defaultModel = wsConfig?.defaults?.model
     // Get default enabled sources from workspace config
@@ -2505,8 +2518,10 @@ export class SessionManager implements ISessionManager {
       }
 
       // Per-session env overrides
+      const miniModel = connection ? (getMiniModel(connection) ?? connection.defaultModel) : undefined
       const envOverrides: Record<string, string> = {
         ZHANGYUGE_AGENT_WORKSPACE_PATH: managed.workspace.rootPath,
+        ...(miniModel ? { ANTHROPIC_DEFAULT_HAIKU_MODEL: miniModel } : {}),
       }
       managed.envOverrides = envOverrides
 
@@ -2599,7 +2614,7 @@ export class SessionManager implements ISessionManager {
         hostRuntime: buildBackendHostRuntimeContext(),
         coreConfig: {
         workspace: managed.workspace,
-        miniModel: connection ? (getMiniModel(connection) ?? connection.defaultModel) : undefined,
+        miniModel,
         thinkingLevel: managed.thinkingLevel,
         session: sessionConfig,
         onSdkSessionIdUpdate,
@@ -4094,6 +4109,17 @@ export class SessionManager implements ISessionManager {
   updateWorkingDirectory(sessionId: string, path: string): void {
     const managed = this.sessions.get(sessionId)
     if (managed) {
+      const validation = isValidWorkingDirectory(path)
+      if (!validation.valid) {
+        sessionLog.warn(`Session ${sessionId}: rejected working directory "${path}" — ${validation.reason}`)
+        this.sendEvent({
+          type: 'working_directory_error',
+          sessionId,
+          error: validation.reason!,
+        }, managed.workspace.id)
+        return
+      }
+
       managed.workingDirectory = path
 
       // Check if we can also update sdkCwd (safe if no SDK interaction yet)
