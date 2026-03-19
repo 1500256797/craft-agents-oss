@@ -23,6 +23,8 @@ export interface SettingsPageDefinition {
   label: string
   /** Short description shown in settings navigator */
   description: string
+  /** When true, keep the route available but hide it from settings navigation/menu lists */
+  hidden?: boolean
 }
 
 /**
@@ -38,7 +40,7 @@ export const SETTINGS_PAGES = [
   { id: 'channels', label: 'Channels', description: 'Channel connections and account status' },
   { id: 'appearance', label: 'Appearance', description: 'Theme, font, tool icons' },
   { id: 'input', label: 'Input', description: 'Send key, spell check' },
-  { id: 'workspace', label: 'Agent', description: 'Name, icon, working directory' },
+  { id: 'workspace', label: 'Agent', description: 'Name, icon, working directory', hidden: true },
   { id: 'permissions', label: 'Permissions', description: 'Explore mode rules' },
   { id: 'shortcuts', label: 'Shortcuts', description: 'Keyboard shortcuts' },
   { id: 'preferences', label: 'Preferences', description: 'User preferences' },

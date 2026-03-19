@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { handleDeepLink } from '../deep-link'
+import { handleDeepLink, parseDeepLink } from '../deep-link'
 import { RPC_CHANNELS } from '../../shared/types'
 import type { EventSink } from '@zhangyuge-agent/server-core/transport'
 import type { WindowManager } from '../window-manager'
@@ -20,6 +20,15 @@ function createMockWindow(webContentsId: number) {
 }
 
 describe('handleDeepLink routing', () => {
+  it('parses module deep links as compound routes', () => {
+    expect(parseDeepLink('zhangyuge-agent://module/agents?window=focused')).toEqual({
+      workspaceId: undefined,
+      view: 'module/agents',
+      windowMode: 'focused',
+      rightSidebar: undefined,
+    })
+  })
+
   it('prefers resolved target client over preferred caller client', async () => {
     const targetWindow = createMockWindow(22)
 

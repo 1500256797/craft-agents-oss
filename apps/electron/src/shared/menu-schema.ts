@@ -240,9 +240,11 @@ const SETTINGS_ICONS: Record<SettingsSubpage, string> = {
 
 /**
  * All settings pages - derived from settings-registry (single source of truth)
- * Order is determined by SETTINGS_PAGES in settings-registry.ts
+ * Order is determined by visible SETTINGS_PAGES entries in settings-registry.ts
  */
-export const SETTINGS_ITEMS: SettingsMenuItem[] = SETTINGS_PAGES.map(page => ({
+export const SETTINGS_ITEMS: SettingsMenuItem[] = SETTINGS_PAGES
+  .filter(page => !('hidden' in page && page.hidden))
+  .map(page => ({
   id: page.id,
   label: page.label,
   icon: SETTINGS_ICONS[page.id],

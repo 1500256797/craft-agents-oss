@@ -11,7 +11,7 @@ export default function AgentsPage() {
     <div className="flex h-full flex-col">
       <PanelHeader
         title={t('common.sidebar.nav.agents')}
-        actions={<HeaderMenu route={routes.view.settings('workspace')} />}
+        actions={<HeaderMenu route={routes.view.module('agents')} />}
       />
 
       <WorkspaceSettingsPage

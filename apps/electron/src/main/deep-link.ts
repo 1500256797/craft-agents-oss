@@ -11,6 +11,7 @@
  *   zhangyuge-agent://state/{stateId}[/session/{sessionId}]     - Session list (state filter)
  *   zhangyuge-agent://sources[/source/{sourceSlug}]          - Sources list
  *   zhangyuge-agent://settings[/{subpage}]                   - Settings (general, shortcuts, preferences)
+ *   zhangyuge-agent://module/{subpage}                        - Module page (agents, models, knowledge-base)
  *
  * Action format:
  *   zhangyuge-agent://action/{actionName}[/{id}][?params]
@@ -115,7 +116,7 @@ export function parseDeepLink(url: string): DeepLinkTarget | null {
 
     // Compound route prefixes
     const COMPOUND_ROUTE_PREFIXES = [
-      'allSessions', 'flagged', 'state', 'sources', 'settings', 'skills'
+      'allSessions', 'flagged', 'state', 'sources', 'settings', 'skills', 'module'
     ]
 
     // zhangyuge-agent://allSessions/..., zhangyuge-agent://settings/..., etc. (compound routes)
