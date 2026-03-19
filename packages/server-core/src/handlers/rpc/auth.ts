@@ -21,6 +21,7 @@ export const HANDLED_CHANNELS = [
   RPC_CHANNELS.auth.GET_CAPTCHA_ID,
   RPC_CHANNELS.auth.GET_CAPTCHA_IMAGE,
   RPC_CHANNELS.auth.LOGOUT,
+  RPC_CHANNELS.auth.RESET_APP,
   RPC_CHANNELS.auth.SHOW_LOGOUT_CONFIRMATION,
   RPC_CHANNELS.auth.SHOW_DELETE_SESSION_CONFIRMATION,
   RPC_CHANNELS.credentials.HEALTH_CHECK,
@@ -76,7 +77,7 @@ export function registerAuthHandlers(server: RpcServer, deps: HandlerDeps): void
       cancelId: 0,
       title: 'Log Out',
       message: 'Are you sure you want to log out?',
-      detail: 'All conversations will be deleted. This action cannot be undone.',
+      detail: 'Your local workspaces and settings will be kept.',
     })
     // result.response is the index of the clicked button
     // 0 = Cancel, 1 = Log Out
@@ -99,15 +100,25 @@ export function registerAuthHandlers(server: RpcServer, deps: HandlerDeps): void
     return result.response === 1
   })
 
-  // Logout - clear all credentials and config
+  // Logout - clear only the account session. Local workspaces/config remain intact.
   server.handle(RPC_CHANNELS.auth.LOGOUT, async () => {
     try {
       await clearAccountSession()
-      await clearAllConfig()
-
-      deps.platform.logger.info('Logout complete - cleared all credentials and config')
+      deps.platform.logger.info('Logout complete - cleared account session only')
     } catch (error) {
       deps.platform.logger.error('Logout error:', error)
+      throw error
+    }
+  })
+
+  // Reset app - destructive clear of credentials, config, and tracked workspaces
+  server.handle(RPC_CHANNELS.auth.RESET_APP, async () => {
+    try {
+      await clearAccountSession()
+      await clearAllConfig()
+      deps.platform.logger.info('Reset app complete - cleared credentials, config, and tracked workspaces')
+    } catch (error) {
+      deps.platform.logger.error('Reset app error:', error)
       throw error
     }
   })

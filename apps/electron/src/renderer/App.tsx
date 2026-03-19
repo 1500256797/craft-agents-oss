@@ -1310,10 +1310,20 @@ export default function App() {
     setShowResetDialog(true)
   }, [])
 
+  const handleLogout = useCallback(async () => {
+    try {
+      await window.electronAPI.logout()
+      setSetupNeeds(null)
+      setAppState('login')
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
+  }, [])
+
   // Execute reset after user confirms in dialog
   const executeReset = useCallback(async () => {
     try {
-      await window.electronAPI.logout()
+      await window.electronAPI.resetApp()
       // Reset all state
       // Clear session atoms - initialize with empty array clears all per-session atoms
       initializeSessions([])
@@ -1446,6 +1456,7 @@ export default function App() {
     onOpenSettings: handleOpenSettings,
     onOpenKeyboardShortcuts: handleOpenKeyboardShortcuts,
     onOpenStoredUserPreferences: handleOpenStoredUserPreferences,
+    onLogout: handleLogout,
     onReset: handleReset,
     // Session options
     onSessionOptionsChange: handleSessionOptionsChange,
@@ -1485,6 +1496,7 @@ export default function App() {
     handleOpenSettings,
     handleOpenKeyboardShortcuts,
     handleOpenStoredUserPreferences,
+    handleLogout,
     handleReset,
     handleSessionOptionsChange,
     handleInputChange,

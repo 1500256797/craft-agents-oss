@@ -143,6 +143,7 @@ export const RPC_CHANNELS = {
     GET_CAPTCHA_ID: 'auth:getCaptchaId',
     GET_CAPTCHA_IMAGE: 'auth:getCaptchaImage',
     LOGOUT: 'auth:logout',
+    RESET_APP: 'auth:resetApp',
     SHOW_LOGOUT_CONFIRMATION: 'auth:showLogoutConfirmation',
     SHOW_DELETE_SESSION_CONFIRMATION: 'auth:showDeleteSessionConfirmation',
   },

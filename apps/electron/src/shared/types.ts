@@ -364,6 +364,7 @@ export interface ElectronAPI {
   showLogoutConfirmation(): Promise<boolean>
   showDeleteSessionConfirmation(name: string): Promise<boolean>
   logout(): Promise<void>
+  resetApp(): Promise<void>
   getChannelTypes(): Promise<ChannelTypeConfig[]>
   getUserChannels(): Promise<UserChannelConfig[]>
   getChannelAccounts(channelType: string): Promise<ChannelAccount[]>

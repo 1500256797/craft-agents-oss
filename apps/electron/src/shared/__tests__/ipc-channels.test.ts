@@ -30,6 +30,7 @@ const EXPECTED_CHANNELS: string[] = [
   'auth:getSessionState',
   'auth:login',
   'auth:logout',
+  'auth:resetApp',
   'auth:showDeleteSessionConfirmation',
   'auth:showLogoutConfirmation',
   'automations:changed',

@@ -519,6 +519,7 @@ function AppShellContent({
     onOpenSettings,
     onOpenKeyboardShortcuts,
     onOpenStoredUserPreferences,
+    onLogout,
     onReset,
     onSendMessage,
     openNewChat,
@@ -2404,7 +2405,7 @@ function AppShellContent({
                   onSelectWorkspace={onSelectWorkspace}
                   onWorkspaceCreated={() => onRefreshWorkspaces?.()}
                   workspaceUnreadMap={workspaceUnreadMap}
-                  onLogout={onReset}
+                  onLogout={onLogout}
                 />
               </div>
 
