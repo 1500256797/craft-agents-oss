@@ -821,7 +821,8 @@
         "apiKeyName": "我有 API key",
         "apiKeyDescription": "Anthropic、OpenRouter、Google 或任意兼容提供商。",
         "localName": "本地模型",
-        "localDescription": "通过 Ollama 在本地运行模型。"
+        "localDescription": "通过 Ollama 在本地运行模型。",
+        "setupLater": "稍后设置"
       },
       "welcome": {
         "titleNew": "欢迎使用 章鱼哥AI",
@@ -1344,9 +1345,13 @@
         "automationConfig": {
           "label": "自动化配置",
           "example": "将 cron 计划改为每 30 分钟"
-        }
       }
     },
+    "workspaceCreation": {
+      "failedTitle": "创建工作区失败",
+      "unknownError": "未知错误"
+    }
+  },
     "chatPage": {
       "linkCopied": "链接已复制到剪贴板",
       "failedToShare": "分享失败",

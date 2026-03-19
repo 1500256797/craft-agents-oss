@@ -821,7 +821,8 @@
         "apiKeyName": "I have an API key",
         "apiKeyDescription": "Anthropic, OpenRouter, Google or any compatible provider.",
         "localName": "Local model",
-        "localDescription": "Run models locally with Ollama."
+        "localDescription": "Run models locally with Ollama.",
+        "setupLater": "Setup later"
       },
       "welcome": {
         "titleNew": "Welcome to 章鱼哥AI",
@@ -1344,9 +1345,13 @@
         "automationConfig": {
           "label": "Automation Configuration",
           "example": "Change the cron schedule to every 30 minutes"
-        }
       }
     },
+    "workspaceCreation": {
+      "failedTitle": "Failed to create workspace",
+      "unknownError": "Unknown error"
+    }
+  },
     "chatPage": {
       "linkCopied": "Link copied to clipboard",
       "failedToShare": "Failed to share",

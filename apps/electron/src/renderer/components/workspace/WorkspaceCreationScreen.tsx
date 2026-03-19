@@ -5,10 +5,12 @@ import { Dithering } from "@paper-design/shaders-react"
 import { FullscreenOverlayBase } from "@zhangyuge-agent/ui"
 import { cn } from "@/lib/utils"
 import { overlayTransitionIn } from "@/lib/animations"
+import { useI18n } from "@/context/I18nContext"
 import { AddWorkspaceStep_Choice } from "./AddWorkspaceStep_Choice"
 import { AddWorkspaceStep_CreateNew } from "./AddWorkspaceStep_CreateNew"
 import { AddWorkspaceStep_OpenFolder } from "./AddWorkspaceStep_OpenFolder"
 import type { Workspace } from "../../../shared/types"
+import { toast } from "sonner"
 
 type CreationStep = 'choice' | 'create' | 'open'
 
@@ -33,6 +35,7 @@ export function WorkspaceCreationScreen({
   onClose,
   className
 }: WorkspaceCreationScreenProps) {
+  const { t } = useI18n()
   const [step, setStep] = useState<CreationStep>('choice')
   const [isCreating, setIsCreating] = useState(false)
   const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 })
@@ -60,10 +63,15 @@ export function WorkspaceCreationScreen({
     try {
       const workspace = await window.electronAPI.createWorkspace(folderPath, name)
       onWorkspaceCreated(workspace)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : t('common.workspaceCreation.unknownError')
+      toast.error(t('common.workspaceCreation.failedTitle'), {
+        description: message,
+      })
     } finally {
       setIsCreating(false)
     }
-  }, [onWorkspaceCreated])
+  }, [onWorkspaceCreated, t])
 
   const renderStep = () => {
     switch (step) {

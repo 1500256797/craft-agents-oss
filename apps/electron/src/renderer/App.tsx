@@ -1589,6 +1589,7 @@ export default function App() {
             onUseGitBashPath={onboarding.handleUseGitBashPath}
             onRecheckGitBash={onboarding.handleRecheckGitBash}
             onClearError={onboarding.handleClearError}
+            onSkipSetup={onboarding.handleSkipSetup}
           />
         </ModalProvider>
       </DismissibleLayerProvider>

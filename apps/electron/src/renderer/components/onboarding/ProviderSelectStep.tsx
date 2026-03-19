@@ -24,6 +24,8 @@ interface ProviderOption {
 interface ProviderSelectStepProps {
   /** Called when the user selects a provider */
   onSelect: (choice: ProviderChoice) => void
+  /** Called when the user chooses to skip setup */
+  onSkip?: () => void
 }
 
 /**
@@ -32,7 +34,7 @@ interface ProviderSelectStepProps {
  * Welcomes the user and asks them to pick their subscription / auth method.
  * Selecting a card immediately advances to the next step.
  */
-export function ProviderSelectStep({ onSelect }: ProviderSelectStepProps) {
+export function ProviderSelectStep({ onSelect, onSkip }: ProviderSelectStepProps) {
   const { t } = useI18n()
   const providerOptions: ProviderOption[] = [
     {
@@ -103,6 +105,17 @@ export function ProviderSelectStep({ onSelect }: ProviderSelectStepProps) {
           </button>
         ))}
       </div>
+
+      {onSkip && (
+        <div className="mt-4 text-center">
+          <button
+            onClick={onSkip}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {t('onboarding.providerSelect.setupLater')}
+          </button>
+        </div>
+      )}
     </StepFormLayout>
   )
 }
