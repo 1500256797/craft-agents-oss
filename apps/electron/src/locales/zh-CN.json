@@ -818,8 +818,8 @@
         "chatgptDescription": "使用你的 ChatGPT Plus 或 Pro 订阅。",
         "copilotName": "GitHub Copilot",
         "copilotDescription": "使用你的 GitHub Copilot 订阅。",
-        "apiKeyName": "我有 API key",
-        "apiKeyDescription": "Anthropic、OpenRouter、Google 或任意兼容提供商。",
+        "apiKeyName": "我使用其他提供商",
+        "apiKeyDescription": "Anthropic、AWS Bedrock、OpenRouter、Google 或任意兼容提供商。",
         "localName": "本地模型",
         "localDescription": "通过 Ollama 在本地运行模型。",
         "setupLater": "稍后设置"

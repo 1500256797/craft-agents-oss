@@ -818,8 +818,8 @@
         "chatgptDescription": "Use your ChatGPT Plus or Pro subscription.",
         "copilotName": "GitHub Copilot",
         "copilotDescription": "Use your GitHub Copilot subscription.",
-        "apiKeyName": "I have an API key",
-        "apiKeyDescription": "Anthropic, OpenRouter, Google or any compatible provider.",
+        "apiKeyName": "I use other provider",
+        "apiKeyDescription": "Anthropic, AWS Bedrock, OpenRouter, Google or any compatible provider.",
         "localName": "Local model",
         "localDescription": "Run models locally with Ollama.",
         "setupLater": "Setup later"
