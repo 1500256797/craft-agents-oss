@@ -622,6 +622,10 @@ export default function App() {
             }))
             break
           }
+          case 'toast_error': {
+            toast.error(effect.message)
+            break
+          }
         }
       }
 
