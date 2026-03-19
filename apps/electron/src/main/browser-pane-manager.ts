@@ -812,8 +812,7 @@ export class BrowserPaneManager implements IBrowserPaneManager {
   }
 
   async drag(id: string, x1: number, y1: number, x2: number, y2: number): Promise<void> {
-    const instance = this.instances.get(id)
-    if (!instance) throw new Error(`Browser instance not found: ${id}`)
+    const instance = this.requireAliveInstance(id)
 
     try {
       await instance.cdp.drag(x1, y1, x2, y2)
@@ -833,8 +832,7 @@ export class BrowserPaneManager implements IBrowserPaneManager {
   }
 
   async typeText(id: string, text: string): Promise<void> {
-    const instance = this.instances.get(id)
-    if (!instance) throw new Error(`Browser instance not found: ${id}`)
+    const instance = this.requireAliveInstance(id)
 
     try {
       await instance.cdp.typeText(text)
@@ -854,14 +852,12 @@ export class BrowserPaneManager implements IBrowserPaneManager {
   }
 
   async setClipboard(id: string, text: string): Promise<void> {
-    const instance = this.instances.get(id)
-    if (!instance) throw new Error(`Browser instance not found: ${id}`)
+    const instance = this.requireAliveInstance(id)
     await instance.cdp.setClipboard(text)
   }
 
   async getClipboard(id: string): Promise<string> {
-    const instance = this.instances.get(id)
-    if (!instance) throw new Error(`Browser instance not found: ${id}`)
+    const instance = this.requireAliveInstance(id)
     return instance.cdp.getClipboard()
   }
 
@@ -870,8 +866,7 @@ export class BrowserPaneManager implements IBrowserPaneManager {
     ref: string,
     options?: { waitFor?: 'none' | 'navigation' | 'network-idle'; timeoutMs?: number }
   ): Promise<void> {
-    const instance = this.instances.get(id)
-    if (!instance) throw new Error(`Browser instance not found: ${id}`)
+    const instance = this.requireAliveInstance(id)
 
     try {
       const geometry = await instance.cdp.clickElement(ref)
@@ -924,8 +919,7 @@ export class BrowserPaneManager implements IBrowserPaneManager {
   }
 
   async fillElement(id: string, ref: string, value: string): Promise<void> {
-    const instance = this.instances.get(id)
-    if (!instance) throw new Error(`Browser instance not found: ${id}`)
+    const instance = this.requireAliveInstance(id)
 
     try {
       const geometry = await instance.cdp.fillElement(ref, value)
@@ -948,8 +942,7 @@ export class BrowserPaneManager implements IBrowserPaneManager {
   }
 
   async selectOption(id: string, ref: string, value: string): Promise<void> {
-    const instance = this.instances.get(id)
-    if (!instance) throw new Error(`Browser instance not found: ${id}`)
+    const instance = this.requireAliveInstance(id)
 
     try {
       const geometry = await instance.cdp.selectOption(ref, value)
@@ -987,8 +980,7 @@ export class BrowserPaneManager implements IBrowserPaneManager {
   }
 
   async screenshot(id: string, options?: BrowserScreenshotOptions): Promise<BrowserScreenshotResult> {
-    const instance = this.instances.get(id)
-    if (!instance) throw new Error(`Browser instance not found: ${id}`)
+    const instance = this.requireAliveInstance(id)
 
     // Hide native agent overlay so it doesn't appear in captures
     const suspendedOverlay = this.suspendOverlayForCapture(instance)
@@ -1626,7 +1618,7 @@ export class BrowserPaneManager implements IBrowserPaneManager {
 
   async detectSecurityChallenge(id: string): Promise<{ detected: boolean; provider: string; signals: string[] }> {
     const instance = this.instances.get(id)
-    if (!instance) return { detected: false, provider: 'none', signals: [] }
+    if (!instance || instance.window.isDestroyed()) return { detected: false, provider: 'none', signals: [] }
 
     const signals: string[] = []
     const title = instance.title || ''
