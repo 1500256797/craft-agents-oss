@@ -22,9 +22,12 @@ function withTopLevelNamespaceAliases(messages: MessageTree): MessageTree {
     common: {
       ...common,
       apiKeyInput: common?.apiKeyInput ?? settings?.apiKeyInput,
+      cronBuilder: common?.cronBuilder ?? settings?.cronBuilder,
     },
     auth: messages.auth ?? settings?.auth,
     onboarding: messages.onboarding ?? settings?.onboarding,
+    sourceInfo: messages.sourceInfo ?? settings?.sourceInfo,
+    skillInfo: messages.skillInfo ?? settings?.skillInfo,
   }
 }
 

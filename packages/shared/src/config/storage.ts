@@ -7,6 +7,7 @@ import {
   loadWorkspaceConfig,
   saveWorkspaceConfig,
   createWorkspaceAtPath,
+  seedBundledSkillsToWorkspace,
   isValidWorkspace,
 } from '../workspaces/storage.ts';
 import { findIconFile } from '../utils/icon.ts';
@@ -608,6 +609,8 @@ export function addWorkspace(workspace: Omit<Workspace, 'id' | 'createdAt'>): Wo
   // Create workspace folder structure if it doesn't exist
   if (!isValidWorkspace(newWorkspace.rootPath)) {
     createWorkspaceAtPath(newWorkspace.rootPath, newWorkspace.name);
+    // Seed built-in skills only for explicit workspace creation, not repair paths.
+    seedBundledSkillsToWorkspace(newWorkspace.rootPath);
   }
 
   config.workspaces.push(newWorkspace);

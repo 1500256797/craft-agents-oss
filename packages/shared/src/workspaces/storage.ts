@@ -7,6 +7,7 @@
  */
 
 import {
+  cpSync,
   existsSync,
   mkdirSync,
   readFileSync,
@@ -18,7 +19,8 @@ import {
 import { join } from 'path';
 import { homedir } from 'os';
 import { randomUUID } from 'crypto';
-import { expandPath, toPortablePath } from '../utils/paths.ts';
+import { expandPath, toPortablePath, getBundledAssetsDir } from '../utils/paths.ts';
+import { debug } from '../utils/debug.ts';
 import { atomicWriteFileSync, readJsonFileSync } from '../utils/files.ts';
 import { getDefaultStatusConfig, saveStatusConfig, ensureDefaultIconFiles } from '../statuses/storage.ts';
 import { getDefaultLabelConfig, saveLabelConfig } from '../labels/storage.ts';
@@ -85,6 +87,68 @@ export function getWorkspaceSessionsPath(rootPath: string): string {
  */
 export function getWorkspaceSkillsPath(rootPath: string): string {
   return join(rootPath, 'skills');
+}
+
+/**
+ * Copy bundled workspace skills into a workspace's skills directory.
+ * Only copies valid skill folders that do not already exist in the target workspace.
+ *
+ * This is intentionally separate from createWorkspaceAtPath(): workspace folder creation
+ * is reused for repair/recovery flows, while bundled skills should only be seeded during
+ * explicit workspace creation.
+ *
+ * @param rootPath - Absolute path to workspace root folder
+ * @returns Number of skill folders copied
+ */
+export function seedBundledSkillsToWorkspace(rootPath: string): number {
+  const bundledSkillsDir = getBundledAssetsDir('bundled-skills');
+  if (!bundledSkillsDir) {
+    return 0;
+  }
+
+  const workspaceSkillsDir = getWorkspaceSkillsPath(rootPath);
+  if (!existsSync(workspaceSkillsDir)) {
+    mkdirSync(workspaceSkillsDir, { recursive: true });
+  }
+
+  let copied = 0;
+
+  try {
+    const entries = readdirSync(bundledSkillsDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+
+      const sourceSkillDir = join(bundledSkillsDir, entry.name);
+      const sourceSkillFile = join(sourceSkillDir, 'SKILL.md');
+      if (!existsSync(sourceSkillFile)) continue;
+
+      const targetSkillDir = join(workspaceSkillsDir, entry.name);
+      if (existsSync(targetSkillDir)) continue;
+
+      try {
+        cpSync(sourceSkillDir, targetSkillDir, { recursive: true });
+        copied++;
+      } catch (error) {
+        debug(
+          '[workspaces] Failed to seed bundled skill',
+          entry.name,
+          'into',
+          targetSkillDir,
+          ':',
+          error instanceof Error ? error.message : String(error),
+        );
+      }
+    }
+  } catch (error) {
+    debug(
+      '[workspaces] Failed to enumerate bundled skills at',
+      bundledSkillsDir,
+      ':',
+      error instanceof Error ? error.message : String(error),
+    );
+  }
+
+  return copied;
 }
 
 // ============================================================

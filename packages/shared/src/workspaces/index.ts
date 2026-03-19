@@ -31,6 +31,7 @@ export {
   generateSlug,
   generateUniqueWorkspacePath,
   createWorkspaceAtPath,
+  seedBundledSkillsToWorkspace,
   deleteWorkspaceFolder,
   isValidWorkspace,
   renameWorkspaceFolder,
