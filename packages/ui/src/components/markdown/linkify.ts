@@ -1,5 +1,6 @@
 import LinkifyIt from 'linkify-it'
 import { FILE_EXTENSIONS_PATTERN } from '../../lib/file-classification'
+import { isLocalPathTarget } from '../../lib/local-paths'
 
 /**
  * Linkify - URL and file path detection for markdown preprocessing
@@ -280,5 +281,6 @@ export function hasLinks(text: string): boolean {
  * Used by click handlers to route local paths to onFileClick instead of onUrlClick.
  */
 export function isFilePathTarget(target: string): boolean {
-  return FILE_PATH_TARGET_REGEX.test(target.trim())
+  const trimmed = target.trim()
+  return FILE_PATH_TARGET_REGEX.test(trimmed) || isLocalPathTarget(trimmed)
 }

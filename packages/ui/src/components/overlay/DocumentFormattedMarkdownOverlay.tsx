@@ -40,6 +40,8 @@ export interface DocumentFormattedMarkdownOverlayProps {
   error?: string
   /** Optional session id used for annotation payload source metadata */
   sessionId?: string
+  /** Session folder used to resolve portable local file paths in markdown content. */
+  sessionFolderPath?: string
   /** Optional message id; when present with callbacks, overlay becomes annotatable */
   messageId?: string
   /** Persisted annotations for the message */
@@ -69,6 +71,7 @@ export function DocumentFormattedMarkdownOverlay({
   typeBadge,
   error,
   sessionId,
+  sessionFolderPath,
   messageId,
   annotations,
   onAddAnnotation,
@@ -114,6 +117,7 @@ export function DocumentFormattedMarkdownOverlay({
                   onUpdateAnnotation={onUpdateAnnotation}
                   onOpenUrl={onOpenUrl}
                   onOpenFile={onOpenFile}
+                  sessionFolderPath={sessionFolderPath}
                   sendMessageKey={sendMessageKey}
                   islandZIndex={420}
                   openAnnotationRequest={openAnnotationRequest}
@@ -124,6 +128,7 @@ export function DocumentFormattedMarkdownOverlay({
                   mode="minimal"
                   onUrlClick={onOpenUrl}
                   onFileClick={onOpenFile}
+                  sessionFolderPath={sessionFolderPath}
                   hideFirstMermaidExpand={false}
                 >
                   {content}

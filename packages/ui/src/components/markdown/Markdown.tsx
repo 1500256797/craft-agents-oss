@@ -23,6 +23,8 @@ import { CollapsibleSection } from './CollapsibleSection'
 import { useCollapsibleMarkdown } from './CollapsibleMarkdownContext'
 import { wrapWithSafeProxy } from './safe-components'
 import { MARKDOWN_MATH_OPTIONS } from './math-options'
+import { usePlatform } from '../../context/PlatformContext'
+import { isLocalPathTarget, normalizeLocalPathTarget } from '../../lib/local-paths'
 
 /**
  * Render modes for markdown content:
@@ -71,6 +73,10 @@ export interface MarkdownProps {
    * @default true
    */
   hideFirstMermaidExpand?: boolean
+  /**
+   * Session folder used to expand portable {{SESSION_PATH}} tokens in local links.
+   */
+  sessionFolderPath?: string
 }
 
 /** Context for collapsible sections */
@@ -100,13 +106,120 @@ function stableHash(input: string): string {
   return (hash >>> 0).toString(36)
 }
 
+interface MarkdownInlineImageProps {
+  src?: string | null
+  alt?: string
+  title?: string
+  onFileClick?: (path: string) => void
+  sessionFolderPath?: string
+}
+
+function MarkdownInlineImage({ src, alt, title, onFileClick, sessionFolderPath }: MarkdownInlineImageProps) {
+  const { onReadFileDataUrl } = usePlatform()
+  const [dataUrl, setDataUrl] = React.useState<string | null>(null)
+  const [loadFailed, setLoadFailed] = React.useState(false)
+
+  const rawSrc = src?.trim()
+  const localPath = React.useMemo(() => {
+    if (!rawSrc) return null
+    return classifyMarkdownLinkTarget(rawSrc) === 'file'
+      ? normalizeLocalPathTarget(rawSrc, sessionFolderPath)
+      : null
+  }, [rawSrc, sessionFolderPath])
+
+  React.useEffect(() => {
+    setDataUrl(null)
+    setLoadFailed(false)
+  }, [localPath, rawSrc])
+
+  React.useEffect(() => {
+    if (!localPath || !onReadFileDataUrl) return
+
+    let cancelled = false
+    onReadFileDataUrl(localPath)
+      .then((nextDataUrl) => {
+        if (cancelled) return
+        setDataUrl(nextDataUrl)
+        setLoadFailed(false)
+      })
+      .catch(() => {
+        if (!cancelled) setLoadFailed(true)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [localPath, onReadFileDataUrl])
+
+  const label = alt?.trim() || title?.trim() || localPath?.split('/').pop() || 'Image'
+  const imageSrc = localPath ? dataUrl : rawSrc
+
+  if (!imageSrc) {
+    if (!localPath || !onFileClick) return null
+    return (
+      <button
+        type="button"
+        onClick={() => onFileClick(localPath)}
+        className="my-2 inline-flex items-center rounded-md border border-border/50 px-3 py-2 text-sm text-accent hover:underline"
+      >
+        {loadFailed ? `Open ${label}` : label}
+      </button>
+    )
+  }
+
+  return (
+    <img
+      src={imageSrc}
+      alt={label}
+      title={title}
+      loading="lazy"
+      onClick={localPath && onFileClick ? () => onFileClick(localPath) : undefined}
+      className={cn(
+        'my-2 max-w-full rounded-md border border-border/50 shadow-minimal',
+        localPath && onFileClick && 'cursor-zoom-in'
+      )}
+    />
+  )
+}
+
+function MarkdownPathBlock({
+  path,
+  onFileClick,
+  sessionFolderPath,
+  className,
+}: {
+  path: string
+  onFileClick?: (path: string) => void
+  sessionFolderPath?: string
+  className?: string
+}) {
+  const resolvedPath = normalizeLocalPathTarget(path, sessionFolderPath)
+  if (!onFileClick) {
+    return <CodeBlock code={resolvedPath} language="text" mode="full" className={className} />
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => onFileClick(resolvedPath)}
+      className={cn(
+        'my-2 inline-flex max-w-full items-center rounded-md border border-border/50 bg-background px-3 py-2 text-left text-sm text-accent shadow-minimal hover:underline',
+        className
+      )}
+    >
+      <code className="break-all font-mono">{resolvedPath}</code>
+    </button>
+  )
+}
+
 function createComponents(
   mode: RenderMode,
   onUrlClick?: (url: string) => void,
   onFileClick?: (path: string) => void,
   collapsibleContext?: CollapsibleContext | null,
   firstMermaidCodeRef?: React.RefObject<string | null>,
-  hideFirstMermaidExpand: boolean = true
+  hideFirstMermaidExpand: boolean = true,
+  sessionFolderPath?: string
 ): Partial<Components> {
   let blockIndex = 0
   const wrapBlock = (
@@ -174,7 +287,7 @@ function createComponents(
 
         const targetType = classifyMarkdownLinkTarget(target)
         if (targetType === 'file' && onFileClick) {
-          onFileClick(target)
+          onFileClick(normalizeLocalPathTarget(target, sessionFolderPath))
         } else if (onUrlClick) {
           onUrlClick(target)
         }
@@ -190,6 +303,15 @@ function createComponents(
         </a>
       )
     },
+    img: ({ src, alt, title }) => (
+      <MarkdownInlineImage
+        src={src}
+        alt={alt}
+        title={title}
+        onFileClick={onFileClick}
+        sessionFolderPath={sessionFolderPath}
+      />
+    ),
   }
 
   // Terminal mode: minimal formatting
@@ -230,6 +352,20 @@ function createComponents(
         // Block code
         if (match || isBlock) {
           const code = String(children).replace(/\n$/, '')
+          const trimmedCode = code.trim()
+          if (!match?.[1] && trimmedCode && !trimmedCode.includes('\n') && isLocalPathTarget(trimmedCode)) {
+            return wrapBlock(
+              'code',
+              code,
+              <MarkdownPathBlock
+                path={trimmedCode}
+                onFileClick={onFileClick}
+                sessionFolderPath={sessionFolderPath}
+                className="my-2"
+              />,
+              props.node?.position
+            )
+          }
           // Diff code blocks → pierre/diffs for a proper diff viewer
           if (match?.[1] === 'diff') {
             return wrapBlock('code', code, <MarkdownDiffBlock code={code} className="my-2" />, props.node?.position)
@@ -359,6 +495,20 @@ function createComponents(
 
       if (match || isBlock) {
         const code = String(children).replace(/\n$/, '')
+        const trimmedCode = code.trim()
+        if (!match?.[1] && trimmedCode && !trimmedCode.includes('\n') && isLocalPathTarget(trimmedCode)) {
+          return wrapBlock(
+            'code',
+            code,
+            <MarkdownPathBlock
+              path={trimmedCode}
+              onFileClick={onFileClick}
+              sessionFolderPath={sessionFolderPath}
+              className="my-2"
+            />,
+            props.node?.position
+          )
+        }
         // Diff code blocks → pierre/diffs for a proper diff viewer
         if (match?.[1] === 'diff') {
           return wrapBlock('code', code, <MarkdownDiffBlock code={code} className="my-2" />, props.node?.position)
@@ -510,6 +660,7 @@ export function Markdown({
   onFileClick,
   collapsible = false,
   hideFirstMermaidExpand = true,
+  sessionFolderPath,
 }: MarkdownProps) {
   // Get collapsible context if enabled
   const collapsibleContext = useCollapsibleMarkdown()
@@ -528,8 +679,16 @@ export function Markdown({
   }
 
   const components = React.useMemo(
-    () => wrapWithSafeProxy(createComponents(mode, onUrlClick, onFileClick, collapsible ? collapsibleContext : null, firstMermaidCodeRef, hideFirstMermaidExpand)),
-    [mode, onUrlClick, onFileClick, collapsible, collapsibleContext, hideFirstMermaidExpand]
+    () => wrapWithSafeProxy(createComponents(
+      mode,
+      onUrlClick,
+      onFileClick,
+      collapsible ? collapsibleContext : null,
+      firstMermaidCodeRef,
+      hideFirstMermaidExpand,
+      sessionFolderPath
+    )),
+    [mode, onUrlClick, onFileClick, collapsible, collapsibleContext, hideFirstMermaidExpand, sessionFolderPath]
   )
 
   // Preprocess to convert raw URLs and file paths to markdown links

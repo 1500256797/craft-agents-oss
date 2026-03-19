@@ -8,6 +8,7 @@
 
 import { describe, it, expect } from 'bun:test'
 import { preprocessLinks, detectLinks, isPlaceholderUrl, isFilePathTarget } from '../linkify'
+import { normalizeLocalPathTarget } from '../../../lib/local-paths'
 
 // ============================================================================
 // preprocessLinks — existing markdown links should NOT be corrupted
@@ -254,6 +255,10 @@ describe('isFilePathTarget', () => {
     expect(isFilePathTarget('/Users/balintorosz/.zhangyuge-agent/sessions/abc/image.jpg')).toBe(true)
   })
 
+  it('accepts explicit directory paths', () => {
+    expect(isFilePathTarget('/Users/ouhuang/.zhangyuge-agent/workspaces/222/sessions/260319-fine-lily/xhs-images/zhangyuge-agent-xiaohongshu')).toBe(true)
+  })
+
   it('accepts parent-relative image paths', () => {
     expect(isFilePathTarget('../downloads/assets/screenshot.png')).toBe(true)
   })
@@ -262,11 +267,27 @@ describe('isFilePathTarget', () => {
     expect(isFilePathTarget('apps/electron/resources/docs/browser-tools.md')).toBe(true)
   })
 
+  it('accepts file URLs', () => {
+    expect(isFilePathTarget('file:///Users/ouhuang/Desktop/image.png')).toBe(true)
+  })
+
   it('rejects web URLs', () => {
     expect(isFilePathTarget('https://example.com/image.jpg')).toBe(false)
   })
 
   it('rejects non-file strings', () => {
     expect(isFilePathTarget('not a link at all')).toBe(false)
+  })
+})
+
+describe('normalizeLocalPathTarget', () => {
+  it('expands session path tokens', () => {
+    expect(
+      normalizeLocalPathTarget('{{SESSION_PATH}}/xhs-images/01-cover.png', '/Users/ouhuang/.zhangyuge-agent/workspaces/222/sessions/260319-fine-lily')
+    ).toBe('/Users/ouhuang/.zhangyuge-agent/workspaces/222/sessions/260319-fine-lily/xhs-images/01-cover.png')
+  })
+
+  it('converts file URLs to absolute paths', () => {
+    expect(normalizeLocalPathTarget('file:///Users/ouhuang/Desktop/image.png')).toBe('/Users/ouhuang/Desktop/image.png')
   })
 })

@@ -14,6 +14,14 @@ describe('classifyMarkdownLinkTarget', () => {
     expect(classifyMarkdownLinkTarget('apps/electron/resources/docs/browser-tools.md')).toBe('file')
   })
 
+  it('classifies explicit directory paths as file', () => {
+    expect(classifyMarkdownLinkTarget('/Users/ouhuang/.zhangyuge-agent/workspaces/222/sessions/260319-fine-lily/xhs-images/zhangyuge-agent-xiaohongshu')).toBe('file')
+  })
+
+  it('classifies file URLs as file', () => {
+    expect(classifyMarkdownLinkTarget('file:///Users/ouhuang/Desktop/image.png')).toBe('file')
+  })
+
   it('classifies https links as url', () => {
     expect(classifyMarkdownLinkTarget('https://example.com/image.jpg')).toBe('url')
   })

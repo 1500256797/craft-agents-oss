@@ -85,6 +85,9 @@ import {
   StyledDropdownMenuContent,
   StyledDropdownMenuItem,
 } from '../ui/StyledDropdown'
+import { usePlatform } from '../../context/PlatformContext'
+import { classifyFile } from '../../lib/file-classification'
+import { normalizeLocalPathTarget } from '../../lib/local-paths'
 
 // ============================================================================
 // Utilities
@@ -534,23 +537,24 @@ function getToolDisplayName(name: string): string {
  * Example: /path/to/sessions/260121-foo/plans/file.md → plans/file.md
  */
 function stripSessionFolderPath(filePath: string, sessionFolderPath?: string): string {
-  if (!sessionFolderPath) return filePath
+  const resolvedPath = normalizeLocalPathTarget(filePath, sessionFolderPath)
+  if (!sessionFolderPath) return resolvedPath
 
   // Get workspace path (parent of sessions folder)
   // sessionFolderPath: /path/workspaces/{uuid}/sessions/{sessionId}
   const workspacePath = normalizePath(sessionFolderPath).replace(/\/sessions\/[^/]+$/, '')
 
   // Try session folder first (more specific)
-  if (pathStartsWith(filePath, sessionFolderPath)) {
-    return stripPathPrefix(filePath, sessionFolderPath)
+  if (pathStartsWith(resolvedPath, sessionFolderPath)) {
+    return stripPathPrefix(resolvedPath, sessionFolderPath)
   }
 
   // Then try workspace folder
-  if (pathStartsWith(filePath, workspacePath)) {
-    return stripPathPrefix(filePath, workspacePath)
+  if (pathStartsWith(resolvedPath, workspacePath)) {
+    return stripPathPrefix(resolvedPath, workspacePath)
   }
 
-  return filePath
+  return resolvedPath
 }
 
 /** Format tool input as a concise summary - CSS truncate handles overflow */
@@ -884,9 +888,110 @@ function TreeViewConnector({ depth }: { depth: number; isLastChild?: boolean }) 
   )
 }
 
+function FilenameBadge({ filePath, onOpenFile }: { filePath: string; onOpenFile?: (path: string) => void }) {
+  const label = normalizePath(filePath).split('/').pop() || filePath
+
+  if (!onOpenFile) {
+    return (
+      <span className="px-1.5 py-0.5 bg-background shadow-minimal rounded-[4px] text-[11px] text-foreground/70">
+        {label}
+      </span>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={(event) => {
+        event.stopPropagation()
+        onOpenFile(filePath)
+      }}
+      className="px-1.5 py-0.5 bg-background shadow-minimal rounded-[4px] text-[11px] text-accent hover:underline"
+    >
+      {label}
+    </button>
+  )
+}
+
+function ReadImagePreview({
+  path,
+  depth,
+  isLastChild = false,
+  onOpenFile,
+}: {
+  path: string
+  depth: number
+  isLastChild?: boolean
+  onOpenFile?: (path: string) => void
+}) {
+  const { onReadFileDataUrl } = usePlatform()
+  const [dataUrl, setDataUrl] = useState<string | null>(null)
+  const [loadFailed, setLoadFailed] = useState(false)
+
+  useEffect(() => {
+    if (!onReadFileDataUrl) return
+
+    let cancelled = false
+    setDataUrl(null)
+    setLoadFailed(false)
+
+    onReadFileDataUrl(path)
+      .then((nextDataUrl) => {
+        if (!cancelled) setDataUrl(nextDataUrl)
+      })
+      .catch(() => {
+        if (!cancelled) setLoadFailed(true)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [onReadFileDataUrl, path])
+
+  if (!onReadFileDataUrl) return null
+
+  return (
+    <div className="flex items-stretch">
+      <TreeViewConnector depth={depth} isLastChild={isLastChild} />
+      <div className="pl-6 pt-1 pb-2">
+        {dataUrl ? (
+          <button
+            type="button"
+            onClick={() => onOpenFile?.(path)}
+            className="overflow-hidden rounded-[8px] border border-border/50 bg-background shadow-minimal"
+          >
+            <img
+              src={dataUrl}
+              alt={normalizePath(path).split('/').pop() || 'Read image preview'}
+              className="h-[112px] w-[112px] object-cover"
+            />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              if (loadFailed) onOpenFile?.(path)
+            }}
+            className="flex h-[112px] w-[112px] items-center justify-center rounded-[8px] border border-border/50 bg-muted/30 px-3 text-center text-xs text-muted-foreground"
+          >
+            {loadFailed ? 'Open image' : 'Loading image...'}
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 /** Single activity row in expanded view */
 function ActivityRow({ activity, onOpenDetails, isLastChild, sessionFolderPath, displayMode = 'detailed' }: ActivityRowProps) {
   const depth = activity.depth || 0
+  const { onOpenFile } = usePlatform()
+  const resolvedActivityFilePath = typeof activity.toolInput?.file_path === 'string'
+    ? normalizeLocalPathTarget(activity.toolInput.file_path, sessionFolderPath)
+    : undefined
+  const shouldPreviewReadImage = activity.toolName === 'Read'
+    && !!resolvedActivityFilePath
+    && classifyFile(resolvedActivityFilePath).type === 'image'
 
   // Intermediate messages (LLM commentary) - render with dashed circle icon
   // Show "Thinking" while streaming, stripped markdown content when complete
@@ -1009,184 +1114,197 @@ function ActivityRow({ activity, onOpenDetails, isLastChild, sessionFolderPath, 
     : null
 
   return (
-    <div className="flex items-stretch">
-      <TreeViewConnector depth={depth} isLastChild={isLastChild} />
-      <div
-        className={cn(
-          "group/row flex items-center gap-2 py-0.5 text-muted-foreground flex-1 min-w-0",
-          SIZE_CONFIG.fontSize
-        )}
-        onClick={onOpenDetails && isComplete ? onOpenDetails : undefined}
-      >
-        <ActivityStatusIcon status={activity.status} toolName={activity.toolName} customIcon={toolDisplay.icon} />
-        {/* MCP/API tools: Source name (shrink-0) then error badge (if any) then compound label (flex-1) */}
-        {isMcpOrApiTool && !isBackgrounded && (
-          <>
-            <span className="shrink-0">{sourceName}</span>
-            {/* Error badge for MCP/API tools */}
-            {activity.status === 'error' && activity.error && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span
-                    className="px-1.5 py-0.5 bg-[color-mix(in_oklab,var(--destructive)_4%,var(--background))] shadow-tinted rounded-[4px] text-[10px] text-destructive font-medium cursor-default shrink-0"
-                    style={{ '--shadow-color': 'var(--destructive-rgb)' } as React.CSSProperties}
-                  >
-                    Error
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-[400px]">
-                  {activity.error}
-                </TooltipContent>
-              </Tooltip>
-            )}
-            {/* Model badge for LLM Query */}
-            {activity.toolName === 'mcp__session__call_llm' && activity.toolInput?.model && (
-              <span className="px-1.5 py-0.5 bg-background shadow-minimal rounded-[4px] text-[10px] text-foreground/60 shrink-0">
-                {String(activity.toolInput.model)}
-              </span>
-            )}
-            {(intentOrDescription || (displayMode === 'detailed' && (toolSlug || inputSummary))) && (
-              <span className={cn("truncate flex-1 min-w-0", onOpenDetails && isComplete && "group-hover/row:underline")}>
-                {intentOrDescription && (
-                  <>
-                    <span className="opacity-60"> · </span>
-                    <span>{intentOrDescription}</span>
-                  </>
-                )}
-                {displayMode === 'detailed' && toolSlug && (
-                  <>
-                    <span className="opacity-60"> · </span>
-                    <span className="opacity-70">{toolSlug}</span>
-                  </>
-                )}
-                {displayMode === 'detailed' && inputSummary && (
-                  <>
-                    <span className="opacity-60"> · </span>
-                    <span className="opacity-50">{inputSummary}</span>
-                  </>
-                )}
-              </span>
-            )}
-          </>
-        )}
-        {/* Native tools: Tool name (shrink-0) */}
-        {!isMcpOrApiTool && (
-          <span className={cn("shrink-0", onOpenDetails && isComplete && "group-hover/row:underline")}>{displayedName}</span>
-        )}
-        {/* Diff stats and filename badges - after tool name */}
-        {!isMcpOrApiTool && !isBackgrounded && diffStats && (
-          <span className="flex items-center gap-1.5 text-[10px] shrink-0">
-            {diffStats.deletions > 0 && (
-              <span
-                className="px-1.5 py-0.5 bg-[color-mix(in_oklab,var(--destructive)_5%,var(--background))] shadow-tinted rounded-[4px] text-destructive"
-                style={{ '--shadow-color': 'var(--destructive-rgb)' } as React.CSSProperties}
-              >{diffStats.deletions}</span>
-            )}
-            {diffStats.additions > 0 && (
-              <span
-                className="px-1.5 py-0.5 bg-[color-mix(in_oklab,var(--success)_5%,var(--background))] shadow-tinted rounded-[4px] text-success"
-                style={{ '--shadow-color': 'var(--success-rgb)' } as React.CSSProperties}
-              >{diffStats.additions}</span>
-            )}
-            {/* Filename badge - supports both Claude Code and Codex formats */}
-            {(() => {
-              // Claude Code format: file_path
-              if (typeof activity.toolInput?.file_path === 'string') {
-                return (
-                  <span className="px-1.5 py-0.5 bg-background shadow-minimal rounded-[4px] text-[11px] text-foreground/70">
-                    {normalizePath(activity.toolInput.file_path).split('/').pop()}
-                  </span>
-                )
-              }
-              // Codex format: changes[0].path
-              if (Array.isArray(activity.toolInput?.changes)) {
-                const firstChange = activity.toolInput.changes[0] as { path?: string } | undefined
-                if (firstChange?.path) {
-                  return (
-                    <span className="px-1.5 py-0.5 bg-background shadow-minimal rounded-[4px] text-[11px] text-foreground/70">
-                      {normalizePath(firstChange.path).split('/').pop()}
+    <div className="space-y-1">
+      <div className="flex items-stretch">
+        <TreeViewConnector depth={depth} isLastChild={isLastChild} />
+        <div
+          className={cn(
+            "group/row flex items-center gap-2 py-0.5 text-muted-foreground flex-1 min-w-0",
+            SIZE_CONFIG.fontSize
+          )}
+          onClick={onOpenDetails && isComplete ? onOpenDetails : undefined}
+        >
+          <ActivityStatusIcon status={activity.status} toolName={activity.toolName} customIcon={toolDisplay.icon} />
+          {/* MCP/API tools: Source name (shrink-0) then error badge (if any) then compound label (flex-1) */}
+          {isMcpOrApiTool && !isBackgrounded && (
+            <>
+              <span className="shrink-0">{sourceName}</span>
+              {/* Error badge for MCP/API tools */}
+              {activity.status === 'error' && activity.error && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      className="px-1.5 py-0.5 bg-[color-mix(in_oklab,var(--destructive)_4%,var(--background))] shadow-tinted rounded-[4px] text-[10px] text-destructive font-medium cursor-default shrink-0"
+                      style={{ '--shadow-color': 'var(--destructive-rgb)' } as React.CSSProperties}
+                    >
+                      Error
                     </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-[400px]">
+                    {activity.error}
+                  </TooltipContent>
+                </Tooltip>
+              )}
+              {/* Model badge for LLM Query */}
+              {activity.toolName === 'mcp__session__call_llm' && activity.toolInput?.model && (
+                <span className="px-1.5 py-0.5 bg-background shadow-minimal rounded-[4px] text-[10px] text-foreground/60 shrink-0">
+                  {String(activity.toolInput.model)}
+                </span>
+              )}
+              {(intentOrDescription || (displayMode === 'detailed' && (toolSlug || inputSummary))) && (
+                <span className={cn("truncate flex-1 min-w-0", onOpenDetails && isComplete && "group-hover/row:underline")}>
+                  {intentOrDescription && (
+                    <>
+                      <span className="opacity-60"> · </span>
+                      <span>{intentOrDescription}</span>
+                    </>
+                  )}
+                  {displayMode === 'detailed' && toolSlug && (
+                    <>
+                      <span className="opacity-60"> · </span>
+                      <span className="opacity-70">{toolSlug}</span>
+                    </>
+                  )}
+                  {displayMode === 'detailed' && inputSummary && (
+                    <>
+                      <span className="opacity-60"> · </span>
+                      <span className="opacity-50">{inputSummary}</span>
+                    </>
+                  )}
+                </span>
+              )}
+            </>
+          )}
+          {/* Native tools: Tool name (shrink-0) */}
+          {!isMcpOrApiTool && (
+            <span className={cn("shrink-0", onOpenDetails && isComplete && "group-hover/row:underline")}>{displayedName}</span>
+          )}
+          {/* Diff stats and filename badges - after tool name */}
+          {!isMcpOrApiTool && !isBackgrounded && diffStats && (
+            <span className="flex items-center gap-1.5 text-[10px] shrink-0">
+              {diffStats.deletions > 0 && (
+                <span
+                  className="px-1.5 py-0.5 bg-[color-mix(in_oklab,var(--destructive)_5%,var(--background))] shadow-tinted rounded-[4px] text-destructive"
+                  style={{ '--shadow-color': 'var(--destructive-rgb)' } as React.CSSProperties}
+                >{diffStats.deletions}</span>
+              )}
+              {diffStats.additions > 0 && (
+                <span
+                  className="px-1.5 py-0.5 bg-[color-mix(in_oklab,var(--success)_5%,var(--background))] shadow-tinted rounded-[4px] text-success"
+                  style={{ '--shadow-color': 'var(--success-rgb)' } as React.CSSProperties}
+                >{diffStats.additions}</span>
+              )}
+              {/* Filename badge - supports both Claude Code and Codex formats */}
+              {(() => {
+                // Claude Code format: file_path
+                if (typeof activity.toolInput?.file_path === 'string') {
+                  return (
+                    <FilenameBadge
+                      filePath={resolvedActivityFilePath || activity.toolInput.file_path}
+                      onOpenFile={onOpenFile}
+                    />
                   )
                 }
-              }
-              return null
-            })()}
-          </span>
-        )}
-        {/* Filename badge for Read tool (no diff stats) */}
-        {!isMcpOrApiTool && !isBackgrounded && !diffStats && activity.toolName === 'Read' && typeof activity.toolInput?.file_path === 'string' && (
-          <span className="flex items-center gap-1.5 text-[10px] shrink-0">
-            <span className="px-1.5 py-0.5 bg-background shadow-minimal rounded-[4px] text-[11px] text-foreground/70">
-              {normalizePath(activity.toolInput.file_path).split('/').pop()}
+                // Codex format: changes[0].path
+                if (Array.isArray(activity.toolInput?.changes)) {
+                  const firstChange = activity.toolInput.changes[0] as { path?: string } | undefined
+                  if (firstChange?.path) {
+                    return (
+                      <FilenameBadge
+                        filePath={normalizeLocalPathTarget(firstChange.path, sessionFolderPath)}
+                        onOpenFile={onOpenFile}
+                      />
+                    )
+                  }
+                }
+                return null
+              })()}
             </span>
-          </span>
-        )}
-        {/* Error badge for native tools */}
-        {!isMcpOrApiTool && activity.status === 'error' && activity.error && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span
-                className="px-1.5 py-0.5 bg-[color-mix(in_oklab,var(--destructive)_4%,var(--background))] shadow-tinted rounded-[4px] text-[10px] text-destructive font-medium cursor-default shrink-0"
-                style={{ '--shadow-color': 'var(--destructive-rgb)' } as React.CSSProperties}
-              >
-                Error
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="top" className="max-w-[400px]">
-              {activity.error}
-            </TooltipContent>
-          </Tooltip>
-        )}
-        {/* Native tools: Compound label with description + params (flex-1) */}
-        {/* In informative mode, hide inputSummary (command details) - only show description */}
-        {!isMcpOrApiTool && !isBackgrounded && (intentOrDescription || (displayMode === 'detailed' && inputSummary)) && (
-          <span className={cn("truncate flex-1 min-w-0", onOpenDetails && isComplete && "group-hover/row:underline")}>
-            {intentOrDescription && (
-              <>
-                <span className="opacity-60"> · </span>
-                <span>{intentOrDescription}</span>
-              </>
-            )}
-            {displayMode === 'detailed' && inputSummary && (
-              <>
-                <span className="opacity-60"> · </span>
-                <span className="opacity-50">{inputSummary}</span>
-              </>
-            )}
-          </span>
-        )}
-        {/* Background task info (task/shell ID + elapsed time) */}
-        {backgroundInfo && (
-          <>
-            <span className="opacity-60 shrink-0">·</span>
-            <span className="truncate min-w-0 max-w-[300px] text-accent">{backgroundInfo}</span>
-          </>
-        )}
-        {/* No spacer needed - both MCP/API and native tools now have flex-1 on their compound spans */}
-        {/* Open details button */}
-        {onOpenDetails && isComplete && (
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={(e) => {
-              e.stopPropagation()
-              onOpenDetails()
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
+          )}
+          {/* Filename badge for Read tool (no diff stats) */}
+          {!isMcpOrApiTool && !isBackgrounded && !diffStats && activity.toolName === 'Read' && typeof activity.toolInput?.file_path === 'string' && (
+            <span className="flex items-center gap-1.5 text-[10px] shrink-0">
+              <FilenameBadge
+                filePath={resolvedActivityFilePath || activity.toolInput.file_path}
+                onOpenFile={onOpenFile}
+              />
+            </span>
+          )}
+          {/* Error badge for native tools */}
+          {!isMcpOrApiTool && activity.status === 'error' && activity.error && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span
+                  className="px-1.5 py-0.5 bg-[color-mix(in_oklab,var(--destructive)_4%,var(--background))] shadow-tinted rounded-[4px] text-[10px] text-destructive font-medium cursor-default shrink-0"
+                  style={{ '--shadow-color': 'var(--destructive-rgb)' } as React.CSSProperties}
+                >
+                  Error
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-[400px]">
+                {activity.error}
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {/* Native tools: Compound label with description + params (flex-1) */}
+          {/* In informative mode, hide inputSummary (command details) - only show description */}
+          {!isMcpOrApiTool && !isBackgrounded && (intentOrDescription || (displayMode === 'detailed' && inputSummary)) && (
+            <span className={cn("truncate flex-1 min-w-0", onOpenDetails && isComplete && "group-hover/row:underline")}>
+              {intentOrDescription && (
+                <>
+                  <span className="opacity-60"> · </span>
+                  <span>{intentOrDescription}</span>
+                </>
+              )}
+              {displayMode === 'detailed' && inputSummary && (
+                <>
+                  <span className="opacity-60"> · </span>
+                  <span className="opacity-50">{inputSummary}</span>
+                </>
+              )}
+            </span>
+          )}
+          {/* Background task info (task/shell ID + elapsed time) */}
+          {backgroundInfo && (
+            <>
+              <span className="opacity-60 shrink-0">·</span>
+              <span className="truncate min-w-0 max-w-[300px] text-accent">{backgroundInfo}</span>
+            </>
+          )}
+          {/* No spacer needed - both MCP/API and native tools now have flex-1 on their compound spans */}
+          {/* Open details button */}
+          {onOpenDetails && isComplete && (
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
                 e.stopPropagation()
                 onOpenDetails()
-              }
-            }}
-            className={cn(
-              "p-0.5 rounded-[3px] opacity-0 group-hover/row:opacity-100 transition-opacity shrink-0",
-              "hover:bg-muted/80 focus:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            )}
-          >
-            <ArrowUpRight className={SIZE_CONFIG.iconSize} />
-          </div>
-        )}
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.stopPropagation()
+                  onOpenDetails()
+                }
+              }}
+              className={cn(
+                "p-0.5 rounded-[3px] opacity-0 group-hover/row:opacity-100 transition-opacity shrink-0",
+                "hover:bg-muted/80 focus:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              )}
+            >
+              <ArrowUpRight className={SIZE_CONFIG.iconSize} />
+            </div>
+          )}
+        </div>
       </div>
+      {shouldPreviewReadImage && resolvedActivityFilePath && (
+        <ReadImagePreview
+          path={resolvedActivityFilePath}
+          depth={depth}
+          isLastChild={isLastChild}
+          onOpenFile={onOpenFile}
+        />
+      )}
     </div>
   )
 }
@@ -1387,6 +1505,8 @@ export interface ResponseCardProps {
   variant?: 'response' | 'plan'
   /** Parent session ID (used to reset local annotation/island UI state on session switches) */
   sessionId?: string
+  /** Session folder used to resolve portable local file paths in markdown content. */
+  sessionFolderPath?: string
   /** Underlying message ID for annotation actions */
   messageId?: string
   /** Persisted annotations for this response */
@@ -1642,6 +1762,7 @@ export function ResponseCard({
   onPopOut,
   variant = 'response',
   sessionId,
+  sessionFolderPath,
   messageId,
   annotations,
   onAccept,
@@ -2458,6 +2579,7 @@ export function ResponseCard({
                 mode="minimal"
                 onUrlClick={onOpenUrl}
                 onFileClick={onOpenFile}
+                sessionFolderPath={sessionFolderPath}
               >
                 {text}
               </Markdown>
@@ -2542,6 +2664,7 @@ export function ResponseCard({
           variant={isPlan ? 'plan' : undefined}
           onOpenUrl={onOpenUrl}
           onOpenFile={onOpenFile}
+          sessionFolderPath={sessionFolderPath}
           sessionId={sessionId}
           messageId={messageId}
           annotations={annotations}
@@ -2582,6 +2705,7 @@ export function ResponseCard({
               mode="minimal"
               onUrlClick={onOpenUrl}
               onFileClick={onOpenFile}
+              sessionFolderPath={sessionFolderPath}
             >
               {displayedText}
             </Markdown>
@@ -3075,6 +3199,7 @@ export const TurnCard = React.memo(function TurnCard({
             text={planActivity.content || ''}
             isStreaming={false}
             sessionId={sessionId}
+            sessionFolderPath={sessionFolderPath}
             onOpenFile={onOpenFile}
             onOpenUrl={onOpenUrl}
             onPopOut={onPopOut ? () => onPopOut(planActivity.content || '') : undefined}
@@ -3114,6 +3239,7 @@ export const TurnCard = React.memo(function TurnCard({
                 isStreaming={response.isStreaming}
                 streamStartTime={response.streamStartTime}
                 sessionId={sessionId}
+                sessionFolderPath={sessionFolderPath}
                 onOpenFile={onOpenFile}
                 onOpenUrl={onOpenUrl}
                 onPopOut={onPopOut ? () => onPopOut(response.text) : undefined}
@@ -3146,6 +3272,7 @@ export const TurnCard = React.memo(function TurnCard({
             isStreaming={response.isStreaming}
             streamStartTime={response.streamStartTime}
             sessionId={sessionId}
+            sessionFolderPath={sessionFolderPath}
             onOpenFile={onOpenFile}
             onOpenUrl={onOpenUrl}
             onPopOut={onPopOut ? () => onPopOut(response.text) : undefined}
