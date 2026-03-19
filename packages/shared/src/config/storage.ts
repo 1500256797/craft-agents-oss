@@ -9,6 +9,7 @@ import {
   createWorkspaceAtPath,
   seedBundledSkillsToWorkspace,
   isValidWorkspace,
+  deleteWorkspaceFolder,
 } from '../workspaces/storage.ts';
 import { findIconFile } from '../utils/icon.ts';
 import { initializeDocs } from '../docs/index.ts';
@@ -447,6 +448,26 @@ export function getConfigPath(): string {
  * Deletes config file and credentials file.
  */
 export async function clearAllConfig(): Promise<void> {
+  // Delete actual workspace root folders tracked in config before removing config.json.
+  // Read the raw config file directly to avoid workspace auto-repair side effects.
+  if (existsSync(CONFIG_FILE)) {
+    try {
+      const config = readJsonFileSync<StoredConfig>(CONFIG_FILE);
+      if (Array.isArray(config.workspaces)) {
+        for (const workspace of config.workspaces) {
+          if (!workspace?.rootPath) continue;
+          try {
+            deleteWorkspaceFolder(expandPath(workspace.rootPath));
+          } catch (error) {
+            console.error(`[storage] Failed to delete workspace folder: ${workspace.rootPath}`, error);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('[storage] Failed to read config before clearAllConfig', error);
+    }
+  }
+
   // Delete config file
   if (existsSync(CONFIG_FILE)) {
     rmSync(CONFIG_FILE);

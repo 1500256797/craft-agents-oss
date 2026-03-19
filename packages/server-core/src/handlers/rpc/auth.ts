@@ -1,6 +1,3 @@
-import { unlink } from 'fs/promises'
-import { join } from 'path'
-import { homedir } from 'os'
 import { RPC_CHANNELS } from '@zhangyuge-agent/shared/protocol'
 import { getCredentialManager } from '@zhangyuge-agent/shared/credentials'
 import {
@@ -12,6 +9,7 @@ import {
   loginAccount,
   type AccountLoginInput,
 } from '@zhangyuge-agent/shared/account-auth'
+import { clearAllConfig } from '@zhangyuge-agent/shared/config'
 import type { RpcServer } from '@zhangyuge-agent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 import { requestClientConfirmDialog } from '@zhangyuge-agent/server-core/transport'
@@ -105,19 +103,7 @@ export function registerAuthHandlers(server: RpcServer, deps: HandlerDeps): void
   server.handle(RPC_CHANNELS.auth.LOGOUT, async () => {
     try {
       await clearAccountSession()
-      const manager = getCredentialManager()
-
-      // List and delete all stored credentials
-      const allCredentials = await manager.list()
-      for (const credId of allCredentials) {
-        await manager.delete(credId)
-      }
-
-      // Delete the config file
-      const configPath = join(homedir(), '.zhangyuge-agent', 'config.json')
-      await unlink(configPath).catch(() => {
-        // Ignore if file doesn't exist
-      })
+      await clearAllConfig()
 
       deps.platform.logger.info('Logout complete - cleared all credentials and config')
     } catch (error) {
