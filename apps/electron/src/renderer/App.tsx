@@ -345,11 +345,21 @@ export default function App() {
     }
   }, [resolveDefaultConnectionSlug, windowWorkspaceId])
 
+  const ensureWorkspaceExistsAfterLogin = useCallback(async (): Promise<void> => {
+    const existing = await window.electronAPI.getWorkspaces()
+    if (existing.length > 0) return
+
+    const homeDir = await window.electronAPI.getHomeDir()
+    const defaultPath = `${homeDir}/.zhangyuge-agent/workspaces/my-workspace`
+    await window.electronAPI.createWorkspace(defaultPath, 'My Workspace')
+  }, [])
+
   const resolvePostLoginState = useCallback(async () => {
+    await ensureWorkspaceExistsAfterLogin()
     const needs = await window.electronAPI.getSetupNeeds()
     setSetupNeeds(needs)
     setAppState(needs.isFullyConfigured ? 'ready' : 'onboarding')
-  }, [])
+  }, [ensureWorkspaceExistsAfterLogin])
 
   // Handle onboarding completion
   const handleOnboardingComplete = useCallback(async () => {

@@ -67,7 +67,7 @@ export function WorkspaceSwitcher({
   const handleWorkspaceCreated = (workspace: Workspace) => {
     setShowCreationScreen(false)
     setFullscreenOverlayOpen(false)
-    toast.success(`Created local agent "${workspace.name}"`)
+    toast.success(`Created workspace "${workspace.name}"`)
     onWorkspaceCreated?.(workspace)
     onSelect(workspace.id)
   }
@@ -95,7 +95,7 @@ export function WorkspaceSwitcher({
             <button
               type="button"
               className="titlebar-no-drag ml-1 flex-1 min-w-0 flex items-center justify-start gap-0.5 h-[30px] px-3 rounded-[8px] border border-foreground/6 text-[13px] text-foreground/50 hover:bg-foreground/5 hover:text-foreground transition-colors cursor-pointer data-[state=open]:bg-foreground/5 data-[state=open]:text-foreground"
-              aria-label="Select local agent"
+              aria-label="Select workspace"
             >
               <CrossfadeAvatar
                 src={selectedWorkspace ? workspaceIconMap.get(selectedWorkspace.id) : undefined}
@@ -104,7 +104,7 @@ export function WorkspaceSwitcher({
                 fallbackClassName="bg-muted text-[10px] rounded-full"
                 fallback={selectedWorkspace?.name?.charAt(0) || 'A'}
               />
-              <span className="truncate min-w-0 flex-1 text-left">{selectedWorkspace?.name || 'Select local agent'}</span>
+              <span className="truncate min-w-0 flex-1 text-left">{selectedWorkspace?.name || 'Select workspace'}</span>
               <ChevronDown className="h-3 w-3 opacity-60 shrink-0" />
               {hasUnreadInOtherWorkspaces && <span className="h-2 w-2 rounded-full bg-accent shrink-0" />}
             </button>
@@ -116,7 +116,7 @@ export function WorkspaceSwitcher({
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 isCollapsed && "h-9 w-9 shrink-0 justify-center p-0"
               )}
-              aria-label="Select local agent"
+              aria-label="Select workspace"
             >
               {showAvatars && (
                 <CrossfadeAvatar
@@ -130,7 +130,7 @@ export function WorkspaceSwitcher({
               {!isCollapsed && (
                 <>
                   <FadingText className={cn("font-sans min-w-0 text-sm", showAvatars && "ml-1")} fadeWidth={36}>
-                    {selectedWorkspace?.name || 'Select local agent'}
+                    {selectedWorkspace?.name || 'Select workspace'}
                   </FadingText>
                   <ChevronDown className="h-3 w-3 opacity-50 shrink-0" />
                 </>
