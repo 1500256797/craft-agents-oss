@@ -14,6 +14,7 @@ import { MarkdownDatatableBlock } from './MarkdownDatatableBlock'
 import { MarkdownSpreadsheetBlock } from './MarkdownSpreadsheetBlock'
 import { MarkdownHtmlBlock } from './MarkdownHtmlBlock'
 import { MarkdownImageBlock } from './MarkdownImageBlock'
+import { MarkdownVideoBlock } from './MarkdownVideoBlock'
 import { MarkdownLatexBlock } from './MarkdownLatexBlock'
 import { MarkdownPdfBlock } from './MarkdownPdfBlock'
 import { preprocessLinks } from './linkify'
@@ -25,6 +26,8 @@ import { wrapWithSafeProxy } from './safe-components'
 import { MARKDOWN_MATH_OPTIONS } from './math-options'
 import { usePlatform } from '../../context/PlatformContext'
 import { isLocalPathTarget, normalizeLocalPathTarget } from '../../lib/local-paths'
+import { classifyFile } from '../../lib/file-classification'
+import { getVideoMimeType } from '../../lib/video'
 
 /**
  * Render modes for markdown content:
@@ -114,6 +117,13 @@ interface MarkdownInlineImageProps {
   sessionFolderPath?: string
 }
 
+interface MarkdownInlineVideoProps {
+  src: string
+  onFileClick?: (path: string) => void
+  sessionFolderPath?: string
+  className?: string
+}
+
 function MarkdownInlineImage({ src, alt, title, onFileClick, sessionFolderPath }: MarkdownInlineImageProps) {
   const { onReadFileDataUrl } = usePlatform()
   const [dataUrl, setDataUrl] = React.useState<string | null>(null)
@@ -182,6 +192,82 @@ function MarkdownInlineImage({ src, alt, title, onFileClick, sessionFolderPath }
   )
 }
 
+function MarkdownInlineVideo({ src, onFileClick, sessionFolderPath, className }: MarkdownInlineVideoProps) {
+  const { onReadFileBinary } = usePlatform()
+  const [videoUrl, setVideoUrl] = React.useState<string | null>(null)
+  const [loadFailed, setLoadFailed] = React.useState(false)
+
+  const resolvedPath = React.useMemo(
+    () => normalizeLocalPathTarget(src, sessionFolderPath),
+    [src, sessionFolderPath]
+  )
+
+  React.useEffect(() => {
+    if (!onReadFileBinary) return
+
+    let cancelled = false
+    let objectUrl: string | null = null
+    setVideoUrl(null)
+    setLoadFailed(false)
+
+    onReadFileBinary(resolvedPath)
+      .then((data) => {
+        if (cancelled) return
+        const bytes = new Uint8Array(data)
+        objectUrl = URL.createObjectURL(new Blob([bytes.buffer], { type: getVideoMimeType(resolvedPath) }))
+        setVideoUrl(objectUrl)
+      })
+      .catch(() => {
+        if (!cancelled) setLoadFailed(true)
+      })
+
+    return () => {
+      cancelled = true
+      if (objectUrl) URL.revokeObjectURL(objectUrl)
+    }
+  }, [onReadFileBinary, resolvedPath])
+
+  if (!onReadFileBinary || (!videoUrl && loadFailed)) {
+    return (
+      <button
+        type="button"
+        onClick={() => onFileClick?.(resolvedPath)}
+        className={cn(
+          'my-2 inline-flex max-w-full items-center rounded-md border border-border/50 bg-background px-3 py-2 text-left text-sm text-accent shadow-minimal hover:underline',
+          className
+        )}
+      >
+        <code className="break-all font-mono">{resolvedPath}</code>
+      </button>
+    )
+  }
+
+  if (!videoUrl) {
+    return (
+      <div className={cn('my-2 flex h-[220px] items-center justify-center rounded-md border border-border/50 bg-muted/20 text-sm text-muted-foreground', className)}>
+        Loading video...
+      </div>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => onFileClick?.(resolvedPath)}
+      className={cn('my-2 block w-full overflow-hidden rounded-md border border-border/50 bg-black shadow-minimal', className)}
+    >
+      <video
+        src={videoUrl}
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="aspect-video w-full object-contain"
+      />
+    </button>
+  )
+}
+
 function MarkdownPathBlock({
   path,
   onFileClick,
@@ -194,6 +280,16 @@ function MarkdownPathBlock({
   className?: string
 }) {
   const resolvedPath = normalizeLocalPathTarget(path, sessionFolderPath)
+  if (classifyFile(resolvedPath).type === 'video') {
+    return (
+      <MarkdownInlineVideo
+        src={resolvedPath}
+        onFileClick={onFileClick}
+        sessionFolderPath={sessionFolderPath}
+        className={className}
+      />
+    )
+  }
   if (!onFileClick) {
     return <CodeBlock code={resolvedPath} language="text" mode="full" className={className} />
   }
@@ -394,6 +490,10 @@ function createComponents(
           if (match?.[1] === 'image-preview') {
             return wrapBlock('image-preview', code, <MarkdownImageBlock code={code} className="my-2" />, props.node?.position)
           }
+          // Video preview blocks → inline video with expand to full viewer
+          if (match?.[1] === 'video-preview') {
+            return wrapBlock('video-preview', code, <MarkdownVideoBlock code={code} className="my-2" />, props.node?.position)
+          }
           // LaTeX/math code blocks → KaTeX rendered display math
           if (match?.[1] === 'latex' || match?.[1] === 'math') {
             return wrapBlock('latex', code, <MarkdownLatexBlock code={code} className="my-2" />, props.node?.position)
@@ -536,6 +636,10 @@ function createComponents(
         // Image preview blocks → inline image with expand to full viewer
         if (match?.[1] === 'image-preview') {
           return wrapBlock('image-preview', code, <MarkdownImageBlock code={code} className="my-2" />, props.node?.position)
+        }
+        // Video preview blocks → inline video with expand to full viewer
+        if (match?.[1] === 'video-preview') {
+          return wrapBlock('video-preview', code, <MarkdownVideoBlock code={code} className="my-2" />, props.node?.position)
         }
         // LaTeX/math code blocks → KaTeX rendered display math
         if (match?.[1] === 'latex' || match?.[1] === 'math') {

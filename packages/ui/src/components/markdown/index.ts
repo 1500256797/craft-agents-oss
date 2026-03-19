@@ -10,5 +10,6 @@ export { CollapsibleMarkdownProvider, useCollapsibleMarkdown } from './Collapsib
 export { MarkdownDatatableBlock, type MarkdownDatatableBlockProps } from './MarkdownDatatableBlock'
 export { MarkdownSpreadsheetBlock, type MarkdownSpreadsheetBlockProps } from './MarkdownSpreadsheetBlock'
 export { MarkdownImageBlock, type MarkdownImageBlockProps } from './MarkdownImageBlock'
+export { MarkdownVideoBlock, type MarkdownVideoBlockProps } from './MarkdownVideoBlock'
 export { ImageCardStack, type ImageCardStackProps, type ImageCardStackItem } from './ImageCardStack'
 export { TiptapMarkdownEditor, type TiptapMarkdownEditorProps, type MarkdownEngine } from './TiptapMarkdownEditor'

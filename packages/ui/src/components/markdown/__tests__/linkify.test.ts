@@ -271,6 +271,10 @@ describe('isFilePathTarget', () => {
     expect(isFilePathTarget('file:///Users/ouhuang/Desktop/image.png')).toBe(true)
   })
 
+  it('accepts local video paths', () => {
+    expect(isFilePathTarget('/Users/ouhuang/.zhangyuge-agent/workspaces/222/sessions/260319-sharp-pebble/zhangyuge-promo/out/video.mp4')).toBe(true)
+  })
+
   it('rejects web URLs', () => {
     expect(isFilePathTarget('https://example.com/image.jpg')).toBe(false)
   })

@@ -17,6 +17,8 @@ import { formatPreferencesForPrompt } from '../../config/preferences.ts';
 import { formatSessionState } from '../mode-manager.ts';
 import { getDateTimeContext, getWorkingDirectoryContext } from '../../prompts/system.ts';
 import { getSessionPlansPath, getSessionDataPath, getSessionPath } from '../../sessions/storage.ts';
+import { loadAllSkills } from '../../skills/storage.ts';
+import type { LoadedSkill } from '../../skills/types.ts';
 import type {
   PromptBuilderConfig,
   ContextBlockOptions,
@@ -89,6 +91,12 @@ export class PromptBuilder {
       parts.push(sourceStateBlock);
     }
 
+    // Add available skills from global/workspace/project scope
+    const skillsContext = this.formatSkillsContext();
+    if (skillsContext) {
+      parts.push(skillsContext);
+    }
+
     // Add workspace capabilities
     parts.push(this.formatWorkspaceCapabilities());
 
@@ -99,6 +107,44 @@ export class PromptBuilder {
     }
 
     return parts;
+  }
+
+  /**
+   * Format available skills for prompt injection.
+   * Includes only skill name + description in a compact XML-like block.
+   */
+  formatSkillsContext(): string | null {
+    const workspaceRoot = this.workspaceRootPath;
+    if (!workspaceRoot) return null;
+
+    const projectRoot = this.config.session?.workingDirectory;
+    const skills = loadAllSkills(workspaceRoot, projectRoot)
+      .filter(skill => skill.metadata?.name && skill.metadata?.description)
+      .sort((a, b) => {
+        const nameCompare = a.metadata.name.localeCompare(b.metadata.name);
+        if (nameCompare !== 0) return nameCompare;
+        return a.slug.localeCompare(b.slug);
+      });
+
+    if (skills.length === 0) return null;
+
+    const lines = skills.map(skill => this.formatSkillNode(skill));
+    return `<skills>\n${lines.join('\n')}\n</skills>`;
+  }
+
+  private formatSkillNode(skill: LoadedSkill): string {
+    const name = this.escapeXml(skill.metadata.name);
+    const description = this.escapeXml(skill.metadata.description);
+    return `  <skill>\n    <name>${name}</name>\n    <description>${description}</description>\n  </skill>`;
+  }
+
+  private escapeXml(value: string): string {
+    return value
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&apos;');
   }
 
   /**

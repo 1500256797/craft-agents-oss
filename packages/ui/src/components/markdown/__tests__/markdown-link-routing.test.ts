@@ -22,6 +22,10 @@ describe('classifyMarkdownLinkTarget', () => {
     expect(classifyMarkdownLinkTarget('file:///Users/ouhuang/Desktop/image.png')).toBe('file')
   })
 
+  it('classifies local video paths as file', () => {
+    expect(classifyMarkdownLinkTarget('/Users/ouhuang/.zhangyuge-agent/workspaces/222/sessions/260319-sharp-pebble/zhangyuge-promo/out/video.mp4')).toBe('file')
+  })
+
   it('classifies https links as url', () => {
     expect(classifyMarkdownLinkTarget('https://example.com/image.jpg')).toBe('url')
   })

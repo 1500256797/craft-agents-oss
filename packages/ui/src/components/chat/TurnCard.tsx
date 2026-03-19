@@ -88,6 +88,7 @@ import {
 import { usePlatform } from '../../context/PlatformContext'
 import { classifyFile } from '../../lib/file-classification'
 import { normalizeLocalPathTarget } from '../../lib/local-paths'
+import { getVideoMimeType } from '../../lib/video'
 
 // ============================================================================
 // Utilities
@@ -982,6 +983,83 @@ function ReadImagePreview({
   )
 }
 
+function ReadVideoPreview({
+  path,
+  depth,
+  isLastChild = false,
+  onOpenFile,
+}: {
+  path: string
+  depth: number
+  isLastChild?: boolean
+  onOpenFile?: (path: string) => void
+}) {
+  const { onReadFileBinary } = usePlatform()
+  const [videoUrl, setVideoUrl] = useState<string | null>(null)
+  const [loadFailed, setLoadFailed] = useState(false)
+
+  useEffect(() => {
+    if (!onReadFileBinary) return
+
+    let cancelled = false
+    let objectUrl: string | null = null
+    setVideoUrl(null)
+    setLoadFailed(false)
+
+    onReadFileBinary(path)
+      .then((data) => {
+        if (cancelled) return
+        const bytes = new Uint8Array(data)
+        objectUrl = URL.createObjectURL(new Blob([bytes.buffer], { type: getVideoMimeType(path) }))
+        setVideoUrl(objectUrl)
+      })
+      .catch(() => {
+        if (!cancelled) setLoadFailed(true)
+      })
+
+    return () => {
+      cancelled = true
+      if (objectUrl) URL.revokeObjectURL(objectUrl)
+    }
+  }, [onReadFileBinary, path])
+
+  if (!onReadFileBinary) return null
+
+  return (
+    <div className="flex items-stretch">
+      <TreeViewConnector depth={depth} isLastChild={isLastChild} />
+      <div className="pl-6 pt-1 pb-2">
+        {videoUrl ? (
+          <button
+            type="button"
+            onClick={() => onOpenFile?.(path)}
+            className="block overflow-hidden rounded-[8px] border border-border/50 bg-black shadow-minimal"
+          >
+            <video
+              src={videoUrl}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="h-[112px] w-[198px] object-cover"
+            />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              if (loadFailed) onOpenFile?.(path)
+            }}
+            className="flex h-[112px] w-[198px] items-center justify-center rounded-[8px] border border-border/50 bg-muted/30 px-3 text-center text-xs text-muted-foreground"
+          >
+            {loadFailed ? 'Open video' : 'Loading video...'}
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 /** Single activity row in expanded view */
 function ActivityRow({ activity, onOpenDetails, isLastChild, sessionFolderPath, displayMode = 'detailed' }: ActivityRowProps) {
   const depth = activity.depth || 0
@@ -989,9 +1067,13 @@ function ActivityRow({ activity, onOpenDetails, isLastChild, sessionFolderPath, 
   const resolvedActivityFilePath = typeof activity.toolInput?.file_path === 'string'
     ? normalizeLocalPathTarget(activity.toolInput.file_path, sessionFolderPath)
     : undefined
+  const resolvedFileClassification = resolvedActivityFilePath ? classifyFile(resolvedActivityFilePath) : null
   const shouldPreviewReadImage = activity.toolName === 'Read'
     && !!resolvedActivityFilePath
-    && classifyFile(resolvedActivityFilePath).type === 'image'
+    && resolvedFileClassification?.type === 'image'
+  const shouldPreviewReadVideo = activity.toolName === 'Read'
+    && !!resolvedActivityFilePath
+    && resolvedFileClassification?.type === 'video'
 
   // Intermediate messages (LLM commentary) - render with dashed circle icon
   // Show "Thinking" while streaming, stripped markdown content when complete
@@ -1299,6 +1381,14 @@ function ActivityRow({ activity, onOpenDetails, isLastChild, sessionFolderPath, 
       </div>
       {shouldPreviewReadImage && resolvedActivityFilePath && (
         <ReadImagePreview
+          path={resolvedActivityFilePath}
+          depth={depth}
+          isLastChild={isLastChild}
+          onOpenFile={onOpenFile}
+        />
+      )}
+      {shouldPreviewReadVideo && resolvedActivityFilePath && (
+        <ReadVideoPreview
           path={resolvedActivityFilePath}
           depth={depth}
           isLastChild={isLastChild}

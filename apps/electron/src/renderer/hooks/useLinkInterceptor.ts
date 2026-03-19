@@ -28,6 +28,11 @@ interface ImagePreview {
   filePath: string
 }
 
+interface VideoPreview {
+  type: 'video'
+  filePath: string
+}
+
 interface PDFPreview {
   type: 'pdf'
   filePath: string
@@ -64,6 +69,7 @@ interface TextPreview {
 
 export type FilePreviewState =
   | ImagePreview
+  | VideoPreview
   | PDFPreview
   | CodePreview
   | MarkdownPreview
@@ -148,8 +154,8 @@ export function useLinkInterceptor(options: LinkInterceptorOptions): LinkInterce
 
     const type = classification.type
 
-    // For image/pdf: set state immediately — the overlay handles its own async loading
-    if (type === 'image' || type === 'pdf') {
+    // For image/video/pdf: set state immediately — the overlay handles its own async loading
+    if (type === 'image' || type === 'video' || type === 'pdf') {
       setPreviewState({ type, filePath: path })
       return
     }
@@ -238,7 +244,7 @@ function buildInitialTextState(type: FilePreviewType, path: string): FilePreview
     case 'text':
       return { type: 'text', filePath: path, content: null }
     default:
-      // Should never happen — image/pdf are handled before this function is called
+      // Should never happen — image/video/pdf are handled before this function is called
       return { type: 'text', filePath: path, content: null }
   }
 }

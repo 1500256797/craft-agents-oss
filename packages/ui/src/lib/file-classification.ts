@@ -5,9 +5,10 @@
  * an in-app preview overlay, and if so, which type of preview to use.
  * Used by useLinkInterceptor to decide between in-app preview vs. opening externally.
  */
+import { VIDEO_EXTENSIONS } from './video'
 
 /** Preview types that map to specific overlay components */
-export type FilePreviewType = 'image' | 'code' | 'markdown' | 'json' | 'text' | 'pdf'
+export type FilePreviewType = 'image' | 'video' | 'code' | 'markdown' | 'json' | 'text' | 'pdf'
 
 export interface FileClassification {
   /** The preview type, or null if no in-app preview is available */
@@ -79,13 +80,14 @@ function getExtension(filePath: string): string {
  * Classify a file path by extension to determine preview capability.
  *
  * Priority order when an extension matches multiple sets (e.g. svg):
- * image > code > markdown > json > text > pdf
+ * image > video > code > markdown > json > text > pdf
  */
 export function classifyFile(filePath: string): FileClassification {
   const ext = getExtension(filePath)
   if (!ext) return { type: null, canPreview: false }
 
   if (IMAGE_EXTENSIONS.has(ext))    return { type: 'image', canPreview: true }
+  if (VIDEO_EXTENSIONS.has(ext))    return { type: 'video', canPreview: true }
   if (MARKDOWN_EXTENSIONS.has(ext)) return { type: 'markdown', canPreview: true }
   if (JSON_EXTENSIONS.has(ext))     return { type: 'json', canPreview: true }
   if (CODE_EXTENSIONS.has(ext))     return { type: 'code', canPreview: true }
@@ -102,6 +104,7 @@ export function classifyFile(filePath: string): FileClassification {
  */
 export const FILE_EXTENSIONS_PATTERN = [
   ...IMAGE_EXTENSIONS,
+  ...VIDEO_EXTENSIONS,
   ...CODE_EXTENSIONS,
   ...MARKDOWN_EXTENSIONS,
   ...JSON_EXTENSIONS,

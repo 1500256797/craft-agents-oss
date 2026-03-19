@@ -51,6 +51,7 @@ import {
   PlatformProvider,
   ImagePreviewOverlay,
   PDFPreviewOverlay,
+  VideoPreviewOverlay,
   CodePreviewOverlay,
   DocumentFormattedMarkdownOverlay,
   JSONPreviewOverlay,
@@ -1681,6 +1682,7 @@ export default function App() {
               state={linkInterceptor.previewState}
               onClose={linkInterceptor.closePreview}
               loadDataUrl={linkInterceptor.readFileDataUrl}
+              loadVideoData={linkInterceptor.readFileBinary}
               loadPdfData={linkInterceptor.readFileBinary}
               isDark={isDark}
             />
@@ -1710,6 +1712,7 @@ function WindowCloseHandler() {
  *
  * Handles all preview types from the link interceptor:
  * - image → ImagePreviewOverlay (binary, loaded via data URL)
+ * - video → VideoPreviewOverlay (binary, loaded via object URL)
  * - pdf → PDFPreviewOverlay (binary, embedded via Chromium viewer)
  * - code/text → CodePreviewOverlay (syntax highlighted)
  * - markdown → DocumentFormattedMarkdownOverlay
@@ -1722,12 +1725,14 @@ function FilePreviewRenderer({
   state,
   onClose,
   loadDataUrl,
+  loadVideoData,
   loadPdfData,
   isDark,
 }: {
   state: FilePreviewState
   onClose: () => void
   loadDataUrl: (path: string) => Promise<string>
+  loadVideoData: (path: string) => Promise<Uint8Array>
   loadPdfData: (path: string) => Promise<Uint8Array>
   isDark: boolean
 }) {
@@ -1741,6 +1746,17 @@ function FilePreviewRenderer({
           onClose={onClose}
           filePath={state.filePath}
           loadDataUrl={loadDataUrl}
+          theme={theme}
+        />
+      )
+
+    case 'video':
+      return (
+        <VideoPreviewOverlay
+          isOpen
+          onClose={onClose}
+          filePath={state.filePath}
+          loadVideoData={loadVideoData}
           theme={theme}
         />
       )
