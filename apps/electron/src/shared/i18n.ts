@@ -9,52 +9,59 @@ export const UI_LANGUAGE_OPTIONS: UiLanguage[] = ['system', 'en', 'zh-CN']
 type TranslationParams = Record<string, string | number>
 type MessageTree = Record<string, unknown>
 
-function withTopLevelNamespaceAliases(messages: MessageTree): MessageTree {
-  const settings = (messages.settings && typeof messages.settings === 'object')
+function getSettingsNamespace(messages: MessageTree): MessageTree | null {
+  return (messages.settings && typeof messages.settings === 'object')
     ? messages.settings as MessageTree
     : null
-  const common = (messages.common && typeof messages.common === 'object')
-    ? messages.common as MessageTree
-    : null
-
-  return {
-    ...messages,
-    common: {
-      ...common,
-      apiKeyInput: common?.apiKeyInput ?? settings?.apiKeyInput,
-      cronBuilder: common?.cronBuilder ?? settings?.cronBuilder,
-      editPopover: common?.editPopover ?? settings?.editPopover,
-    },
-    auth: messages.auth ?? settings?.auth,
-    onboarding: messages.onboarding ?? settings?.onboarding,
-    sourceInfo: messages.sourceInfo ?? settings?.sourceInfo,
-    skillInfo: messages.skillInfo ?? settings?.skillInfo,
-  }
 }
 
 const UI_MESSAGES = {
-  en: withTopLevelNamespaceAliases(enMessages as MessageTree),
-  'zh-CN': withTopLevelNamespaceAliases(zhCNMessages as MessageTree),
+  en: enMessages as MessageTree,
+  'zh-CN': zhCNMessages as MessageTree,
 } as const
 
 type MessageKey = string
 
-function lookupMessage(locale: ResolvedUiLanguage, key: MessageKey): string | undefined {
-  const messages = UI_MESSAGES[locale]
-  if (!messages) return undefined
+function lookupParts(root: MessageTree | null | undefined, parts: string[]): string | undefined {
+  if (!root) return undefined
 
-  const parts = key.split('.')
-  let current: any = messages
-
+  let current: unknown = root
   for (const part of parts) {
-    if (current && typeof current === 'object' && part in current) {
-      current = current[part]
+    if (current && typeof current === 'object' && part in (current as Record<string, unknown>)) {
+      current = (current as Record<string, unknown>)[part]
     } else {
       return undefined
     }
   }
 
   return typeof current === 'string' ? current : undefined
+}
+
+function lookupMessage(locale: ResolvedUiLanguage, key: MessageKey): string | undefined {
+  const messages = UI_MESSAGES[locale]
+  if (!messages) return undefined
+
+  const parts = key.split('.')
+  const direct = lookupParts(messages, parts)
+  if (direct !== undefined) return direct
+
+  const settings = getSettingsNamespace(messages)
+  if (!settings) return undefined
+
+  // Legacy fallback: auth.*, onboarding.*, sourceInfo.*, updates.*, etc. now live under settings.*
+  const settingsScoped = lookupParts(settings, parts)
+  if (settingsScoped !== undefined) return settingsScoped
+
+  // Secondary fallback: some historical common.* keys (e.g. common.editPopover, common.chatPage)
+  // also live under settings.<namespace>.* in the current locale files.
+  if (parts[0] === 'common' && parts.length > 1) {
+    const commonAlias = lookupParts(settings, parts.slice(1))
+    if (commonAlias !== undefined) {
+      return commonAlias
+    }
+  }
+
+  return undefined
 }
 
 function interpolate(template: string, params?: TranslationParams): string {

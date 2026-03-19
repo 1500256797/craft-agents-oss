@@ -17,4 +17,16 @@ describe('translateUi namespace aliases', () => {
   it('resolves common.editPopover keys from settings namespace', () => {
     expect(translateUi('en', 'common.editPopover.processingMessages.0')).toBe('Thinking...')
   })
+
+  it('resolves updates keys from settings namespace', () => {
+    expect(translateUi('en', 'updates.upToDate')).toBe("You're up to date")
+  })
+
+  it('resolves common.chatPage keys from settings namespace', () => {
+    expect(translateUi('en', 'common.chatPage.linkCopied')).toBe('Link copied to clipboard')
+  })
+
+  it('resolves auth keys from settings namespace', () => {
+    expect(translateUi('en', 'auth.login.title')).toBe('Sign In')
+  })
 })
