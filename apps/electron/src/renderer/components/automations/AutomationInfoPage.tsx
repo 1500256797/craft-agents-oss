@@ -23,9 +23,112 @@ import { AutomationActionRow } from './AutomationActionRow'
 import { AutomationTestPanel } from './AutomationTestPanel'
 import { AutomationEventTimeline } from './AutomationEventTimeline'
 import { PhaseBadge } from './PhaseBadge'
-import { getEventDisplayName, getPermissionDisplayName, type AutomationListItem, type ExecutionEntry, type TestResult } from './types'
+import { getEventDisplayName, getPermissionDisplayName, type AutomationConditionUI, type AutomationListItem, type ExecutionEntry, type TestResult } from './types'
 import { describeCron, computeNextRuns } from './utils'
 import { useI18n } from '@/context/I18nContext'
+
+// ============================================================================
+// Condition display helpers
+// ============================================================================
+
+type TranslateFn = (
+  key: string,
+  params?: Record<string, string | number>,
+  fallback?: string,
+) => string
+
+function getConditionFieldLabel(field: string, t: TranslateFn): string {
+  switch (field) {
+    case 'permissionMode':
+      return t('common.automationInfo.permissionModeField')
+    case 'sessionStatus':
+      return t('common.automationInfo.sessionStatusField')
+    case 'isFlagged':
+      return t('common.automationInfo.flaggedField')
+    case 'labels':
+      return t('common.automationInfo.labelField')
+    case 'sessionName':
+      return t('common.automationInfo.sessionNameField')
+    default:
+      return field
+  }
+}
+
+function describeConditionLeaf(condition: AutomationConditionUI, t: TranslateFn): string {
+  switch (condition.condition) {
+    case 'time': {
+      const parts: string[] = []
+      if (condition.weekday?.length) parts.push(condition.weekday.join(', '))
+      if (condition.after) parts.push(t('common.automationInfo.after', { value: condition.after }))
+      if (condition.before) parts.push(t('common.automationInfo.before', { value: condition.before }))
+      if (condition.timezone) parts.push(`(${condition.timezone})`)
+      return parts.length > 0 ? parts.join(' ') : t('common.automationInfo.anyTime')
+    }
+    case 'state': {
+      const field = getConditionFieldLabel(condition.field, t)
+      if (condition.from !== undefined || condition.to !== undefined) {
+        const from = condition.from !== undefined ? String(condition.from) : t('common.automationInfo.anyValue')
+        const to = condition.to !== undefined ? String(condition.to) : t('common.automationInfo.anyValue')
+        return t('common.automationInfo.changedFromTo', { field, from, to })
+      }
+      if (condition.contains) {
+        return t('common.automationInfo.hasField', { field, value: condition.contains })
+      }
+      if (condition.not_value !== undefined) {
+        if (condition.field === 'isFlagged') {
+          return condition.not_value
+            ? t('common.automationInfo.notFlagged')
+            : t('common.automationInfo.isFlagged')
+        }
+        return t('common.automationInfo.isNotValue', { field, value: String(condition.not_value) })
+      }
+      if (condition.value !== undefined) {
+        if (condition.field === 'isFlagged') {
+          return condition.value
+            ? t('common.automationInfo.isFlagged')
+            : t('common.automationInfo.notFlagged')
+        }
+        return t('common.automationInfo.isValue', { field, value: String(condition.value) })
+      }
+      return field
+    }
+    case 'and':
+    case 'or':
+    case 'not': {
+      const separator = condition.condition === 'not'
+        ? t('common.automationInfo.conditionAndNot')
+        : condition.condition === 'and'
+          ? t('common.automationInfo.conditionAnd')
+          : t('common.automationInfo.conditionOr')
+      return condition.conditions.map((item) => describeConditionLeaf(item, t)).join(separator)
+    }
+  }
+}
+
+function flattenConditions(conditions: AutomationConditionUI[], t: TranslateFn): Array<{ label: string; description: string }> {
+  const rows: Array<{ label: string; description: string }> = []
+  for (const condition of conditions) {
+    if (condition.condition === 'and' || condition.condition === 'or' || condition.condition === 'not') {
+      const firstChild = condition.conditions[0]
+      const label = firstChild
+        ? firstChild.condition === 'time'
+          ? t('common.automationInfo.timeCondition')
+          : firstChild.condition === 'state'
+            ? t('common.automationInfo.stateCondition')
+            : t('common.automationInfo.condition')
+        : t('common.automationInfo.condition')
+      rows.push({ label, description: describeConditionLeaf(condition, t) })
+      continue
+    }
+    rows.push({
+      label: condition.condition === 'time'
+        ? t('common.automationInfo.timeCondition')
+        : t('common.automationInfo.stateCondition'),
+      description: describeConditionLeaf(condition, t),
+    })
+  }
+  return rows
+}
 
 // ============================================================================
 // Component
@@ -153,6 +256,25 @@ export function AutomationInfoPage({
           </Info_Table>
         </Info_Section>
 
+        {/* Section: If (conditions) — hidden when empty */}
+        {automation.conditions && automation.conditions.length > 0 && (
+          <Info_Section
+            title={t('common.automationInfo.if')}
+            description={t('common.automationInfo.ifDescription')}
+            actions={editActions}
+          >
+            <Info_Table>
+              {flattenConditions(automation.conditions, t).map((row, i) => (
+                <Info_Table.Row key={i} label={row.label}>
+                  <span className="text-sm text-foreground/70">
+                    {row.description}
+                  </span>
+                </Info_Table.Row>
+              ))}
+            </Info_Table>
+          </Info_Section>
+        )}
+
         {/* Section: Then */}
         <Info_Section
           title={t('common.automationInfo.then')}
@@ -209,6 +331,7 @@ export function AutomationInfoPage({
               {`\`\`\`json\n${JSON.stringify({
                 event: automation.event,
                 matcher: automation.matcher,
+                conditions: automation.conditions,
                 cron: automation.cron,
                 timezone: automation.timezone,
                 permissionMode: automation.permissionMode,
