@@ -44,7 +44,15 @@ export const meta: DetailsPageMeta = {
 // Main Component
 // ============================================
 
-export default function WorkspaceSettingsPage() {
+interface WorkspaceSettingsPageProps {
+  embedded?: boolean
+  emptyStateText?: string
+}
+
+export default function WorkspaceSettingsPage({
+  embedded = false,
+  emptyStateText,
+}: WorkspaceSettingsPageProps = {}) {
   const { t } = useI18n()
   // Get active workspace from context
   const appShellContext = useAppShellContext()
@@ -314,241 +322,265 @@ export default function WorkspaceSettingsPage() {
     [enabledModes, updateWorkspaceSetting]
   )
 
+  const content = (
+    <div className="flex-1 min-h-0 mask-fade-y">
+      <ScrollArea className="h-full">
+        <div className="px-5 py-7 max-w-3xl mx-auto">
+        <div className="space-y-8">
+          {/* Workspace Info */}
+          <SettingsSection title={t('settings.workspace.sections.info')}>
+            <SettingsCard>
+              <SettingsRow
+                label={t('settings.workspace.rows.name')}
+                description={wsName || t('settings.workspace.rows.untitled')}
+                action={
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setWsNameEditing(wsName)
+                      setRenameDialogOpen(true)
+                    }}
+                    className="inline-flex items-center h-8 px-3 text-sm rounded-lg bg-background shadow-minimal hover:bg-foreground/[0.02] transition-colors"
+                  >
+                    {t('settings.workspace.rows.edit')}
+                  </button>
+                }
+              />
+              <SettingsRow
+                label={t('settings.workspace.rows.icon')}
+                action={
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif"
+                      onChange={handleIconUpload}
+                      className="sr-only"
+                      disabled={isUploadingIcon}
+                    />
+                    <span className="inline-flex items-center h-8 px-3 text-sm rounded-lg bg-background shadow-minimal hover:bg-foreground/[0.02] transition-colors">
+                      {isUploadingIcon ? t('settings.workspace.rows.uploading') : t('settings.workspace.rows.change')}
+                    </span>
+                  </label>
+                }
+              >
+                <div
+                  className={cn(
+                    'w-6 h-6 rounded-full overflow-hidden bg-foreground/5 flex items-center justify-center',
+                    'ring-1 ring-border/50'
+                  )}
+                >
+                  {isUploadingIcon ? (
+                    <Spinner className="text-muted-foreground text-[8px]" />
+                  ) : wsIconUrl ? (
+                    <img src={wsIconUrl} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-xs font-medium text-muted-foreground">
+                      {wsName?.charAt(0)?.toUpperCase() || 'W'}
+                    </span>
+                  )}
+                </div>
+              </SettingsRow>
+            </SettingsCard>
+
+            <RenameDialog
+              open={renameDialogOpen}
+              onOpenChange={setRenameDialogOpen}
+              title={t('settings.workspace.rows.renameTitle')}
+              value={wsNameEditing}
+              onValueChange={setWsNameEditing}
+              onSubmit={() => {
+                const newName = wsNameEditing.trim()
+                if (newName && newName !== wsName) {
+                  setWsName(newName)
+                  updateWorkspaceSetting('name', newName)
+                  onRefreshWorkspaces?.()
+                }
+                setRenameDialogOpen(false)
+              }}
+              placeholder={t('settings.workspace.rows.renamePlaceholder')}
+            />
+          </SettingsSection>
+
+          {/* Permissions */}
+          <SettingsSection title={t('settings.workspace.sections.permissions')}>
+            <SettingsCard>
+              <SettingsMenuSelectRow
+                label={t('settings.workspace.rows.defaultMode')}
+                description={t('settings.workspace.rows.defaultModeDescription')}
+                value={permissionMode}
+                onValueChange={(v) => handlePermissionModeChange(v as PermissionMode)}
+                options={[
+                  { value: 'safe', label: t('settings.workspace.modes.safeLabel'), description: t('settings.workspace.modes.safeDescription') },
+                  { value: 'ask', label: t('settings.workspace.modes.askLabel'), description: t('settings.workspace.modes.askDescription') },
+                  { value: 'allow-all', label: t('settings.workspace.modes.allowAllLabel'), description: t('settings.workspace.modes.allowAllDescription') },
+                ]}
+              />
+            </SettingsCard>
+          </SettingsSection>
+
+          {/* Mode Cycling */}
+          <SettingsSection
+            title={t('settings.workspace.sections.modeCycling')}
+            description={t('settings.workspace.modes.cyclingDescription')}
+          >
+            <SettingsCard>
+              {(['safe', 'ask', 'allow-all'] as const).map((m) => {
+                const isEnabled = enabledModes.includes(m)
+                return (
+                  <SettingsToggle
+                    key={m}
+                    label={
+                      m === 'safe'
+                        ? t('settings.workspace.modes.safeLabel')
+                        : m === 'ask'
+                          ? t('settings.workspace.modes.askLabel')
+                          : t('settings.workspace.modes.allowAllLabel')
+                    }
+                    description={
+                      m === 'safe'
+                        ? t('settings.workspace.modes.safeDescription')
+                        : m === 'ask'
+                          ? t('settings.workspace.modes.askDescription')
+                          : t('settings.workspace.modes.allowAllDescription')
+                    }
+                    checked={isEnabled}
+                    onCheckedChange={(checked) => handleModeToggle(m, checked)}
+                  />
+                )
+              })}
+            </SettingsCard>
+            <AnimatePresence>
+              {modeCyclingError && (
+                <motion.p
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                  className="text-xs text-destructive mt-1 overflow-hidden"
+                >
+                  {modeCyclingError}
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </SettingsSection>
+
+          {/* Default Sources */}
+          <SettingsSection
+            title={t('settings.workspace.sections.defaultSources')}
+            description={t('settings.workspace.rows.defaultSourcesDescription')}
+          >
+            {availableSources.length > 0 ? (
+              <SettingsCard>
+                {availableSources.map((source) => (
+                  <SettingsToggle
+                    key={source.config.slug}
+                    label={
+                      <span className="inline-flex items-center gap-2">
+                        <SourceAvatar source={source} size="xs" />
+                        {source.config.name}
+                      </span>
+                    }
+                    description={source.config.tagline}
+                    checked={enabledSourceSlugs.includes(source.config.slug)}
+                    onCheckedChange={(checked) => handleSourceToggle(source.config.slug, checked)}
+                  />
+                ))}
+              </SettingsCard>
+            ) : (
+              <p className="text-sm text-muted-foreground">{t('settings.workspace.rows.noSources')}</p>
+            )}
+          </SettingsSection>
+
+          {/* Advanced */}
+          <SettingsSection title={t('settings.workspace.sections.advanced')}>
+            <SettingsCard>
+              <SettingsRow
+                label={t('settings.workspace.rows.defaultWorkingDirectory')}
+                description={workingDirectory || t('settings.workspace.rows.defaultWorkingDirectoryUnset')}
+                action={
+                  <div className="flex items-center gap-2">
+                    {workingDirectory && (
+                      <button
+                        type="button"
+                        onClick={handleClearWorkingDirectory}
+                        className="inline-flex items-center h-8 px-3 text-sm rounded-lg bg-background shadow-minimal hover:bg-foreground/[0.02] transition-colors text-foreground/60 hover:text-foreground"
+                      >
+                        {t('settings.workspace.rows.clear')}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleChangeWorkingDirectory}
+                      className="inline-flex items-center h-8 px-3 text-sm rounded-lg bg-background shadow-minimal hover:bg-foreground/[0.02] transition-colors"
+                    >
+                      {t('settings.workspace.rows.changeEllipsis')}
+                    </button>
+                  </div>
+                }
+              />
+              <SettingsToggle
+                label={t('settings.workspace.rows.localMcpServers')}
+                description={t('settings.workspace.rows.localMcpServersDescription')}
+                checked={localMcpEnabled}
+                onCheckedChange={handleLocalMcpEnabledChange}
+              />
+            </SettingsCard>
+          </SettingsSection>
+
+        </div>
+      </div>
+      </ScrollArea>
+    </div>
+  )
+
   // Show empty state if no workspace is active
   if (!activeWorkspaceId) {
+    const emptyContent = (
+      <div className="flex-1 flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">{emptyStateText ?? 'No workspace selected'}</p>
+      </div>
+    )
+
+    if (embedded) {
+      return emptyContent
+    }
+
     return (
       <div className="h-full flex flex-col">
         <PanelHeader title={t('settings.pages.workspace.title')} actions={<HeaderMenu route={routes.view.settings('workspace')} helpFeature="workspaces" />} />
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-sm text-muted-foreground">No workspace selected</p>
-        </div>
+        {emptyContent}
       </div>
     )
   }
 
   // Show loading state
   if (isLoadingWorkspace) {
+    const loadingContent = (
+      <div className="flex-1 flex items-center justify-center">
+        <Spinner className="text-muted-foreground" />
+      </div>
+    )
+
+    if (embedded) {
+      return loadingContent
+    }
+
     return (
       <div className="h-full flex flex-col">
         <PanelHeader title={t('settings.pages.workspace.title')} actions={<HeaderMenu route={routes.view.settings('workspace')} helpFeature="workspaces" />} />
-        <div className="flex-1 flex items-center justify-center">
-          <Spinner className="text-muted-foreground" />
-        </div>
+        {loadingContent}
       </div>
     )
+  }
+
+  if (embedded) {
+    return content
   }
 
   return (
     <div className="h-full flex flex-col">
       <PanelHeader title={t('settings.pages.workspace.title')} actions={<HeaderMenu route={routes.view.settings('workspace')} helpFeature="workspaces" />} />
-      <div className="flex-1 min-h-0 mask-fade-y">
-        <ScrollArea className="h-full">
-          <div className="px-5 py-7 max-w-3xl mx-auto">
-          <div className="space-y-8">
-            {/* Workspace Info */}
-            <SettingsSection title={t('settings.workspace.sections.info')}>
-              <SettingsCard>
-                <SettingsRow
-                  label={t('settings.workspace.rows.name')}
-                  description={wsName || t('settings.workspace.rows.untitled')}
-                  action={
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setWsNameEditing(wsName)
-                        setRenameDialogOpen(true)
-                      }}
-                      className="inline-flex items-center h-8 px-3 text-sm rounded-lg bg-background shadow-minimal hover:bg-foreground/[0.02] transition-colors"
-                    >
-                      {t('settings.workspace.rows.edit')}
-                    </button>
-                  }
-                />
-                <SettingsRow
-                  label={t('settings.workspace.rows.icon')}
-                  action={
-                    <label className="cursor-pointer">
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif"
-                        onChange={handleIconUpload}
-                        className="sr-only"
-                        disabled={isUploadingIcon}
-                      />
-                      <span className="inline-flex items-center h-8 px-3 text-sm rounded-lg bg-background shadow-minimal hover:bg-foreground/[0.02] transition-colors">
-                        {isUploadingIcon ? t('settings.workspace.rows.uploading') : t('settings.workspace.rows.change')}
-                      </span>
-                    </label>
-                  }
-                >
-                  <div
-                    className={cn(
-                      'w-6 h-6 rounded-full overflow-hidden bg-foreground/5 flex items-center justify-center',
-                      'ring-1 ring-border/50'
-                    )}
-                  >
-                    {isUploadingIcon ? (
-                      <Spinner className="text-muted-foreground text-[8px]" />
-                    ) : wsIconUrl ? (
-                      <img src={wsIconUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-xs font-medium text-muted-foreground">
-                        {wsName?.charAt(0)?.toUpperCase() || 'W'}
-                      </span>
-                    )}
-                  </div>
-                </SettingsRow>
-              </SettingsCard>
-
-              <RenameDialog
-                open={renameDialogOpen}
-                onOpenChange={setRenameDialogOpen}
-                title={t('settings.workspace.rows.renameTitle')}
-                value={wsNameEditing}
-                onValueChange={setWsNameEditing}
-                onSubmit={() => {
-                  const newName = wsNameEditing.trim()
-                  if (newName && newName !== wsName) {
-                    setWsName(newName)
-                    updateWorkspaceSetting('name', newName)
-                    onRefreshWorkspaces?.()
-                  }
-                  setRenameDialogOpen(false)
-                }}
-                placeholder={t('settings.workspace.rows.renamePlaceholder')}
-              />
-            </SettingsSection>
-
-            {/* Permissions */}
-            <SettingsSection title={t('settings.workspace.sections.permissions')}>
-              <SettingsCard>
-                <SettingsMenuSelectRow
-                  label={t('settings.workspace.rows.defaultMode')}
-                  description={t('settings.workspace.rows.defaultModeDescription')}
-                  value={permissionMode}
-                  onValueChange={(v) => handlePermissionModeChange(v as PermissionMode)}
-                  options={[
-                    { value: 'safe', label: t('settings.workspace.modes.safeLabel'), description: t('settings.workspace.modes.safeDescription') },
-                    { value: 'ask', label: t('settings.workspace.modes.askLabel'), description: t('settings.workspace.modes.askDescription') },
-                    { value: 'allow-all', label: t('settings.workspace.modes.allowAllLabel'), description: t('settings.workspace.modes.allowAllDescription') },
-                  ]}
-                />
-              </SettingsCard>
-            </SettingsSection>
-
-            {/* Mode Cycling */}
-            <SettingsSection
-              title={t('settings.workspace.sections.modeCycling')}
-              description={t('settings.workspace.modes.cyclingDescription')}
-            >
-              <SettingsCard>
-                {(['safe', 'ask', 'allow-all'] as const).map((m) => {
-                  const isEnabled = enabledModes.includes(m)
-                  return (
-                    <SettingsToggle
-                      key={m}
-                      label={
-                        m === 'safe'
-                          ? t('settings.workspace.modes.safeLabel')
-                          : m === 'ask'
-                            ? t('settings.workspace.modes.askLabel')
-                            : t('settings.workspace.modes.allowAllLabel')
-                      }
-                      description={
-                        m === 'safe'
-                          ? t('settings.workspace.modes.safeDescription')
-                          : m === 'ask'
-                            ? t('settings.workspace.modes.askDescription')
-                            : t('settings.workspace.modes.allowAllDescription')
-                      }
-                      checked={isEnabled}
-                      onCheckedChange={(checked) => handleModeToggle(m, checked)}
-                    />
-                  )
-                })}
-              </SettingsCard>
-              <AnimatePresence>
-                {modeCyclingError && (
-                  <motion.p
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-                    className="text-xs text-destructive mt-1 overflow-hidden"
-                  >
-                    {modeCyclingError}
-                  </motion.p>
-                )}
-              </AnimatePresence>
-            </SettingsSection>
-
-            {/* Default Sources */}
-            <SettingsSection
-              title={t('settings.workspace.sections.defaultSources')}
-              description={t('settings.workspace.rows.defaultSourcesDescription')}
-            >
-              {availableSources.length > 0 ? (
-                <SettingsCard>
-                  {availableSources.map((source) => (
-                    <SettingsToggle
-                      key={source.config.slug}
-                      label={
-                        <span className="inline-flex items-center gap-2">
-                          <SourceAvatar source={source} size="xs" />
-                          {source.config.name}
-                        </span>
-                      }
-                      description={source.config.tagline}
-                      checked={enabledSourceSlugs.includes(source.config.slug)}
-                      onCheckedChange={(checked) => handleSourceToggle(source.config.slug, checked)}
-                    />
-                  ))}
-                </SettingsCard>
-              ) : (
-                <p className="text-sm text-muted-foreground">{t('settings.workspace.rows.noSources')}</p>
-              )}
-            </SettingsSection>
-
-            {/* Advanced */}
-            <SettingsSection title={t('settings.workspace.sections.advanced')}>
-              <SettingsCard>
-                <SettingsRow
-                  label={t('settings.workspace.rows.defaultWorkingDirectory')}
-                  description={workingDirectory || t('settings.workspace.rows.defaultWorkingDirectoryUnset')}
-                  action={
-                    <div className="flex items-center gap-2">
-                      {workingDirectory && (
-                        <button
-                          type="button"
-                          onClick={handleClearWorkingDirectory}
-                          className="inline-flex items-center h-8 px-3 text-sm rounded-lg bg-background shadow-minimal hover:bg-foreground/[0.02] transition-colors text-foreground/60 hover:text-foreground"
-                        >
-                          {t('settings.workspace.rows.clear')}
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={handleChangeWorkingDirectory}
-                        className="inline-flex items-center h-8 px-3 text-sm rounded-lg bg-background shadow-minimal hover:bg-foreground/[0.02] transition-colors"
-                      >
-                        {t('settings.workspace.rows.changeEllipsis')}
-                      </button>
-                    </div>
-                  }
-                />
-                <SettingsToggle
-                  label={t('settings.workspace.rows.localMcpServers')}
-                  description={t('settings.workspace.rows.localMcpServersDescription')}
-                  checked={localMcpEnabled}
-                  onCheckedChange={handleLocalMcpEnabledChange}
-                />
-              </SettingsCard>
-            </SettingsSection>
-
-          </div>
-        </div>
-        </ScrollArea>
-      </div>
+      {content}
     </div>
   )
 }
