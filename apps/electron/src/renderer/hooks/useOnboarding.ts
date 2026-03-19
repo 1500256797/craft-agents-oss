@@ -144,6 +144,13 @@ export function apiSetupMethodToConnectionSetup(
     piAuthProvider?: string
     modelSelectionMode?: 'automaticallySyncedFromProvider' | 'userDefined3Tier'
     customEndpoint?: CustomEndpointConfig
+    iamCredentials?: {
+      accessKeyId: string
+      secretAccessKey: string
+      sessionToken?: string
+    }
+    awsRegion?: string
+    bedrockAuthMethod?: 'iam_credentials' | 'environment'
   },
   editingSlug: string | null,
   existingSlugs: Set<string>,
@@ -159,6 +166,9 @@ export function apiSetupMethodToConnectionSetup(
         defaultModel: options.connectionDefaultModel,
         models: options.models,
         customEndpoint: options.customEndpoint,
+        iamCredentials: options.iamCredentials,
+        awsRegion: options.awsRegion,
+        bedrockAuthMethod: options.bedrockAuthMethod,
       }
     case 'claude_oauth':
       return {
@@ -243,6 +253,13 @@ export function useOnboarding({
       piAuthProvider?: string
       modelSelectionMode?: 'automaticallySyncedFromProvider' | 'userDefined3Tier'
       customEndpoint?: CustomEndpointConfig
+      iamCredentials?: {
+        accessKeyId: string
+        secretAccessKey: string
+        sessionToken?: string
+      }
+      awsRegion?: string
+      bedrockAuthMethod?: 'iam_credentials' | 'environment'
     },
     methodOverride?: ApiSetupMethod,
     connectionSlugOverride?: string,
@@ -265,6 +282,9 @@ export function useOnboarding({
         piAuthProvider: options?.piAuthProvider,
         modelSelectionMode: options?.modelSelectionMode,
         customEndpoint: options?.customEndpoint,
+        iamCredentials: options?.iamCredentials,
+        awsRegion: options?.awsRegion,
+        bedrockAuthMethod: options?.bedrockAuthMethod,
       }, connectionSlugOverride ?? editingSlug, existingSlugs)
       // Use new unified API
       const result = await window.electronAPI.setupLlmConnection(
@@ -369,10 +389,11 @@ export function useOnboarding({
     setState(s => ({ ...s, credentialStatus: 'validating', errorMessage: undefined }))
 
     const isPiApiKeyFlow = state.apiSetupMethod === 'pi_api_key'
+    const isBedrock = !!data.bedrockAuthMethod
 
     try {
       // When editing an existing connection, API key is optional (empty = keep existing credential)
-      if (!data.apiKey.trim() && editingSlug) {
+      if (!data.apiKey.trim() && editingSlug && !isBedrock) {
         const saved = await handleSaveConfig(undefined, {
           baseUrl: data.baseUrl,
           connectionDefaultModel: data.connectionDefaultModel,
@@ -380,6 +401,9 @@ export function useOnboarding({
           piAuthProvider: data.piAuthProvider,
           modelSelectionMode: data.modelSelectionMode,
           customEndpoint: data.customEndpoint,
+          iamCredentials: data.iamCredentials,
+          awsRegion: data.awsRegion,
+          bedrockAuthMethod: data.bedrockAuthMethod,
         })
         if (saved) {
           setState(s => ({ ...s, credentialStatus: 'success', step: 'complete' }))
@@ -393,7 +417,29 @@ export function useOnboarding({
       // - Local/loopback custom endpoints may be keyless (e.g. Ollama)
       // - Non-local endpoints require an API key
       const isLoopbackCustomEndpoint = isLoopbackEndpoint(data.baseUrl)
-      if (isPiApiKeyFlow) {
+      if (isBedrock) {
+        const saved = await handleSaveConfig(undefined, {
+          connectionDefaultModel: data.connectionDefaultModel,
+          models: data.models,
+          piAuthProvider: data.piAuthProvider,
+          modelSelectionMode: data.modelSelectionMode,
+          customEndpoint: data.customEndpoint,
+          iamCredentials: data.iamCredentials,
+          awsRegion: data.awsRegion,
+          bedrockAuthMethod: data.bedrockAuthMethod,
+        })
+
+        if (saved) {
+          setState(s => ({
+            ...s,
+            credentialStatus: 'success',
+            step: 'complete',
+          }))
+        } else {
+          setState(s => ({ ...s, credentialStatus: 'error' }))
+        }
+        return
+      } else if (isPiApiKeyFlow) {
         if (!data.apiKey.trim() && !isLoopbackCustomEndpoint) {
           setState(s => ({
             ...s,
@@ -441,6 +487,9 @@ export function useOnboarding({
         piAuthProvider: data.piAuthProvider,
         modelSelectionMode: data.modelSelectionMode,
         customEndpoint: data.customEndpoint,
+        iamCredentials: data.iamCredentials,
+        awsRegion: data.awsRegion,
+        bedrockAuthMethod: data.bedrockAuthMethod,
       })
 
       if (saved) {
@@ -460,7 +509,7 @@ export function useOnboarding({
         errorMessage: error instanceof Error ? error.message : 'Validation failed',
       }))
     }
-  }, [handleSaveConfig, state.apiSetupMethod])
+  }, [editingSlug, handleSaveConfig, state.apiSetupMethod])
 
   // Save config, validate the connection, and update state accordingly.
   // Shared by all OAuth flows after tokens are captured.

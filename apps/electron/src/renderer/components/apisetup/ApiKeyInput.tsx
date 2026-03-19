@@ -45,6 +45,16 @@ export interface ApiKeySubmitData {
   modelSelectionMode?: 'automaticallySyncedFromProvider' | 'userDefined3Tier'
   /** Custom endpoint protocol — set when user configures an arbitrary API endpoint */
   customEndpoint?: CustomEndpointConfig
+  /** Bedrock IAM credentials — set when user configures AWS IAM auth */
+  iamCredentials?: {
+    accessKeyId: string
+    secretAccessKey: string
+    sessionToken?: string
+  }
+  /** AWS region for Bedrock */
+  awsRegion?: string
+  /** Bedrock authentication method */
+  bedrockAuthMethod?: 'iam_credentials' | 'environment'
 }
 
 export interface ApiKeyInputProps {
@@ -232,6 +242,13 @@ export function ApiKeyInput({
   const [customApi, setCustomApi] = useState<CustomEndpointApi>(initialValues?.customApi ?? 'openai-completions')
   const [modelError, setModelError] = useState<string | null>(null)
 
+  // Bedrock auth state
+  const [bedrockAuthMethod, setBedrockAuthMethod] = useState<'iam_credentials' | 'environment'>('iam_credentials')
+  const [awsAccessKeyId, setAwsAccessKeyId] = useState('')
+  const [awsSecretAccessKey, setAwsSecretAccessKey] = useState('')
+  const [awsSessionToken, setAwsSessionToken] = useState('')
+  const [awsRegion, setAwsRegion] = useState('us-east-1')
+
   // Pi model tier state (for providers with many models like OpenRouter, Vercel)
   const [piModels, setPiModels] = useState<PiModelInfo[]>([])
   const [piModelsLoading, setPiModelsLoading] = useState(false)
@@ -247,6 +264,7 @@ export function ApiKeyInput({
   const isDisabled = disabled || status === 'validating'
 
   const isPiApiKeyFlow = providerType === 'pi_api_key'
+  const isBedrock = activePreset === 'amazon-bedrock'
   // Hide endpoint/model fields for providers with well-known endpoints handled by the SDK
   const DEFAULT_ENDPOINT_PROVIDERS = new Set(['anthropic', 'openai', 'pi', 'google'])
   const isDefaultProviderPreset = DEFAULT_ENDPOINT_PROVIDERS.has(activePreset)
@@ -375,10 +393,41 @@ export function ApiKeyInput({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    setModelError(null)
 
     const effectivePiAuthProvider = isPiApiKeyFlow
       ? resolvePiAuthProviderForSubmit(activePreset, lastNonCustomPreset)
       : undefined
+
+    // Bedrock — submit with auth method and optional IAM credentials
+    if (isBedrock) {
+      if (bedrockAuthMethod === 'iam_credentials' && !awsAccessKeyId.trim()) {
+        setModelError(t('common.apiKeyInput.bedrock.accessKeyRequired'))
+        return
+      }
+      if (bedrockAuthMethod === 'iam_credentials' && !awsSecretAccessKey.trim()) {
+        setModelError(t('common.apiKeyInput.bedrock.secretKeyRequired'))
+        return
+      }
+
+      const parsedModels = parseModelList(connectionDefaultModel)
+      onSubmit({
+        apiKey: '',
+        piAuthProvider: effectivePiAuthProvider,
+        bedrockAuthMethod,
+        awsRegion: awsRegion.trim() || 'us-east-1',
+        ...(bedrockAuthMethod === 'iam_credentials' ? {
+          iamCredentials: {
+            accessKeyId: awsAccessKeyId.trim(),
+            secretAccessKey: awsSecretAccessKey.trim(),
+            ...(awsSessionToken.trim() ? { sessionToken: awsSessionToken.trim() } : {}),
+          },
+        } : {}),
+        connectionDefaultModel: parsedModels[0],
+        models: parsedModels.length > 0 ? parsedModels : undefined,
+      })
+      return
+    }
 
     // Pi API key flow with tier dropdowns — submit selected models
     if (hasPiModels) {
@@ -438,7 +487,8 @@ export function ApiKeyInput({
 
   return (
     <form id={formId} onSubmit={handleSubmit} className="space-y-6">
-      {/* API Key */}
+      {/* API Key — hidden for Bedrock (uses IAM/Environment auth) */}
+      {!isBedrock && (
       <div className="space-y-2">
         <Label htmlFor="api-key">{t('common.apiKeyInput.apiKey')}</Label>
         <div className={cn(
@@ -472,6 +522,7 @@ export function ApiKeyInput({
           </button>
         </div>
       </div>
+      )}
 
       {/* Endpoint/Provider Preset Selector - hidden when only one preset (e.g. Codex/OpenAI direct) */}
       {presets.length > 1 && (
@@ -500,8 +551,8 @@ export function ApiKeyInput({
             </StyledDropdownMenuContent>
           </DropdownMenu>
         </div>
-        {/* Base URL input - hidden for default provider presets (Anthropic/OpenAI) */}
-        {!isDefaultProviderPreset && (
+        {/* Base URL input - hidden for default provider presets (Anthropic/OpenAI) and Bedrock */}
+        {!isDefaultProviderPreset && !isBedrock && (
           <div className={cn(
             "rounded-md shadow-minimal transition-colors",
             "bg-foreground-2 focus-within:bg-background"
@@ -553,6 +604,129 @@ export function ApiKeyInput({
             {t('common.apiKeyInput.protocolHint')}
           </p>
         </div>
+      )}
+
+      {/* Bedrock Auth Section */}
+      {isBedrock && (
+        <>
+          <div className="space-y-2">
+            <Label>{t('common.apiKeyInput.bedrock.authentication')}</Label>
+            <div className={cn(
+              "flex rounded-md shadow-minimal overflow-hidden",
+              "bg-foreground-2",
+              isDisabled && "opacity-50 pointer-events-none"
+            )}>
+              {([
+                { value: 'iam_credentials' as const, label: t('common.apiKeyInput.bedrock.iamCredentials') },
+                { value: 'environment' as const, label: t('common.apiKeyInput.bedrock.environment') },
+              ]).map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  disabled={isDisabled}
+                  onClick={() => setBedrockAuthMethod(value)}
+                  className={cn(
+                    "flex-1 py-1.5 text-[12px] font-medium transition-colors",
+                    bedrockAuthMethod === value
+                      ? "bg-background text-foreground shadow-minimal"
+                      : "text-foreground/50 hover:text-foreground/70"
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {bedrockAuthMethod === 'iam_credentials' && (
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="aws-access-key-id" className="text-muted-foreground font-normal text-xs">
+                  {t('common.apiKeyInput.bedrock.accessKeyId')}
+                </Label>
+                <div className={cn("rounded-md shadow-minimal transition-colors", "bg-foreground-2 focus-within:bg-background")}>
+                  <Input
+                    id="aws-access-key-id"
+                    type="text"
+                    value={awsAccessKeyId}
+                    onChange={(e) => setAwsAccessKeyId(e.target.value)}
+                    placeholder="AKIA..."
+                    className="border-0 bg-transparent shadow-none"
+                    disabled={isDisabled}
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="aws-secret-key" className="text-muted-foreground font-normal text-xs">
+                  {t('common.apiKeyInput.bedrock.secretAccessKey')}
+                </Label>
+                <div className={cn("relative rounded-md shadow-minimal transition-colors", "bg-foreground-2 focus-within:bg-background")}>
+                  <Input
+                    id="aws-secret-key"
+                    type={showValue ? 'text' : 'password'}
+                    value={awsSecretAccessKey}
+                    onChange={(e) => setAwsSecretAccessKey(e.target.value)}
+                    placeholder={t('common.apiKeyInput.bedrock.secretAccessKeyPlaceholder')}
+                    className="pr-10 border-0 bg-transparent shadow-none"
+                    disabled={isDisabled}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowValue(!showValue)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    tabIndex={-1}
+                  >
+                    {showValue ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="aws-session-token" className="text-muted-foreground font-normal text-xs">
+                  {t('common.apiKeyInput.bedrock.sessionToken')} <span className="text-foreground/30">· {t('common.apiKeyInput.optional')}</span>
+                </Label>
+                <div className={cn("rounded-md shadow-minimal transition-colors", "bg-foreground-2 focus-within:bg-background")}>
+                  <Input
+                    id="aws-session-token"
+                    type="text"
+                    value={awsSessionToken}
+                    onChange={(e) => setAwsSessionToken(e.target.value)}
+                    placeholder={t('common.apiKeyInput.bedrock.sessionTokenPlaceholder')}
+                    className="border-0 bg-transparent shadow-none"
+                    disabled={isDisabled}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {bedrockAuthMethod === 'environment' && (
+            <div className="rounded-md bg-foreground-2 p-3">
+              <p className="text-xs text-foreground/50">
+                {t('common.apiKeyInput.bedrock.environmentHint')}
+              </p>
+            </div>
+          )}
+
+          <div className="space-y-1.5">
+            <Label htmlFor="aws-region" className="text-muted-foreground font-normal text-xs">
+              {t('common.apiKeyInput.bedrock.awsRegion')}
+            </Label>
+            <div className={cn("rounded-md shadow-minimal transition-colors", "bg-foreground-2 focus-within:bg-background")}>
+              <Input
+                id="aws-region"
+                type="text"
+                value={awsRegion}
+                onChange={(e) => setAwsRegion(e.target.value)}
+                placeholder="us-east-1"
+                className="border-0 bg-transparent shadow-none"
+                disabled={isDisabled}
+              />
+            </div>
+          </div>
+        </>
       )}
 
       {/* Model Selection — 3 tier dropdowns for Pi providers, text input for custom/compat */}
@@ -670,7 +844,7 @@ export function ApiKeyInput({
           <Label htmlFor="connection-default-model" className="text-muted-foreground font-normal">
             {t('common.apiKeyInput.defaultModel')}{' '}
             <span className="text-foreground/30">
-              · {baseUrl.trim() ? t('common.apiKeyInput.required') : t('common.apiKeyInput.optional')}
+              · {!isBedrock && baseUrl.trim() ? t('common.apiKeyInput.required') : t('common.apiKeyInput.optional')}
             </span>
           </Label>
           <div className={cn(
