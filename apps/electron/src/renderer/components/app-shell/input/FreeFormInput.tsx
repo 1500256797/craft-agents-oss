@@ -1489,7 +1489,7 @@ export function FreeFormInput({
             model={addLabelEditConfig.model}
             systemPromptPreset={addLabelEditConfig.systemPromptPreset}
             secondaryAction={workspaceRootPath ? {
-              label: 'Edit File',
+              label: t('settings.appearance.rows.editFile'),
               filePath: `${workspaceRootPath}/labels/config.json`,
             } : undefined}
             side="top"

@@ -68,6 +68,7 @@ import { useBackgroundTasks } from "@/hooks/useBackgroundTasks"
 import { useTurnCardExpansion } from "@/hooks/useTurnCardExpansion"
 import { useNavigation } from "@/contexts/NavigationContext"
 import { useAppShellContext } from "@/context/AppShellContext"
+import { useI18n } from "@/context/I18nContext"
 import { routes } from "@/lib/navigate"
 import { CHAT_LAYOUT } from "@/config/layout"
 import { resolveBranchNewPanelOption } from "./branching"
@@ -302,58 +303,18 @@ export interface ChatDisplayHandle {
  * Processing status messages - cycles through these randomly
  * Inspired by Claude Code's playful status messages
  */
-const PROCESSING_MESSAGES = [
-  'Thinking...',
-  'Pondering...',
-  'Contemplating...',
-  'Reasoning...',
-  'Processing...',
-  'Computing...',
-  'Considering...',
-  'Reflecting...',
-  'Deliberating...',
-  'Cogitating...',
-  'Ruminating...',
-  'Musing...',
-  'Working on it...',
-  'On it...',
-  'Crunching...',
-  'Brewing...',
-  'Connecting dots...',
-  'Mulling it over...',
-  'Deep in thought...',
-  'Hmm...',
-  'Let me see...',
-  'One moment...',
-  'Hold on...',
-  'Bear with me...',
-  'Just a sec...',
-  'Hang tight...',
-  'Getting there...',
-  'Almost...',
-  'Working...',
-  'Busy busy...',
-  'Whirring...',
-  'Churning...',
-  'Percolating...',
-  'Simmering...',
-  'Cooking...',
-  'Baking...',
-  'Stirring...',
-  'Spinning up...',
-  'Warming up...',
-  'Revving...',
-  'Buzzing...',
-  'Humming...',
-  'Ticking...',
-  'Clicking...',
-  'Whizzing...',
-  'Zooming...',
-  'Zipping...',
-  'Chugging...',
-  'Trucking...',
-  'Rolling...',
-]
+function getProcessingMessages(t: (key: string) => string): string[] {
+  return [
+    t('common.editPopover.processingMessages.0'),
+    t('common.editPopover.processingMessages.1'),
+    t('common.editPopover.processingMessages.2'),
+    t('common.editPopover.processingMessages.3'),
+    t('common.editPopover.processingMessages.4'),
+    t('common.editPopover.processingMessages.5'),
+    t('common.editPopover.processingMessages.6'),
+    t('common.editPopover.processingMessages.7'),
+  ]
+}
 
 /**
  * Format elapsed time: "45s" under a minute, "1:02" for 1+ minutes
@@ -377,9 +338,11 @@ interface ProcessingIndicatorProps {
  * Matches TurnCard header layout for visual continuity
  */
 function ProcessingIndicator({ startTime, statusMessage }: ProcessingIndicatorProps) {
+  const { t } = useI18n()
+  const processingMessages = React.useMemo(() => getProcessingMessages(t), [t])
   const [elapsed, setElapsed] = React.useState(0)
   const [messageIndex, setMessageIndex] = React.useState(() =>
-    Math.floor(Math.random() * PROCESSING_MESSAGES.length)
+    Math.floor(Math.random() * processingMessages.length)
   )
 
   // Update elapsed time every second using provided startTime
@@ -400,18 +363,18 @@ function ProcessingIndicator({ startTime, statusMessage }: ProcessingIndicatorPr
     const interval = setInterval(() => {
       setMessageIndex(prev => {
         // Pick a random different message
-        let next = Math.floor(Math.random() * PROCESSING_MESSAGES.length)
-        while (next === prev && PROCESSING_MESSAGES.length > 1) {
-          next = Math.floor(Math.random() * PROCESSING_MESSAGES.length)
+        let next = Math.floor(Math.random() * processingMessages.length)
+        while (next === prev && processingMessages.length > 1) {
+          next = Math.floor(Math.random() * processingMessages.length)
         }
         return next
       })
     }, 10000)
     return () => clearInterval(interval)
-  }, [statusMessage])
+  }, [processingMessages, statusMessage])
 
   // Use status message if provided, otherwise cycle through default messages
-  const displayMessage = statusMessage || PROCESSING_MESSAGES[messageIndex]
+  const displayMessage = statusMessage || processingMessages[messageIndex] || processingMessages[0]
 
   return (
     <div className="flex items-center gap-2 px-3 py-1 -mb-1 text-[13px] text-muted-foreground">
@@ -529,6 +492,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
   // Connection unavailable
   connectionUnavailable = false,
 }, ref) {
+  const { t } = useI18n()
   // Panel focus state (for multi-panel auto-scroll behavior)
   const appShellContext = useAppShellContext()
   const isFocusedPanel = appShellContext?.isFocusedPanel ?? true
@@ -1713,14 +1677,14 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
                   {/* Empty state for compact mode - inviting conversational prompt, centered in full popover */}
                   {compactMode && turns.length === 0 && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center select-none gap-1 pointer-events-none">
-                      <span className="text-sm text-muted-foreground">What would you like to change?</span>
-                      <span className="text-xs text-muted-foreground/50">Just describe it — I'll handle the rest</span>
+                      <span className="text-sm text-muted-foreground">{t('common.editPopover.emptyState.title')}</span>
+                      <span className="text-xs text-muted-foreground/50">{t('common.editPopover.emptyState.description')}</span>
                     </div>
                   )}
                   {/* Load more indicator - shown when there are older messages */}
                   {hasMoreAbove && (
                     <div className="text-center text-muted-foreground/60 text-xs py-3 select-none">
-                      ↑ Scroll up for earlier messages ({startIndex} more)
+                      {t('common.editPopover.history.moreMessages', { count: startIndex })}
                     </div>
                   )}
                   {turns.map((turn, index) => {

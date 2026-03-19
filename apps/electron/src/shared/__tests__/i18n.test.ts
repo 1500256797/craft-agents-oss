@@ -13,4 +13,8 @@ describe('translateUi namespace aliases', () => {
   it('resolves common.cronBuilder keys from settings namespace', () => {
     expect(translateUi('en', 'common.cronBuilder.commonSchedules')).toBe('Common Schedules')
   })
+
+  it('resolves common.editPopover keys from settings namespace', () => {
+    expect(translateUi('en', 'common.editPopover.processingMessages.0')).toBe('Thinking...')
+  })
 })

@@ -1209,6 +1209,23 @@
     },
     "editPopover": {
       "defaultPlaceholder": "Describe what you'd like to change",
+      "emptyState": {
+        "title": "What would you like to change?",
+        "description": "Just describe it and I'll handle the rest."
+      },
+      "history": {
+        "moreMessages": "↑ Scroll up for earlier messages ({{count}} more)"
+      },
+      "processingMessages": {
+        "0": "Thinking...",
+        "1": "Working on it...",
+        "2": "Connecting the dots...",
+        "3": "One moment...",
+        "4": "Almost there...",
+        "5": "Processing...",
+        "6": "Hold on...",
+        "7": "Reasoning..."
+      },
       "compactPlaceholders": {
         "0": "Just tell me what to change",
         "1": "Describe the update",

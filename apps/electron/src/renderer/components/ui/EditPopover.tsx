@@ -359,7 +359,7 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
   // Status configuration context
   'edit-statuses': (location) => ({
     context: {
-      label: 'Status Configuration',
+      label: t('common.editPopover.configs.editStatuses.label'),
       filePath: `${location}/statuses/config.json`,
       context:
         'The user wants to customize session statuses (workflow states). ' +
@@ -370,7 +370,7 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
         'After editing, call config_validate with target "statuses" to verify the changes. ' +
         'Confirm clearly when done.',
     },
-    example: 'Add a "Blocked" status',
+    example: t('common.editPopover.configs.editStatuses.example'),
     model: 'haiku',               // Use fast model for quick config edits
     systemPromptPreset: 'mini',   // Use focused mini prompt
     inlineExecution: true,        // Execute inline in popover
@@ -379,7 +379,7 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
   // Label configuration context
   'edit-labels': (location) => ({
     context: {
-      label: 'Label Configuration',
+      label: t('common.editPopover.configs.editLabels.label'),
       filePath: `${location}/labels/config.json`,
       context:
         'The user wants to customize session labels (tagging/categorization). ' +
@@ -391,7 +391,7 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
         'Read ~/.zhangyuge-agent/docs/labels.md for full format reference. ' +
         'Confirm clearly when done.',
     },
-    example: 'Add a "Bug" label with red color',
+    example: t('common.editPopover.configs.editLabels.example'),
     model: 'haiku',               // Use fast model for quick config edits
     systemPromptPreset: 'mini',   // Use focused mini prompt
     inlineExecution: true,        // Execute inline in popover
@@ -1025,6 +1025,7 @@ export const EditButton = React.forwardRef<
   HTMLButtonElement,
   React.ComponentPropsWithoutRef<typeof Button>
 >(function EditButton({ className, ...props }, ref) {
+  const { t } = useI18n()
   return (
     <Button
       ref={ref}
@@ -1034,7 +1035,7 @@ export const EditButton = React.forwardRef<
       className={cn("h-8 px-3 rounded-[6px] bg-background shadow-minimal text-foreground/70 hover:text-foreground", className)}
       {...props}
     >
-      Edit
+      {t('common.actions.edit')}
     </Button>
   )
 })
