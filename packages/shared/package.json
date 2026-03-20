@@ -66,7 +66,7 @@
   "dependencies": {
     "@isaacs/ttlcache": "^2.1.4",
     "@leeoniya/ufuzzy": "^1.0.19",
-    "@mariozechner/pi-ai": "0.60.0",
+    "@mariozechner/pi-ai": "0.61.0",
     "@zhangyuge-agent/core": "workspace:*",
     "@zhangyuge-agent/session-tools-core": "workspace:*",
     "bash-parser": "^0.5.0",

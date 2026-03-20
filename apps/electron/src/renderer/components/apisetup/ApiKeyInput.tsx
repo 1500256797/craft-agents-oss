@@ -140,7 +140,7 @@ const COMPAT_ANTHROPIC_DEFAULTS = 'claude-opus-4-6, claude-sonnet-4-6, claude-ha
 const COMPAT_OPENAI_DEFAULTS = 'gpt-5.4, gpt-5.2, gpt-5.1'
 const COMPAT_OPENAI_GATEWAY_DEFAULTS = 'openai/gpt-5.4, openai/gpt-5.2, openai/gpt-5.1'
 const COMPAT_GOOGLE_DEFAULTS = 'gemini-2.5-pro, gemini-2.5-flash, gemini-2.5-flash-lite'
-const COMPAT_MINIMAX_DEFAULTS = 'MiniMax-M2.5, MiniMax-M2.5-highspeed'
+const COMPAT_MINIMAX_DEFAULTS = 'MiniMax-M2.7, MiniMax-M2.7-highspeed, MiniMax-M2.5'
 const COMPAT_KIMI_DEFAULTS = 'k2p5, kimi-k2-thinking'
 const AUTO_MODEL_DEFAULTS = new Set([
   COMPAT_ANTHROPIC_DEFAULTS,

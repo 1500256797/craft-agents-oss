@@ -22,7 +22,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@mariozechner/pi-ai": "0.60.0",
+    "@mariozechner/pi-ai": "0.61.0",
     "@zhangyuge-agent/core": "workspace:*",
     "@zhangyuge-agent/shared": "workspace:*",
     "sharp": "0.34.5",
