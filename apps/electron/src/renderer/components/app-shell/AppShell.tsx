@@ -41,7 +41,7 @@ import { isMac } from "@/lib/platform"
 import { Button } from "@/components/ui/button"
 import { HeaderIconButton } from "@/components/ui/HeaderIconButton"
 import { Separator } from "@/components/ui/separator"
-import { Tooltip, TooltipTrigger, TooltipContent, DocumentFormattedMarkdownOverlay } from "@zhangyuge-agent/ui"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@zhangyuge-agent/ui"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -121,6 +121,7 @@ import { AutomationsListPanel } from "../automations/AutomationsListPanel"
 import { APP_EVENTS, AGENT_EVENTS, type AutomationFilterKind, AUTOMATION_TYPE_TO_FILTER_KIND } from "../automations/types"
 import { useAutomations } from "@/hooks/useAutomations"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { WhatsNewDialog } from "./WhatsNewDialog"
 import { PanelHeader } from "./PanelHeader"
 import { EditPopover, getEditConfig, type EditContextKey } from "@/components/ui/EditPopover"
 import SettingsNavigator from "@/pages/settings/SettingsNavigator"
@@ -550,12 +551,14 @@ function AppShellContent({
   // What's New overlay
   const [showWhatsNew, setShowWhatsNew] = React.useState(false)
   const [releaseNotesContent, setReleaseNotesContent] = React.useState('')
+  const [latestReleaseVersion, setLatestReleaseVersion] = React.useState('')
   const [hasUnseenReleaseNotes, setHasUnseenReleaseNotes] = React.useState(false)
 
   // Check for unseen release notes on mount
   useEffect(() => {
     window.electronAPI.getLatestReleaseVersion().then((latestVersion) => {
       if (!latestVersion) return
+      setLatestReleaseVersion(latestVersion)
       const lastSeen = storage.get(storage.KEYS.whatsNewLastSeenVersion, '')
       setHasUnseenReleaseNotes(lastSeen !== latestVersion)
     })
@@ -1729,12 +1732,17 @@ function AppShellContent({
     setReleaseNotesContent(content)
     setShowWhatsNew(true)
     setHasUnseenReleaseNotes(false)
-    // Update last seen version
-    const latestVersion = await window.electronAPI.getLatestReleaseVersion()
-    if (latestVersion) {
-      storage.set(storage.KEYS.whatsNewLastSeenVersion, latestVersion)
+    let versionToMark = latestReleaseVersion
+    if (!versionToMark) {
+      versionToMark = await window.electronAPI.getLatestReleaseVersion() || ''
+      if (versionToMark) {
+        setLatestReleaseVersion(versionToMark)
+      }
     }
-  }, [])
+    if (versionToMark) {
+      storage.set(storage.KEYS.whatsNewLastSeenVersion, versionToMark)
+    }
+  }, [latestReleaseVersion])
 
   // ============================================================================
   // EDIT POPOVER STATE
@@ -3403,11 +3411,11 @@ function AppShellContent({
         </>
       )}
 
-      {/* What's New overlay */}
-      <DocumentFormattedMarkdownOverlay
-        isOpen={showWhatsNew}
-        onClose={() => setShowWhatsNew(false)}
+      <WhatsNewDialog
+        open={showWhatsNew}
+        onOpenChange={setShowWhatsNew}
         content={releaseNotesContent}
+        version={latestReleaseVersion}
         onOpenUrl={(url) => window.electronAPI.openUrl(url)}
       />
 

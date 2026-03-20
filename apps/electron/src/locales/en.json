@@ -217,6 +217,12 @@
         "settings": "Settings",
         "whatsNew": "What's New"
       },
+      "whatsNewDialog": {
+        "title": "What's New",
+        "latestVersion": "Latest",
+        "empty": "There are no release notes to show right now.",
+        "acknowledge": "Got it"
+      },
       "menu": {
         "markAllRead": "Mark All Read",
         "configureStatuses": "Configure Statuses",

@@ -217,6 +217,12 @@
         "settings": "设置",
         "whatsNew": "新功能"
       },
+      "whatsNewDialog": {
+        "title": "新功能更新",
+        "latestVersion": "最新版本",
+        "empty": "当前还没有可展示的更新内容。",
+        "acknowledge": "我知道了"
+      },
       "menu": {
         "markAllRead": "全部标为已读",
         "configureStatuses": "配置状态",
