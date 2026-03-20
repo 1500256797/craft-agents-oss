@@ -263,6 +263,14 @@
         "noSourcesConfigured": "当前没有配置数据源",
         "noSkillsConfigured": "当前没有配置技能",
         "noAutomationsConfigured": "当前没有配置自动化"
+      },
+      "scheduledTasksPanel": {
+        "title": "定时任务",
+        "description": "用自然语言创建日常总结、周期检查和后续跟进任务。",
+        "emptyTitle": "还没有定时任务",
+        "emptyDescription": "直接描述任务内容和执行时间，应用会把它创建成当前工作区的定时任务。",
+        "create": "创建定时任务",
+        "advanced": "高级配置"
       }
     },
     "freeFormInput": {
@@ -1336,6 +1344,11 @@
           "label": "添加技能",
           "example": "按照我们的代码标准审查 PR",
           "placeholder": "我应该学会做什么？"
+        },
+        "addScheduledTask": {
+          "label": "创建定时任务",
+          "example": "每个工作日上午 9 点检查新的 GitHub issue",
+          "placeholder": "描述任务内容和执行时间"
         },
         "editStatuses": {
           "label": "状态配置",

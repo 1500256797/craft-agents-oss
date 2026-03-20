@@ -87,6 +87,7 @@ export type EditContextKey =
   | 'add-label'
   | 'edit-views'
   | 'edit-tool-icons'
+  | 'add-scheduled-task'
   | 'automation-config'
 
 /**
@@ -354,6 +355,26 @@ function getEditConfigs(t: (key: string) => string): Record<EditContextKey, (loc
     },
     example: t('common.editPopover.configs.addSkill.example'),
     overridePlaceholder: t('common.editPopover.configs.addSkill.placeholder'),
+  }),
+
+  'add-scheduled-task': (location) => ({
+    context: {
+      label: t('common.editPopover.configs.addScheduledTask.label'),
+      filePath: `${location}/automations.json`,
+      context:
+        'The user wants to create a scheduled task in plain language. ' +
+        'Convert their request into a new SchedulerTick automation entry inside automations.json. ' +
+        'If the file does not exist, create a valid automations.json file with version 2 and an automations object. ' +
+        'Prefer adding a new matcher under automations.SchedulerTick instead of modifying unrelated automations. ' +
+        'Set a clear name, derive a valid cron expression, preserve or infer a sensible timezone, and default enabled to true unless the user asks otherwise. ' +
+        'Prefer permissionMode "safe" unless the user explicitly asks for a different mode. ' +
+        'Create a prompt action that preserves the user intent. ' +
+        'Confirm clearly what scheduled task was created.',
+    },
+    example: t('common.editPopover.configs.addScheduledTask.example'),
+    overridePlaceholder: t('common.editPopover.configs.addScheduledTask.placeholder'),
+    model: 'sonnet',
+    systemPromptPreset: 'mini',
   }),
 
   // Status configuration context

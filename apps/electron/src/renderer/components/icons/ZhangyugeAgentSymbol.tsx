@@ -1,4 +1,4 @@
-import brandLogo from "@/assets/logo.svg"
+import brandLogo from "@/assets/logo.png"
 
 interface ZhangyugeAgentSymbolProps {
   className?: string
@@ -13,7 +13,7 @@ export function ZhangyugeAgentSymbol({ className }: ZhangyugeAgentSymbolProps) {
       src={brandLogo}
       alt=""
       aria-hidden="true"
-      className={className}
+      className={className ? `${className} object-contain` : 'object-contain'}
       draggable={false}
     />
   )

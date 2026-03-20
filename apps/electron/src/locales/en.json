@@ -263,6 +263,14 @@
         "noSourcesConfigured": "No sources configured",
         "noSkillsConfigured": "No skills configured",
         "noAutomationsConfigured": "No automations configured"
+      },
+      "scheduledTasksPanel": {
+        "title": "Scheduled Tasks",
+        "description": "Create recurring tasks in plain language for daily summaries, routine checks, and follow-up work.",
+        "emptyTitle": "No scheduled tasks yet",
+        "emptyDescription": "Describe what should run and when, and the app will turn it into a recurring task for this workspace.",
+        "create": "Create Scheduled Task",
+        "advanced": "Advanced Configuration"
       }
     },
     "freeFormInput": {
@@ -1336,6 +1344,11 @@
           "label": "Add Skill",
           "example": "Review PRs following our code standards",
           "placeholder": "What should I learn to do?"
+        },
+        "addScheduledTask": {
+          "label": "Create Scheduled Task",
+          "example": "Every weekday at 9:00, review new GitHub issues",
+          "placeholder": "Describe what should run and when"
         },
         "editStatuses": {
           "label": "Status Configuration",

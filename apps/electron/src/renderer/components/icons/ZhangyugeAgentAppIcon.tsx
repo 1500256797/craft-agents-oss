@@ -1,4 +1,4 @@
-import brandLogo from "@/assets/logo.svg"
+import brandLogo from "@/assets/logo.png"
 
 interface 章鱼哥AIAppIconProps {
   className?: string
@@ -15,7 +15,7 @@ export function 章鱼哥AIAppIcon({ className, size = 64 }: 章鱼哥AIAppIconP
       alt="Logo"
       width={size}
       height={size}
-      className={className}
+      className={className ? `${className} object-contain` : 'object-contain'}
     />
   )
 }

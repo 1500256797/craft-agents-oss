@@ -7,6 +7,7 @@ import { EntityListBadge } from '@/components/ui/entity-list-badge'
 import { useAppShellContext } from '@/context/AppShellContext'
 import { useI18n } from '@/context/I18nContext'
 import { useTransportConnectionState } from '@/hooks/useTransportConnectionState'
+import { ScheduledTasksModulePanel } from './ScheduledTasksModulePanel'
 
 type AgentNavigatorItem =
   | {
@@ -164,6 +165,10 @@ export function ModuleNavigatorPanel({ subpage }: ModuleNavigatorPanelProps) {
         }}
       />
     )
+  }
+
+  if (subpage === 'scheduled-tasks') {
+    return <ScheduledTasksModulePanel />
   }
 
   return (
