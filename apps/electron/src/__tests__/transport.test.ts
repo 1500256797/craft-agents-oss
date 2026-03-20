@@ -6,9 +6,13 @@
  */
 
 import { describe, test, expect, afterEach } from 'bun:test'
+import { randomUUID } from 'node:crypto'
+import { createServer } from 'node:net'
 import { WebSocket } from 'ws'
+import { EVENT_BUFFER_MAX_SIZE, type MessageEnvelope } from '@zhangyuge-agent/shared/protocol'
 import { WsRpcServer } from '../transport/server'
 import { WsRpcClient } from '../transport/client'
+import { serializeEnvelope } from '../transport/codec'
 
 // Helpers to manage cleanup
 let servers: WsRpcServer[] = []
@@ -48,15 +52,46 @@ async function waitForStatus(
   }
 }
 
+async function waitUntil(predicate: () => boolean, timeoutMs = 2000): Promise<void> {
+  const start = Date.now()
+  while (!predicate()) {
+    if (Date.now() - start > timeoutMs) {
+      throw new Error('Condition wait timeout')
+    }
+    await new Promise(r => setTimeout(r, 10))
+  }
+}
+
+async function getAvailablePort(): Promise<number> {
+  return await new Promise((resolve, reject) => {
+    const server = createServer()
+    server.listen(0, '127.0.0.1', () => {
+      const address = server.address()
+      if (typeof address === 'object' && address?.port) {
+        const { port } = address
+        server.close((err) => {
+          if (err) reject(err)
+          else resolve(port)
+        })
+        return
+      }
+      server.close()
+      reject(new Error('Failed to allocate a free port'))
+    })
+    server.on('error', reject)
+  })
+}
+
 /** Create a server + connected client pair. */
 async function createPair(
   serverOpts?: Partial<import('../transport/server').WsRpcServerOptions>,
   clientOpts?: Partial<import('../transport/client').WsRpcClientOptions>,
 ) {
+  const port = serverOpts?.port ?? await getAvailablePort()
   let connectedClientId: string | null = null
   const server = trackServer(new WsRpcServer({
     host: '127.0.0.1',
-    port: 0,
+    port,
     onClientConnected: (info) => { connectedClientId = info.clientId },
     ...serverOpts,
   }))
@@ -90,14 +125,16 @@ describe('handshake', () => {
     expect(client.isConnected).toBe(true)
   })
 
-  test('server assigns random port when port=0', async () => {
-    const server = trackServer(new WsRpcServer({ host: '127.0.0.1', port: 0 }))
+  test('server listens on requested port', async () => {
+    const port = await getAvailablePort()
+    const server = trackServer(new WsRpcServer({ host: '127.0.0.1', port }))
     await server.listen()
-    expect(server.port).toBeGreaterThan(0)
+    expect(server.port).toBe(port)
   })
 
   test('handshake without protocolVersion is rejected', async () => {
-    const server = trackServer(new WsRpcServer({ host: '127.0.0.1', port: 0 }))
+    const port = await getAvailablePort()
+    const server = trackServer(new WsRpcServer({ host: '127.0.0.1', port }))
     await server.listen()
 
     const result = await new Promise<{ code: number; reason: string }>((resolve, reject) => {
@@ -274,7 +311,8 @@ describe('push events', () => {
   })
 
   test('workspace-targeted push only reaches matching clients', async () => {
-    const server = trackServer(new WsRpcServer({ host: '127.0.0.1', port: 0 }))
+    const port = await getAvailablePort()
+    const server = trackServer(new WsRpcServer({ host: '127.0.0.1', port }))
     await server.listen()
 
     const client1 = trackClient(new WsRpcClient(`ws://127.0.0.1:${server.port}`, {
@@ -346,14 +384,190 @@ describe('push events', () => {
 })
 
 // ---------------------------------------------------------------------------
+// Reliable delivery
+// ---------------------------------------------------------------------------
+
+describe('reliable delivery', () => {
+  test('manual reconnect preserves reconnect identity and replays missed events', async () => {
+    let sawDisconnect = false
+    const server = trackServer(new WsRpcServer({
+      host: '127.0.0.1',
+      port: await getAvailablePort(),
+      onClientDisconnected: () => {
+        if (sawDisconnect) return
+        sawDisconnect = true
+        server.push('stream', { to: 'workspace', workspaceId: 'test-workspace' }, 'missed-during-manual-reconnect')
+      },
+    }))
+    await server.listen()
+
+    const client = trackClient(new WsRpcClient(`ws://127.0.0.1:${server.port}`, {
+      workspaceId: 'test-workspace',
+      autoReconnect: false,
+    }))
+
+    const received: string[] = []
+    const reconnectStates: boolean[] = []
+    client.on('stream', (value: string) => received.push(value))
+    client.on('__transport:reconnected', (isStale: boolean) => reconnectStates.push(isStale))
+
+    client.connect()
+    await waitConnected(client)
+
+    server.push('stream', { to: 'workspace', workspaceId: 'test-workspace' }, 'before-reconnect')
+    await waitUntil(() => received.includes('before-reconnect'))
+
+    client.reconnectNow()
+
+    await waitConnected(client)
+    await waitUntil(() => reconnectStates.length === 1)
+    await waitUntil(() => received.includes('missed-during-manual-reconnect'))
+
+    expect(reconnectStates).toEqual([false])
+    expect(received).toEqual(['before-reconnect', 'missed-during-manual-reconnect'])
+  })
+
+  test('reconnect replay ignores events targeted at other clients', async () => {
+    const port = await getAvailablePort()
+    const server = trackServer(new WsRpcServer({ host: '127.0.0.1', port }))
+    await server.listen()
+
+    const clientA = trackClient(new WsRpcClient(`ws://127.0.0.1:${server.port}`, {
+      workspaceId: 'ws-a',
+      autoReconnect: false,
+    }))
+    const clientB = trackClient(new WsRpcClient(`ws://127.0.0.1:${server.port}`, {
+      workspaceId: 'ws-b',
+      autoReconnect: false,
+    }))
+
+    const receivedA: string[] = []
+    const receivedB: string[] = []
+    const reconnectStates: boolean[] = []
+
+    clientA.on('stream', (value: string) => receivedA.push(value))
+    clientB.on('stream', (value: string) => receivedB.push(value))
+    clientA.on('__transport:reconnected', (isStale: boolean) => reconnectStates.push(isStale))
+
+    clientA.connect()
+    clientB.connect()
+    await waitConnected(clientA)
+    await waitConnected(clientB)
+
+    server.push('stream', { to: 'workspace', workspaceId: 'ws-a' }, 'before-a')
+    await waitUntil(() => receivedA.includes('before-a'))
+
+    ;((clientA as any).ws as WebSocket).close()
+    await waitForStatus(clientA, (status) => status === 'disconnected')
+
+    server.push('stream', { to: 'workspace', workspaceId: 'ws-b' }, 'only-b')
+    server.push('stream', { to: 'workspace', workspaceId: 'ws-a' }, 'missed-a')
+
+    await waitUntil(() => receivedB.includes('only-b'))
+
+    clientA.reconnectNow()
+
+    await waitConnected(clientA)
+    await waitUntil(() => reconnectStates.length === 1)
+    await waitUntil(() => receivedA.includes('missed-a'))
+
+    expect(reconnectStates).toEqual([false])
+    expect(receivedA).toEqual(['before-a', 'missed-a'])
+    expect(receivedB).toEqual(['only-b'])
+    expect((clientA as any).lastSeenSeq).toBe(2)
+    expect((clientB as any).lastSeenSeq).toBe(1)
+  })
+
+  test('marks reconnect stale when the retained buffer evicts missed events', async () => {
+    const port = await getAvailablePort()
+    const server = trackServer(new WsRpcServer({ host: '127.0.0.1', port }))
+    await server.listen()
+
+    const client = trackClient(new WsRpcClient(`ws://127.0.0.1:${server.port}`, {
+      workspaceId: 'test-workspace',
+      autoReconnect: false,
+    }))
+
+    const received: string[] = []
+    const reconnectStates: boolean[] = []
+    client.on('stream', (value: string) => received.push(value))
+    client.on('__transport:reconnected', (isStale: boolean) => reconnectStates.push(isStale))
+
+    client.connect()
+    await waitConnected(client)
+
+    server.push('stream', { to: 'workspace', workspaceId: 'test-workspace' }, 'before-stale')
+    await waitUntil(() => received.includes('before-stale'))
+
+    ;((client as any).ws as WebSocket).close()
+    await waitForStatus(client, (status) => status === 'disconnected')
+
+    for (let i = 0; i < EVENT_BUFFER_MAX_SIZE + 25; i++) {
+      server.push('stream', { to: 'workspace', workspaceId: 'test-workspace' }, `missed-${i}`)
+    }
+
+    client.reconnectNow()
+
+    await waitConnected(client)
+    await waitUntil(() => reconnectStates.length === 1)
+
+    expect(reconnectStates).toEqual([true])
+    expect(received).toEqual(['before-stale'])
+  })
+
+  test('sequence_ack evicts acknowledged buffered events', async () => {
+    const { server, client, clientId } = await createPair()
+
+    server.push('stream', { to: 'workspace', workspaceId: 'test-workspace' }, 'one')
+    server.push('stream', { to: 'workspace', workspaceId: 'test-workspace' }, 'two')
+
+    await waitUntil(() => (client as any).lastSeenSeq === 2)
+
+    const ack: MessageEnvelope = {
+      id: randomUUID(),
+      type: 'sequence_ack',
+      lastSeq: 2,
+    }
+    ;((client as any).ws as WebSocket).send(serializeEnvelope(ack))
+
+    await waitUntil(() => ((server as any).clients.get(clientId)?.eventBuffer.length ?? -1) === 0)
+
+    expect((server as any).clients.get(clientId)?.lastAckedSeq).toBe(2)
+  })
+
+  test('safe send skips non-open sockets', () => {
+    const client = trackClient(new WsRpcClient('ws://127.0.0.1:1', {
+      autoReconnect: false,
+    }))
+
+    let sendCalls = 0
+    const fakeWs = {
+      OPEN: 1,
+      readyState: 2,
+      send: () => { sendCalls += 1 },
+    }
+
+    const sent = (client as any).trySendEnvelope(fakeWs, {
+      id: randomUUID(),
+      type: 'sequence_ack',
+      lastSeq: 1,
+    } satisfies MessageEnvelope)
+
+    expect(sent).toBe(false)
+    expect(sendCalls).toBe(0)
+  })
+})
+
+// ---------------------------------------------------------------------------
 // Auth
 // ---------------------------------------------------------------------------
 
 describe('auth', () => {
   test('server with requireAuth rejects clients without token', async () => {
+    const port = await getAvailablePort()
     const server = trackServer(new WsRpcServer({
       host: '127.0.0.1',
-      port: 0,
+      port,
       requireAuth: true,
       validateToken: async (t) => t === 'valid-token',
     }))
@@ -370,9 +584,10 @@ describe('auth', () => {
   })
 
   test('server with requireAuth accepts valid token', async () => {
+    const port = await getAvailablePort()
     const server = trackServer(new WsRpcServer({
       host: '127.0.0.1',
-      port: 0,
+      port,
       requireAuth: true,
       validateToken: async (t) => t === 'valid-token',
     }))
@@ -389,9 +604,10 @@ describe('auth', () => {
   })
 
   test('server with requireAuth rejects invalid token', async () => {
+    const port = await getAvailablePort()
     const server = trackServer(new WsRpcServer({
       host: '127.0.0.1',
-      port: 0,
+      port,
       requireAuth: true,
       validateToken: async (t) => t === 'valid-token',
     }))
@@ -423,9 +639,10 @@ describe('connection state', () => {
   })
 
   test('classifies invalid token as auth failure', async () => {
+    const port = await getAvailablePort()
     const server = trackServer(new WsRpcServer({
       host: '127.0.0.1',
-      port: 0,
+      port,
       requireAuth: true,
       validateToken: async (t) => t === 'valid-token',
     }))
@@ -455,9 +672,10 @@ describe('connection state', () => {
   })
 
   test('captures websocket close code and reason for handshake failures', async () => {
+    const port = await getAvailablePort()
     const server = trackServer(new WsRpcServer({
       host: '127.0.0.1',
-      port: 0,
+      port,
       requireAuth: true,
       validateToken: async (t) => t === 'valid-token',
     }))
@@ -481,7 +699,8 @@ describe('connection state', () => {
 
 describe('edge cases', () => {
   test('invoke queues until handshake completes', async () => {
-    const server = trackServer(new WsRpcServer({ host: '127.0.0.1', port: 0 }))
+    const port = await getAvailablePort()
+    const server = trackServer(new WsRpcServer({ host: '127.0.0.1', port }))
     await server.listen()
 
     server.handle('ping', async () => 'pong')
@@ -496,7 +715,8 @@ describe('edge cases', () => {
   })
 
   test('invoke without explicit connect auto-starts connection', async () => {
-    const server = trackServer(new WsRpcServer({ host: '127.0.0.1', port: 0 }))
+    const port = await getAvailablePort()
+    const server = trackServer(new WsRpcServer({ host: '127.0.0.1', port }))
     await server.listen()
 
     server.handle('ping', async () => 'pong')

@@ -6,6 +6,8 @@ import type { FileAttachment, LoadedSource, PermissionMode } from '../../shared/
 
 export const mockElectronAPI = {
   isDebugMode: async () => true,
+  getSystemWarnings: async () => ({ vcredistMissing: false }),
+  onReconnected: () => () => {},
 
   openFileDialog: async () => {
     console.log('[Playground] openFileDialog called')

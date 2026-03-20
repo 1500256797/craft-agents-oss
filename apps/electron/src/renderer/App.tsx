@@ -27,6 +27,7 @@ import { useUpdateChecker } from '@/hooks/useUpdateChecker'
 import { NavigationProvider } from '@/contexts/NavigationContext'
 import { navigate, routes } from './lib/navigate'
 import { stripMarkdown } from './utils/text'
+import { getSessionsToRefreshAfterStaleReconnect } from './lib/reconnect-recovery'
 import { extractWorkspaceSlugFromPath } from '@zhangyuge-agent/shared/utils/workspace-slug'
 import { initRendererPerf } from './lib/perf'
 import {
@@ -37,6 +38,7 @@ import {
   sessionAtomFamily,
   sessionMetaMapAtom,
   sessionIdsAtom,
+  loadedSessionsAtom,
   backgroundTasksAtomFamily,
   extractSessionMeta,
   windowWorkspaceIdAtom,
@@ -58,6 +60,7 @@ import {
 } from '@zhangyuge-agent/ui'
 import { useLinkInterceptor, type FilePreviewState } from '@/hooks/useLinkInterceptor'
 import { useTransportConnectionState } from '@/hooks/useTransportConnectionState'
+import { useStaleSessionRecovery } from '@/hooks/useStaleSessionRecovery'
 import { TransportConnectionBanner, shouldShowTransportConnectionBanner } from '@/components/app-shell/TransportConnectionBanner'
 import { getFileManagerName } from '@/lib/platform'
 import { ActionRegistryProvider } from '@/actions'
@@ -326,7 +329,97 @@ export default function App() {
   }, [applyPermissionModeState])
 
   // Event processor hook - handles all agent events through pure functions
-  const { processAgentEvent } = useEventProcessor()
+  const { processAgentEvent, clearStreamingState } = useEventProcessor()
+
+  const syncSessionOptionsFromSession = useCallback((session: Session) => {
+    setSessionOptions(prev => {
+      const next = new Map(prev)
+      const current = next.get(session.id)
+      const normalizedThinking = normalizeThinkingLevel(session.thinkingLevel) ?? 'medium'
+      const merged = {
+        ...defaultSessionOptions,
+        ...current,
+        permissionMode: session.permissionMode ?? defaultSessionOptions.permissionMode,
+        thinkingLevel: normalizedThinking,
+      }
+
+      const hasNonDefaultMode = merged.permissionMode !== defaultSessionOptions.permissionMode
+      const hasNonDefaultThinking = merged.thinkingLevel !== 'medium'
+
+      if (!hasNonDefaultMode && !hasNonDefaultThinking && merged.permissionModeVersion == null) {
+        next.delete(session.id)
+      } else {
+        next.set(session.id, merged)
+      }
+
+      return next
+    })
+  }, [])
+
+  const refreshSessionFromServer = useCallback(async (sessionId: string): Promise<boolean> => {
+    try {
+      const fresh = await window.electronAPI.getSessionMessages(sessionId)
+      if (!fresh) return false
+
+      clearStreamingState(sessionId)
+      updateSessionDirect(sessionId, () => fresh)
+      syncSessionOptionsFromSession(fresh)
+      void reconcilePermissionModeState(sessionId)
+      return true
+    } catch (err) {
+      console.error(`[App] Failed to refresh session ${sessionId}:`, err)
+      return false
+    }
+  }, [clearStreamingState, updateSessionDirect, syncSessionOptionsFromSession, reconcilePermissionModeState])
+
+  const refreshSessionListMetadataFromServer = useCallback(async (): Promise<Map<string, SessionMeta> | null> => {
+    try {
+      const sessions = await window.electronAPI.getSessions()
+      const loadedSessionIds = store.get(loadedSessionsAtom)
+      const currentIds = store.get(sessionIdsAtom)
+      const latestIds = new Set(sessions.map(session => session.id))
+
+      for (const staleSessionId of currentIds) {
+        if (!latestIds.has(staleSessionId)) {
+          removeSession(staleSessionId)
+        }
+      }
+
+      for (const session of sessions) {
+        const currentSession = store.get(sessionAtomFamily(session.id))
+        const shouldPreserveMessages = !!currentSession && loadedSessionIds.has(session.id)
+        const nextSession = shouldPreserveMessages && currentSession
+          ? { ...session, messages: currentSession.messages }
+          : session
+
+        store.set(sessionAtomFamily(session.id), nextSession)
+        syncSessionOptionsFromSession(session)
+        void reconcilePermissionModeState(session.id)
+      }
+
+      const nextMetaMap = new Map<string, SessionMeta>()
+      for (const session of sessions) {
+        nextMetaMap.set(session.id, extractSessionMeta(session))
+      }
+      store.set(sessionMetaMapAtom, nextMetaMap)
+
+      const nextIds = sessions
+        .slice()
+        .sort((a, b) => (b.lastMessageAt || 0) - (a.lastMessageAt || 0))
+        .map(session => session.id)
+      store.set(sessionIdsAtom, nextIds)
+
+      return nextMetaMap
+    } catch (err) {
+      console.error('[App] Failed to refresh session list metadata after reconnect:', err)
+      return null
+    }
+  }, [store, removeSession, syncSessionOptionsFromSession, reconcilePermissionModeState])
+
+  const { trackSessionActivity } = useStaleSessionRecovery({
+    store,
+    refreshSessionFromServer,
+  })
 
   const DRAFT_SAVE_DEBOUNCE_MS = 500
 
@@ -463,6 +556,18 @@ export default function App() {
 
     window.electronAPI.getWorkspaces().then(setWorkspaces)
     window.electronAPI.getNotificationsEnabled().then(setNotificationsEnabled)
+    window.electronAPI.getSystemWarnings().then((warnings) => {
+      if (warnings.vcredistMissing) {
+        toast.warning('Microsoft Visual C++ Redistributable not found', {
+          description: 'Document tools (PDF, PPTX, DOCX, XLSX) require it to work. Restart after installing.',
+          duration: Infinity,
+          action: {
+            label: 'Install',
+            onClick: () => window.electronAPI.openUrl(warnings.downloadUrl ?? 'https://aka.ms/vs/17/release/vc_redist.x64.exe'),
+          },
+        })
+      }
+    }).catch(() => {})
     window.electronAPI.getSessions().then(async (loadedSessions) => {
       // Initialize per-session atoms and metadata map
       // NOTE: No sessionsAtom used - sessions are only in per-session atoms
@@ -682,7 +787,7 @@ export default function App() {
               } else {
                 addSession(createdSession)
               }
-              populateSessionOptions(createdSession)
+              syncSessionOptionsFromSession(createdSession)
               return
             }
             return window.electronAPI.getSessions().then(initializeSessions)
@@ -697,6 +802,8 @@ export default function App() {
       }
 
       const agentEvent = event as unknown as AgentEvent
+
+      trackSessionActivity(sessionId)
 
       // Dispatch window event when compaction completes
       // This allows FreeFormInput to sequence the plan execution message after compaction
@@ -788,6 +895,7 @@ export default function App() {
     return cleanup
   }, [
     processAgentEvent,
+    trackSessionActivity,
     windowWorkspaceId,
     store,
     updateSessionDirect,
@@ -795,9 +903,31 @@ export default function App() {
     initializeSessions,
     addSession,
     removeSession,
+    syncSessionOptionsFromSession,
     applyPermissionModeState,
     reconcilePermissionModeState,
   ])
+
+  useEffect(() => {
+    const cleanup = window.electronAPI.onReconnected(async (isStale: boolean) => {
+      if (!isStale) {
+        console.info('[App] Reconnected with event replay — no refresh needed')
+        return
+      }
+
+      console.warn('[App] Stale reconnect — refreshing session metadata and active/processing sessions')
+
+      const refreshedMetaMap = await refreshSessionListMetadataFromServer()
+      const metaMap = refreshedMetaMap ?? store.get(sessionMetaMapAtom)
+      const refreshIds = getSessionsToRefreshAfterStaleReconnect(metaMap, sessionSelection.selected)
+
+      for (const sessionId of refreshIds) {
+        await refreshSessionFromServer(sessionId)
+      }
+    })
+
+    return cleanup
+  }, [store, sessionSelection.selected, refreshSessionFromServer, refreshSessionListMetadataFromServer])
 
   // Listen for menu bar events
   useEffect(() => {
@@ -819,30 +949,14 @@ export default function App() {
 
   // Populate sessionOptions for a session with non-default permission mode or thinking level.
   // Centralised helper used by all session creation paths (create, branch, event handler).
-  const populateSessionOptions = useCallback((session: Session) => {
-    const hasNonDefaultMode = session.permissionMode && session.permissionMode !== 'ask'
-    const normalizedThinking = normalizeThinkingLevel(session.thinkingLevel)
-    const hasNonDefaultThinking = normalizedThinking && normalizedThinking !== 'medium'
-    if (hasNonDefaultMode || hasNonDefaultThinking) {
-      setSessionOptions(prev => {
-        const next = new Map(prev)
-        next.set(session.id, {
-          permissionMode: session.permissionMode ?? 'ask',
-          thinkingLevel: normalizedThinking ?? 'medium',
-        })
-        return next
-      })
-    }
-  }, [])
-
   const handleCreateSession = useCallback(async (workspaceId: string, options?: import('../shared/types').CreateSessionOptions): Promise<Session> => {
     const session = await window.electronAPI.createSession(workspaceId, options)
     // Add to per-session atom and metadata map (no sessionsAtom)
     addSession(session)
-    populateSessionOptions(session)
+    syncSessionOptionsFromSession(session)
 
     return session
-  }, [addSession, populateSessionOptions])
+  }, [addSession, syncSessionOptionsFromSession])
 
   // Deep link navigation is initialized later after handleInputChange is defined
 

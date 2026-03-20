@@ -28,6 +28,7 @@ import {
   LOCAL_CLIENT_CAPABILITIES,
 } from '@zhangyuge-agent/server-core/transport'
 import type { ConfirmDialogSpec, FileDialogSpec } from '@zhangyuge-agent/server-core/transport'
+import type { ElectronAPI } from '../shared/types'
 
 // Connection details — from env (remote server) or main process (local)
 let wsUrl: string
@@ -162,6 +163,9 @@ if (wsMode === 'remote') {
 }
 ;(api as any).reconnectTransport = async () => {
   client.reconnectNow()
+}
+;(api as any).onReconnected = (callback: (isStale: boolean) => void) => {
+  return client.on('__transport:reconnected', callback)
 }
 
 // ── performOAuth ─────────────────────────────────────────────────────────
@@ -309,5 +313,10 @@ if (wsMode === 'remote') {
     callbackServer?.close()
   }
 }
+
+;(api as ElectronAPI).getSystemWarnings = async () => ({
+  vcredistMissing: process.env.ZHANGYUGE_AGENT_VCREDIST_MISSING === '1',
+  downloadUrl: process.env.ZHANGYUGE_AGENT_VCREDIST_URL,
+})
 
 contextBridge.exposeInMainWorld('electronAPI', api)
